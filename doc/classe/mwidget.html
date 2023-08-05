@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MWidget</title>
+    </head>
+    <body>
+        <h1>MWidget</h1>
+        <div>
+            MWidget est la classe principale pour définir un <a href="base.html">widget</a>.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>)</br>
+            Construit un objet widget.
+        </div>
+        <h3 id="getHeight">getHeight()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la hauteur du widget.
+        </div>
+        <h3 id="getParent">getParent()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#parent">parent</a> du widget.
+        </div>
+        <h3 id="getWidth">getWidth()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la largeur du widget.
+        </div>
+        <h3 id="getX">getX()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la coordonnée X du widget.
+        </div>
+        <h3 id="getY">getY()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la coordonnée Y du widget.
+        </div>
+        <h3 id="move">move()</h3>
+        <div>
+            Paramètres : newX (nouvelle coordonnée X du widget), newY(nouvelle coordonnée Y du widget)</br>
+            Change les coordonnées du widget X et Y à newX et newY.
+        </div>
+        <h3 id="resize">resize()</h3>
+        <div>
+            Paramètres : newWidth (nouvelle largeur du widget), newHeight (nouvelle hauteur du widget)</br>
+            Change la hauteur et la largeur du widget.
+        </div>
+        <h3 id="setHeight">setHeight()</h3>
+        <div>
+            Paramètres : newHeight (nouvelle hauteur du widget)</br>
+            Change la hauteur du widget pour newHeight.
+        </div>
+        <h3 id="setParent">setParent()</h3>
+        <div>
+            Paramètres : newParent (nouveau parent)</br>
+            Change le <a href="#parent">parent</a> du widget à newParent.
+        </div>
+        <h3 id="setWidth">setWidth()</h3>
+        <div>
+            Paramètres : newWidth (nouvelle largeur du widget)</br>
+            Change la largeur du widget pour newWidth.
+        </div>
+        <h3 id="setX">setX()</h3>
+        <div>
+            Paramètres : newX (nouvelle coordonnée X du widget)</br>
+            Change la coordonnée X du widget.
+        </div>
+        <h3 id="setY">setY()</h3>
+        <div>
+            Paramètres : newY (nouvelle coordonnée Y du widget)</br>
+            Change la coordonnée Y du widget.
+        </div>
+        <h3 id = "_render">_render()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
+            Si <a href="#shouldModify">shouldModify</a> est "true", la render normale à lieu. Sinon, il retourne <a href="#_lastSurface">_lastSurface</a>.
+        </div>
+        <h3 id = "_renderAfterHierarchy">_renderAfterHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
+            Cette fonction est appelée après le render de la hiérarchie dans <a href="#_render">_render</a>.
+            Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
+        </div>
+        <h3 id = "_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
+            Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.
+            Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
+        </div>
+
+        <h2>Variables</h2>
+        <h3 id = "height">height</h3>
+        <div>
+            Hauteur du widget.
+        </div>
+        <h3 id = "parent">parent</h3>
+        <div>
+            Parent du widget selon le système de <a href="base.html">hiérarchie</a>.
+        </div>
+        <h3 id = "shouldModify">shouldModify</h3>
+        <div>
+            Booléen qui indique si le widget doit se <a href="#_render">render</a> pendant cette frame ou non.
+        </div>
+        <h3 id = "width">width</h3>
+        <div>
+            Largeur du widget.
+        </div>
+        <h3 id = "x">x</h3>
+        <div>
+            Coordonnée x du widget.
+        </div>
+        <h3 id = "y">y</h3>
+        <div>
+            Coordonnée y du widget.
+        </div>
+        <h3 id = "_lastSurface">_lastSurface</h3>
+        <div>
+            Surface correspondant à la dernière modification de la surface selon <a href="#_render">render</a>.
+        </div>
+    </body>
+</html>
