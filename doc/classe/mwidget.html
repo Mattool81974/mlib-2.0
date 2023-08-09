@@ -17,6 +17,11 @@
             Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>)</br>
             Construit un objet widget.
         </div>
+        <h3 id = "containsChild">containsChild()</h3>
+        <div>
+            Paramètres : enfant (widget à chercher)</br>
+            Retourne -1 si l'enfant n'est pas dans la liste <a href="#_children">_children</a> ou l'index si l'enfant y est.
+        </div>
         <h3 id="getHeight">getHeight()</h3>
         <div>
             Paramètres : aucun</br>
@@ -82,10 +87,15 @@
             Paramètres : newY (nouvelle coordonnée Y du widget)</br>
             Change la coordonnée Y du widget.
         </div>
-        <h3 id = "_addChild">_addChild</h3>
+        <h3 id = "_addChild">_addChild()</h3>
         <div>
             Paramètres : enfant (widget à ajouter en enfant)</br>
             Ajoute l'enfant "enfant" à la liste d'enfant <a href="#_children">_children</a> et configure le tout.
+        </div>
+        <h3 id = "_removeChild">_removeChild()</h3>
+        <div>
+            Paramètres : enfant (widget à supprimer en enfant)</br>
+            Supprime l'enfant "enfant" de la liste  d'enfant <a href="#_children">_children</a>.
         </div>
         <h3 id = "_render">_render()</h3>
         <div>
