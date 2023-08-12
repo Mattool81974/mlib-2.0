@@ -14,13 +14,18 @@
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>)</br>
+            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), backgroundColor = (0, 0, 0) (assignée à la variable <a href="#backgroundColor">backgroundColor</a>, basiquement mis à (0,0,0,), soit noir)</br>
             Construit un objet widget.
         </div>
         <h3 id = "containsChild">containsChild()</h3>
         <div>
             Paramètres : enfant (widget à chercher)</br>
             Retourne -1 si l'enfant n'est pas dans la liste <a href="#_children">_children</a> ou l'index si l'enfant y est.
+        </div>
+        <h3 id="getBackgroundColor">getBackgroundColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la couleur d'arrière plan <a href="#backgroundColor">backgroundColor</a> du widget.
         </div>
         <h3 id="getHeight">getHeight()</h3>
         <div>
@@ -36,6 +41,16 @@
         <div>
             Paramètres : aucun</br>
             Retourne le <a href="#parent">parent</a> du widget.
+        </div>
+        <h3 id="getRect">getRect()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#x">x</a>, <a href="#y">y</a>, <a href="#width">width</a> et <a href="#height">height</a> sous la forme (x, y, width, height).
+        </div>
+        <h3 id="getShouldModify">getShouldModify()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la valeur de <a href="#shouldModify">shouldModify</a> du widget.
         </div>
         <h3 id="getWidth">getWidth()</h3>
         <div>
@@ -62,6 +77,11 @@
             Paramètres : newWidth (nouvelle largeur du widget), newHeight (nouvelle hauteur du widget)</br>
             Change la hauteur et la largeur du widget.
         </div>
+        <h3 id="setBackgroundColor">setBackgroundColor()</h3>
+        <div>
+            Paramètres : backgroundColor (nouvelle couleur d'arrière plan)</br>
+            Change la couleur d'arrière plan <a href="#backgroundColor">backgroundColor</a> du widget pour backgroundColor.
+        </div>
         <h3 id="setHeight">setHeight()</h3>
         <div>
             Paramètres : newHeight (nouvelle hauteur du widget)</br>
@@ -76,6 +96,11 @@
         <div>
             Paramètres : newWidth (nouvelle largeur du widget)</br>
             Change la largeur du widget pour newWidth.
+        </div>
+        <h3 id="setShouldModify">setShouldModify()</h3>
+        <div>
+            Paramètres : shouldModify (nouvelle valeur de <a href="#shouldModify">shouldModify</a>)</br>
+            Modifie <a href="#shouldModify">shouldModify</a> en configurant aussi l'état des parents.
         </div>
         <h3 id="setX">setX()</h3>
         <div>
@@ -99,8 +124,8 @@
         </div>
         <h3 id = "_render">_render()</h3>
         <div>
-            Paramètres : surface (surface parent)</br>
-            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
+            Paramètres : aucun</br>
+            Fait le rendu du widget et retourne le rendu final.<br>
             Si <a href="#shouldModify">shouldModify</a> est "true", la render normale à lieu. Sinon, il retourne <a href="#_lastSurface">_lastSurface</a>.
         </div>
         <h3 id = "_renderAfterHierarchy">_renderAfterHierarchy()</h3>
@@ -117,8 +142,18 @@
             Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.
             Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
         </div>
+        <h3 id = "_renderHierarchy">_renderHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec la hiérarchie du widget et retourne "surface" mis à jour.<br>
+            Cette fonction est appelée entre <a href="#_renderBeforeHierarchy">_renderBeforeHierarchy()</a> et <a href="#_renderAfterHierarchy">_renderAfterHierarchy()</a>.
+        </div>
 
         <h2>Variables</h2>
+        <h3 id = "backgroundColor">backgroundColor</h3>
+        <div>
+            Couleur d'arrière plan du widget (avec le format RGB dans un tuple).
+        </div>
         <h3 id = "height">height</h3>
         <div>
             Hauteur du widget.
@@ -154,6 +189,12 @@
         <h3 id = "_lastSurface">_lastSurface</h3>
         <div>
             Surface correspondant à la dernière modification de la surface selon <a href="#_render">render</a>.
+        </div>
+        <h3 id = "_type">_type</h3>
+        <div>
+            Nom (de type str) pour décrire le type du widget.</br>
+            Voici les différents types :</br>
+            -MApp : représente les widgets de classe <a href="./mapp.html">MApp</a>.
         </div>
     </body>
 </html>

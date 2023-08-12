@@ -14,22 +14,82 @@
         <h2>Fonctions</h2>
         <h3>__init__()</h3>
         <div>
-            Paramètres : pygameWindow (assignée à la variable <a href="#_pygameWindow">pygameWindow</a>)</br>
+            Paramètres : pygameWindow (assignée à la variable <a href="#_pygameWindow">pygameWindow</a>), windowTitle (assignée à la variable <a href="#windowTitle">windowTitle</a>), windowWidth (défini la largeur de la fenêtre), windowHeight (défini la hauteur de la fenêtre), bakcgroundColor (assignée à la variable <a href="./mwidget.html#backgroundColor">backgroundColor</a> de <a href="./mwidget.html">mwidget</a>), printFps (assignée à la variable <a href="#printFps">printFps</a>)</br>
             Crée la fenêtre sur lequel effectuer les modifications graphiques.
         </div>
-        <h3>frame()</h3>
+        <h3 id="frame">frame()</h3>
         <div>
             Paramètres : Aucun</br>
             Effectue toutes les actions de la fenêtre graphique.
         </div>
-        <h3>frameEvent()</h3>
+        <h3 id="frameEvent">frameEvent()</h3>
         <div>
             Paramètres : Aucun</br>
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux <a href="../base.html#event">évènements</a>.</br>
+            Cette fonction s'occupe aussi d'actualiser le <a href="#deltaTime">deltaTime</a> puis <a href="#fps">fps</a>.</br>
             Il est FORTEMENT conseillé d'appeler cette fonction au début d'une frame.
+        </div>
+        <h3 id="frameGraphics">frameGraphics()</h3>
+        <div>
+            Paramètres : Aucun</br>
+            Effectue toutes les actions de la fenêtre graphique qui correspondent aux graphismes.</br>
+            Il est FORTEMENT conseillé d'appeler cette fonction à la fin d'une frame.
+        </div>
+        <h3 id="getDeltaTime">getDeltaTime()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#deltaTime">deltaTime</a>.
+        </div>
+        <h3 id="getFps">getFps()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#fps">fps</a>.
+        </div>
+        <h3 id="getPrintFps">getPrintFps()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#printFps">printFps</a>.
+        </div>
+        <h3 id="setPrintFps">setPrintFps()</h3>
+        <div>
+            Paramètres : printFps (nouvelle valeur de <a href="#printFps">printFps</a>)</br>
+            Change la valeur de <a href="#printFps">printFps</a>.
+        </div>
+        <h3 id="setWindowTitle">setWindowTitle()</h3>
+        <div>
+            Paramètres : windowTitle (nouveau titre de la fenêtre)</br>
+            Change le <a href="#windowTitle">titre</a> de la fenêtre.
         </div>
 
         <h2>Variables</h2>
+        <h3 id = "deltaTime">deltaTime</h3>
+        <div>
+            Temps entre la dernière <a href="#frameEvent">frame évènement</a> et la <a href="#frameEvent">frame évènement</a> actuel.
+        </div>
+        <h3 id = "fps">fps</h3>
+        <div>
+            Nombre de frames par secondes.
+        </div>
+        <h3 id = "printFps">fps</h3>
+        <div>
+            Booléen qui détermine si le MApp print le nombre de FPS à chaque updates de <a href="#fps">fps</a>.
+        </div>
+        <h3 id = "windowTitle">windowTitle</h3>
+        <div>
+            Texte affiché en haut de la fenêtre graphique.
+        </div>
+        <h3 id = "_deltaTimeCache">deltaTime</h3>
+        <div>
+            Variable cacher pour permettre d'actualiser <a href="#deltaTime">deltaTime</a>.
+        </div>
+        <h3 id = "_fpsCount">fpsCount</h3>
+        <div>
+            Nombre de frames depuis la dernière update de <a href="#fps">fps</a>.
+        </div>
+        <h3 id = "_fpsDuration">fpsDuration</h3>
+        <div>
+            Nombre de secondes depuis la dernière update de <a href="#fps">fps</a>.
+        </div>
         <h3 id = "_pygameWindow">pygameWindow</h3>
         <div>
             Fenêtre pygame de base ou effectuer les modifications.
