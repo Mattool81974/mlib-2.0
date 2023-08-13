@@ -20,6 +20,9 @@ for i in range(carreTaille[0]):
         widgetsSub.append(widget)
     widgets.append(widgetsSub)
 
+for i in mapp.getWidgets():
+    print(i.getID())
+
 def carreCentral(color = (0, 0, 0)):
     widgets[floor(carreTaille[0]/2)][floor(carreTaille[1]/2)].setBackgroundColor(color)
 

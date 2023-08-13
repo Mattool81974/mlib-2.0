@@ -27,6 +27,9 @@ class MWidget:
         if parent != 0:
             self.setParent(parent)
 
+        if type != "MApp" and self.parent != 0: #Register the widget into the MApp object
+            self.parent._declaringWidget(self)
+
     def containsChild(self, id): #Return if the widget contains the child with the id
         for i1, i2 in enumerate(self._children): #Search through all the children to find the one with the good id
             if i2.getID() == id:
@@ -108,6 +111,9 @@ class MWidget:
     def _addChild(self, child): #Add a child to the widget
         if self.containsChild(child.getID()) == -1:
             self._children.append(child)
+
+    def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp (function defined in MApp) or pass hit to his parent
+        self.parent._declaringWidget(widget)
     
     def _removeChild(self, child): #Remove a child to the widget
         id = self.containsChild(child.getId())
@@ -156,6 +162,7 @@ class MApp(MWidget):
         self._fpsCount = 0
         self._fpsDuration = 0
         self._pygameWindow = pygameWindow
+        self._widgets = []
 
     def frame(self): #Do a frame in the application
         self.frameEvent()
@@ -194,6 +201,9 @@ class MApp(MWidget):
     def getPrintFps(self): #Return printFps
         return self.printFps
     
+    def getWidgets(self): #Return _widget
+        return self._widgets
+    
     def setPrintFps(self, printFps): #Change the value of printFps
         self.printFps = printFps
 
@@ -201,3 +211,14 @@ class MApp(MWidget):
         self.windowTitle = windowTitle
 
         pygame.display.set_caption(windowTitle)
+
+    def _containsWidget(self, widget): #Return if a widget is stored into _widgets
+        for i in self._widgets:
+            if i.getID() == widget.getID():
+                return True
+        return False
+
+    def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp or pass hit to his parent (function defined in MWidget)
+        if not self._containsWidget(widget):
+            self._widgets.append(widget)
+            widget._mapp = self

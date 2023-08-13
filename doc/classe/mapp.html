@@ -50,6 +50,11 @@
             Paramètres : aucun</br>
             Retourne <a href="#printFps">printFps</a>.
         </div>
+        <h3 id="getWidgets">getWidgets()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#_widgets">_widgets</a>.
+        </div>
         <h3 id="setPrintFps">setPrintFps()</h3>
         <div>
             Paramètres : printFps (nouvelle valeur de <a href="#printFps">printFps</a>)</br>
@@ -59,6 +64,16 @@
         <div>
             Paramètres : windowTitle (nouveau titre de la fenêtre)</br>
             Change le <a href="#windowTitle">titre</a> de la fenêtre.
+        </div>
+        <h3 id = "_containsWidget">_containsWidget</h3>
+        <div>
+            Paramètres : widget (widget à chercher)</br>
+            Retourne si le "widget" est contenu dans <a href="#_widgets">_widgets</a>.
+        </div>
+        <h3 id = "_declaringWidget">_declaringWidget()</h3>
+        <div>
+            Paramètres : widget (widget à enregistrer)</br>
+            Fonction permettant d'enregistrer un widget nouvellement crée dans <a href="#_widgets">_widgets</a>.
         </div>
 
         <h2>Variables</h2>
@@ -93,6 +108,10 @@
         <h3 id = "_pygameWindow">pygameWindow</h3>
         <div>
             Fenêtre pygame de base ou effectuer les modifications.
+        </div>
+        <h3 id = "_widgets">_widgets</h3>
+        <div>
+            Liste de tous les widgets présents dans le MApp.
         </div>
     </body>
 </html>
