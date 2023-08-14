@@ -14,8 +14,23 @@
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), backgroundColor = (0, 0, 0) (assignée à la variable <a href="#backgroundColor">backgroundColor</a>, basiquement mis à (0,0,0,), soit noir)</br>
+            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), backgroundColor = (0, 0, 0) (assignée à la variable <a href="#backgroundColor">backgroundColor</a>, basiquement mis à (0,0,0,), soit noir), cursorOnOverflight (assignée à la variable <a href="cursorOnOverflight">cursorOnOverflight</a>, basiquement mis à pygame.SYSTEM_CURSOR_ARROW)</br>
             Construit un objet widget.
+        </div>
+        <h3 id="absolutePos">absolutePos()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne un tuple avec (<a href="#absoluteX">absoluteX()</a>, <a href="#absoluteY">absoluteY()</a>).
+        </div>
+        <h3 id="absoluteX">absoluteX()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le x du widget par rapport au MApp (l'addition des coordonnées x des parents du widget).
+        </div>
+        <h3 id="absoluteY">absoluteY()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le y du widget par rapport au MApp (l'addition des coordonnées y des parents du widget).
         </div>
         <h3 id = "containsChild">containsChild()</h3>
         <div>
@@ -26,6 +41,11 @@
         <div>
             Paramètres : aucun</br>
             Retourne la couleur d'arrière plan <a href="#backgroundColor">backgroundColor</a> du widget.
+        </div>
+        <h3 id="getCursorOnOverflight">getCursorOnOverflight()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le curseur de survol <a href="cursorOnOverflight">cursorOnOverflight</a>.
         </div>
         <h3 id="getHeight">getHeight()</h3>
         <div>
@@ -72,6 +92,11 @@
             Paramètres : newX (nouvelle coordonnée X du widget), newY(nouvelle coordonnée Y du widget)</br>
             Change les coordonnées du widget X et Y à newX et newY.
         </div>
+        <h3 id="posIn">posIn()</h3>
+        <div>
+            Paramètres : pos (coordonnées à tester)</br>
+            Retourne si les coordonnées "pos" se situent dans le widget grâce à <a href="#absolutePos">"absolutePos"</a>.
+        </div>
         <h3 id="resize">resize()</h3>
         <div>
             Paramètres : newWidth (nouvelle largeur du widget), newHeight (nouvelle hauteur du widget)</br>
@@ -80,7 +105,12 @@
         <h3 id="setBackgroundColor">setBackgroundColor()</h3>
         <div>
             Paramètres : backgroundColor (nouvelle couleur d'arrière plan)</br>
-            Change la couleur d'arrière plan <a href="#backgroundColor">backgroundColor</a> du widget pour backgroundColor.
+            Change la couleur d'arrière plan <a href="#backgroundColor">"backgroundColor"</a> du widget pour backgroundColor.
+        </div>
+        <h3 id="getCursorOnOverflight">getCursorOnOverflight()</h3>
+        <div>
+            Paramètres : cursorOnOverflight (nouveau curseur de survol)</br>
+            Change le curseur de survol <a href="cursorOnOverflight">"cursorOnOverflight"</a> en cursorOnOverflight.
         </div>
         <h3 id="setHeight">setHeight()</h3>
         <div>
@@ -90,7 +120,7 @@
         <h3 id="setParent">setParent()</h3>
         <div>
             Paramètres : newParent (nouveau parent)</br>
-            Change le <a href="#parent">parent</a> du widget à newParent.
+            Change le <a href="#parent">"parent"</a> du widget à newParent.
         </div>
         <h3 id="setWidth">setWidth()</h3>
         <div>
@@ -158,6 +188,11 @@
         <h3 id = "backgroundColor">backgroundColor</h3>
         <div>
             Couleur d'arrière plan du widget (avec le format RGB dans un tuple).
+        </div>
+        <h3 id="cursorOnOverflight">cursorOnOverflight</h3>
+        <div>
+            Icône du curseur lors du survol du widget.</br>
+            L'icône doit être un icône de <a href="https://www.pygame.org/docs/ref/cursors.html">pygame</a>.
         </div>
         <h3 id = "height">height</h3>
         <div>

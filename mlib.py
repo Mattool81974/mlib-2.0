@@ -9,9 +9,10 @@ _nbWidget = 0
 
 ###################### Base widget class
 class MWidget:
-    def __init__(self, x, y, width, height, parent, backgroundColor = (0, 0, 0)): #MWidget's constructor
+    def __init__(self, x, y, width, height, parent, backgroundColor = (0, 0, 0), cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW, widgetType = "MWidget"): #MWidget's constructor
         global _nbWidget
         self.backgroundColor = backgroundColor
+        self.cursorOnOverflight = cursorOnOverflight
         self.height = height
         self.parent = 0
         self.setShouldModify(True)
@@ -21,14 +22,34 @@ class MWidget:
         self._children = []
         self._id = _nbWidget
         self._lastSurface = 0
+        self._type = widgetType
 
         _nbWidget += 1
 
         if parent != 0:
             self.setParent(parent)
 
-        if type != "MApp" and self.parent != 0: #Register the widget into the MApp object
+        if self._type != "MApp": #Register the widget into the MApp object
             self.parent._declaringWidget(self)
+
+    def absolutePos(self): #Return the pos according to the MApp object
+        return self.absoluteX(), self.absoluteY()
+    
+    def absoluteX(self): #Return x according to the MApp object
+        if self._type == "MApp":
+            return 0
+        else:
+            x = self.getX()
+            x += self.parent.absoluteX()
+            return x
+        
+    def absoluteY(self): #Return y according to the MApp object
+        if self._type == "MApp":
+            return 0
+        else:
+            y = self.getY()
+            y += self.parent.absoluteY()
+            return y
 
     def containsChild(self, id): #Return if the widget contains the child with the id
         for i1, i2 in enumerate(self._children): #Search through all the children to find the one with the good id
@@ -38,6 +59,15 @@ class MWidget:
     
     def getBackgroundColor(self): #Return the value of backgroundColor
         return self.backgroundColor
+    
+    def getCursorOnOverflight(self): #Return the value of cursorOnOverflight
+        return self.cursorOnOverflight
+    
+    def getChildren(self): #Report the list of all the children of the widget
+        return self._children
+    
+    def getChildrenAtIndex(self, index): #Report the widget at the index "index" in the list _children
+        return self._children[index]
 
     def getHeight(self): #Return the value of height
         return self.height
@@ -67,12 +97,21 @@ class MWidget:
         self.setX(newX)
         self.setY(newY)
 
+    def posIn(self, pos): #Check if "pos" is in the widget
+        if pos[0] >= self.absoluteX() and pos[1] > self.absoluteY() and pos[0] < self.absoluteX() + self.getWidth() and pos[1] < self.absoluteY() + self.getHeight():
+            return True
+        return False
+
     def resize(self, newWidth, newHeight): #Change the value of width and height in one function
         self.setHeight(newHeight)
         self.setWidth(newWidth)
 
     def setBackgroundColor(self, backgroundColor): #Change the value of backgroundColor
         self.backgroundColor = backgroundColor
+        self.setShouldModify(True)
+
+    def setCursorOnOverflight(self, cursorOnOverflight): #Return the value of cursorOnOverflight
+        self.cursorOnOverflight = cursorOnOverflight
         self.setShouldModify(True)
     
     def setHeight(self, newHeight): #Change the value of height
@@ -150,10 +189,8 @@ class MWidget:
 
 ###################### Main application class
 class MApp(MWidget):
-    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, backgroundColor = (0, 0, 0), printFps = False): #MApp's constructor
-        self._type = "MApp"
-
-        MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, backgroundColor) #Parent class constructor call
+    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, backgroundColor = (0, 0, 0), cursorOnOnverflight = pygame.SYSTEM_CURSOR_ARROW, printFps = False): #MApp's constructor
+        MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, backgroundColor, cursorOnOnverflight, "MApp") #Parent class constructor call
         self.deltaTime = 0
         self.fps = 0
         self.printFps = printFps
@@ -170,10 +207,10 @@ class MApp(MWidget):
 
     def frameEvent(self): #Do all events updates in the application
         self.deltaTime = (time_ns() - self._deltaTimeCache)/(10**9)
-        self._deltaTimeCache = time_ns()
+        self._deltaTimeCache = time_ns() #Calculate deltaTime
 
         self._fpsDuration += self.deltaTime
-        if self._fpsDuration >= 1:
+        if self._fpsDuration >= 1: #Handle fps counting
             self.fps = self._fpsCount
             self._fpsDuration -= 1
             self._fpsCount = 0
@@ -183,9 +220,25 @@ class MApp(MWidget):
 
         self._fpsCount += 1
 
+        cursor = self.getCursorOnOverflight()
+
+        mousePos = pygame.mouse.get_pos() #Get mouse position
+
+        overflightedWidget = self
+        i = 0
+        while i < len(overflightedWidget.getChildren()): #Find the overflighted widget
+            widget = overflightedWidget.getChildrenAtIndex(i)
+            if widget.posIn(mousePos):
+                overflightedWidget = widget
+                i = -1
+            i += 1
+
+        cursor = overflightedWidget.getCursorOnOverflight()
+        pygame.mouse.set_cursor(cursor)
+
         events = pygame.event.get()
         for event in events: #Event handler
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: #Quit pygame
                 pygame.quit()
                 exit()
 
