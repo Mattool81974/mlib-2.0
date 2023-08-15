@@ -14,11 +14,13 @@ class MWidget:
         self.backgroundColor = backgroundColor
         self.cursorOnOverflight = cursorOnOverflight
         self.height = height
+        self.overflighted = False
         self.parent = 0
         self.setShouldModify(True)
         self.width = width
         self.x = x
         self.y = y
+        self._BACKGROUNDCOLOR = backgroundColor
         self._children = []
         self._id = _nbWidget
         self._lastSurface = 0
@@ -74,6 +76,9 @@ class MWidget:
     
     def getID(self): #Return the value of _id
         return self._id
+    
+    def getOverflighted(self): #Return if the widget is overflighted or not
+        return self.overflighted
 
     def getParent(self): #Return the value of parent
         return self.parent
@@ -101,13 +106,25 @@ class MWidget:
         if pos[0] >= self.absoluteX() and pos[1] > self.absoluteY() and pos[0] < self.absoluteX() + self.getWidth() and pos[1] < self.absoluteY() + self.getHeight():
             return True
         return False
+    
+    def resetWidget(self): #Reset the widget as its initial state (with no events)
+        self.backgroundColor = self._BACKGROUNDCOLOR
+        self.overflighted = False
+        self.setShouldModify(True)
 
     def resize(self, newWidth, newHeight): #Change the value of width and height in one function
         self.setHeight(newHeight)
         self.setWidth(newWidth)
 
-    def setBackgroundColor(self, backgroundColor): #Change the value of backgroundColor
+    def setBackgroundColor(self, backgroundColor, constant = True): #Change the value of backgroundColor
         self.backgroundColor = backgroundColor
+        if constant:
+            self._BACKGROUNDCOLOR = backgroundColor
+        else:
+            if self._type == "MApp":
+                self._addWidgetToReset(self)
+            else:
+                self._mapp._addWidgetToReset(self)
         self.setShouldModify(True)
 
     def setCursorOnOverflight(self, cursorOnOverflight): #Return the value of cursorOnOverflight
@@ -153,6 +170,9 @@ class MWidget:
 
     def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp (function defined in MApp) or pass hit to his parent
         self.parent._declaringWidget(widget)
+
+    def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
+        pass
     
     def _removeChild(self, child): #Remove a child to the widget
         id = self.containsChild(child.getId())
@@ -198,6 +218,7 @@ class MApp(MWidget):
         self._deltaTimeCache = time_ns()
         self._fpsCount = 0
         self._fpsDuration = 0
+        self._modifiedWidget = []
         self._pygameWindow = pygameWindow
         self._widgets = []
 
@@ -220,6 +241,11 @@ class MApp(MWidget):
 
         self._fpsCount += 1
 
+        for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
+            i.resetWidget()
+
+        self._modifiedWidget.clear()
+
         cursor = self.getCursorOnOverflight()
 
         mousePos = pygame.mouse.get_pos() #Get mouse position
@@ -234,7 +260,9 @@ class MApp(MWidget):
             i += 1
 
         cursor = overflightedWidget.getCursorOnOverflight()
+        overflightedWidget.overflighted = True
         pygame.mouse.set_cursor(cursor)
+        overflightedWidget._isGettingOverflighted()
 
         events = pygame.event.get()
         for event in events: #Event handler
@@ -264,6 +292,9 @@ class MApp(MWidget):
         self.windowTitle = windowTitle
 
         pygame.display.set_caption(windowTitle)
+
+    def _addWidgetToReset(self, widget): #Add a widget _modifiedWidget
+        self._modifiedWidget.append(widget)
 
     def _containsWidget(self, widget): #Return if a widget is stored into _widgets
         for i in self._widgets:

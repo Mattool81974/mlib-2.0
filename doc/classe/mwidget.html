@@ -32,7 +32,7 @@
             Paramètres : aucun</br>
             Retourne le y du widget par rapport au MApp (l'addition des coordonnées y des parents du widget).
         </div>
-        <h3 id = "containsChild">containsChild()</h3>
+        <h3 id="containsChild">containsChild()</h3>
         <div>
             Paramètres : enfant (widget à chercher)</br>
             Retourne -1 si l'enfant n'est pas dans la liste <a href="#_children">_children</a> ou l'index si l'enfant y est.
@@ -56,6 +56,11 @@
         <div>
             Paramètres : aucun</br>
             Retourne l'<a href="#_id">id</a> du widget.
+        </div>
+        <h3 id="getOverflighted">getOverflighted()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne si le widget est <a href="#overflighted">survolé par le curseur</a>.
         </div>
         <h3 id="getParent">getParent()</h3>
         <div>
@@ -104,13 +109,20 @@
         </div>
         <h3 id="setBackgroundColor">setBackgroundColor()</h3>
         <div>
-            Paramètres : backgroundColor (nouvelle couleur d'arrière plan)</br>
-            Change la couleur d'arrière plan <a href="#backgroundColor">"backgroundColor"</a> du widget pour backgroundColor.
+            Paramètres : backgroundColor (nouvelle couleur d'arrière plan), constant (booléen qui définit si la modification est constante)</br>
+            Change la couleur d'arrière plan <a href="#backgroundColor">"backgroundColor"</a> du widget pour backgroundColor.</br>
+            Si "constant" est True, <a href="#backgroundColor">"backgroundColor"</a> et <a href="#_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</a> sont modifiés. Si il est à False, seulement <a href="#backgroundColor">"backgroundColor"</a> est modifié pendant seulement une frame (le widget est stocké dans la liste <a href="./mapp.html#_modifiedWidget">_modifiedWidget</a> de MApp).
         </div>
         <h3 id="getCursorOnOverflight">getCursorOnOverflight()</h3>
         <div>
             Paramètres : cursorOnOverflight (nouveau curseur de survol)</br>
             Change le curseur de survol <a href="cursorOnOverflight">"cursorOnOverflight"</a> en cursorOnOverflight.
+        </div>
+        <h3 id = "resetWidget">resetWidget()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Reset le widget à son état initial (si aucun <a href="../base.html#event">évènements</a> ne le modifie).</br>
+            Pour cela, la fonction utiliser toutes les variables (constantes) qui s'appellent "_NOMDUNEVARIABLE", comme <a href="#_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</a>.
         </div>
         <h3 id="setHeight">setHeight()</h3>
         <div>
@@ -151,6 +163,13 @@
         <div>
             Paramètres : widget (widget à transmettre au parent)</br>
             Fonction permettant de passer le widget de parent en parent jusqu'au <a href="./mapp.html#_declaringWidget">MApp</a>.
+        </div>
+        <h3 id = "_isGettingOverflighted">_isGettingOverflighted()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a> et qui retourne si une modification est nécessaire.</br>
+            La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
+            Cette fonction ne s'occupe pas du curseur, c'est <a href="./mapp.html">MApp</a> qui s'en occupe.
         </div>
         <h3 id = "_removeChild">_removeChild()</h3>
         <div>
@@ -198,6 +217,12 @@
         <div>
             Hauteur du widget.
         </div>
+        <h3 id = "overflighted">overflighted</h3>
+        <div>
+            Paramètres : aucun</br>
+            Booléen qui représente si le widget est survolé par le curseur ou non.</br>
+            Si possible, il est conseillé d'utiliser <a href="_isGettingOverflighted">_isGettingOverflighted</a>.
+        </div>
         <h3 id = "parent">parent</h3>
         <div>
             Parent du widget selon le système de <a href="base.html">hiérarchie</a>.
@@ -217,6 +242,10 @@
         <h3 id = "y">y</h3>
         <div>
             Coordonnée y du widget.
+        </div>
+        <h3 id = "_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</h3>
+        <div>
+            Variable (constante) égale à <a href="#backgroundColor">backgroundColor</a> initial, modifiable que dans <a href="__init__">le constructeur</a> et <a href="#setBackgroundColor">setBackgroundColor</a>.
         </div>
         <h3 id = "_children">_children</h3>
         <div>

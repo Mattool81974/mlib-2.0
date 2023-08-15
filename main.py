@@ -8,7 +8,7 @@ from time import sleep
 TAILLE = (500, 500)
 
 fenetre = display.set_mode(TAILLE)
-mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], backgroundColor=(255, 255, 255))
+mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], backgroundColor=(255, 255, 255), printFps=True)
 widgets = []
 
 cursors = [pygame.SYSTEM_CURSOR_ARROW, pygame.SYSTEM_CURSOR_CROSSHAIR, pygame.SYSTEM_CURSOR_HAND, pygame.SYSTEM_CURSOR_CROSSHAIR, pygame.SYSTEM_CURSOR_NO]
