@@ -57,6 +57,11 @@
             Paramètres : aucun</br>
             Retourne l'<a href="#_id">id</a> du widget.
         </div>
+        <h3 id="getMouseDown">getMouseDown()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le boutton clické sur le widget <a href="mouseDown">mouseDown</a>.
+        </div>
         <h3 id="getOverflighted">getOverflighted()</h3>
         <div>
             Paramètres : aucun</br>
@@ -113,7 +118,7 @@
             Change la couleur d'arrière plan <a href="#backgroundColor">"backgroundColor"</a> du widget pour backgroundColor.</br>
             Si "constant" est True, <a href="#backgroundColor">"backgroundColor"</a> et <a href="#_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</a> sont modifiés. Si il est à False, seulement <a href="#backgroundColor">"backgroundColor"</a> est modifié pendant seulement une frame (le widget est stocké dans la liste <a href="./mapp.html#_modifiedWidget">_modifiedWidget</a> de MApp).
         </div>
-        <h3 id="getCursorOnOverflight">getCursorOnOverflight()</h3>
+        <h3 id="setCursorOnOverflight">setCursorOnOverflight()</h3>
         <div>
             Paramètres : cursorOnOverflight (nouveau curseur de survol)</br>
             Change le curseur de survol <a href="cursorOnOverflight">"cursorOnOverflight"</a> en cursorOnOverflight.
@@ -154,6 +159,11 @@
             Paramètres : newY (nouvelle coordonnée Y du widget)</br>
             Change la coordonnée Y du widget.
         </div>
+        <h3 id = "softResetWidget">softResetWidget()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Effectue un reset du widget comme <a href="#resetWidget">resetWidget</a> sans modifications graphiques.
+        </div>
         <h3 id = "_addChild">_addChild()</h3>
         <div>
             Paramètres : enfant (widget à ajouter en enfant)</br>
@@ -164,10 +174,18 @@
             Paramètres : widget (widget à transmettre au parent)</br>
             Fonction permettant de passer le widget de parent en parent jusqu'au <a href="./mapp.html#_declaringWidget">MApp</a>.
         </div>
+        <h3 id = "_isGettingMouseDown">_isGettingMouseDown()</h3>
+        <div>
+            Paramètres : button (nombre entier du bouton de souris clické)</br>
+            Fonction appelé lorsque le widget est clické.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.
+        </div>
         <h3 id = "_isGettingOverflighted">_isGettingOverflighted()</h3>
         <div>
             Paramètres : aucun</br>
-            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a> et qui retourne si une modification est nécessaire.</br>
+            Fonction appelé lorsque le widget est survolé.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
             Cette fonction ne s'occupe pas du curseur, c'est <a href="./mapp.html">MApp</a> qui s'en occupe.
         </div>
@@ -208,7 +226,7 @@
         <div>
             Couleur d'arrière plan du widget (avec le format RGB dans un tuple).
         </div>
-        <h3 id="cursorOnOverflight">cursorOnOverflight</h3>
+        <h3 id = "cursorOnOverflight">cursorOnOverflight</h3>
         <div>
             Icône du curseur lors du survol du widget.</br>
             L'icône doit être un icône de <a href="https://www.pygame.org/docs/ref/cursors.html">pygame</a>.
@@ -217,11 +235,16 @@
         <div>
             Hauteur du widget.
         </div>
+        <h3 id = "mouseDown">mouseDown</h3>
+        <div>
+            Nombre qui représente , soit le bouton de la souris par lequel il est clické, soit -1.</br>
+            Si bouton est "1", la touche clické est la touche gauche, si bouton est "2", la touche clické est la molette, si bouton est "3", la touche clické est la touche droite.</br>
+            Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseDown">_isGettingOverflighted</a>.
+        </div>
         <h3 id = "overflighted">overflighted</h3>
         <div>
-            Paramètres : aucun</br>
             Booléen qui représente si le widget est survolé par le curseur ou non.</br>
-            Si possible, il est conseillé d'utiliser <a href="_isGettingOverflighted">_isGettingOverflighted</a>.
+            Si possible, il est conseillé d'utiliser <a href="#_isGettingOverflighted">_isGettingOverflighted</a>.
         </div>
         <h3 id = "parent">parent</h3>
         <div>

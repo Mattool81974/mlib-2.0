@@ -14,6 +14,7 @@ class MWidget:
         self.backgroundColor = backgroundColor
         self.cursorOnOverflight = cursorOnOverflight
         self.height = height
+        self.mouseDown = -1
         self.overflighted = False
         self.parent = 0
         self.setShouldModify(True)
@@ -62,20 +63,23 @@ class MWidget:
     def getBackgroundColor(self): #Return the value of backgroundColor
         return self.backgroundColor
     
-    def getCursorOnOverflight(self): #Return the value of cursorOnOverflight
-        return self.cursorOnOverflight
-    
     def getChildren(self): #Report the list of all the children of the widget
         return self._children
     
     def getChildrenAtIndex(self, index): #Report the widget at the index "index" in the list _children
         return self._children[index]
+    
+    def getCursorOnOverflight(self): #Return the value of cursorOnOverflight
+        return self.cursorOnOverflight
 
     def getHeight(self): #Return the value of height
         return self.height
     
     def getID(self): #Return the value of _id
         return self._id
+    
+    def getMouseDown(self): #Return the value of mouseDown
+        return self.mouseDown
     
     def getOverflighted(self): #Return if the widget is overflighted or not
         return self.overflighted
@@ -109,7 +113,6 @@ class MWidget:
     
     def resetWidget(self): #Reset the widget as its initial state (with no events)
         self.backgroundColor = self._BACKGROUNDCOLOR
-        self.overflighted = False
         self.setShouldModify(True)
 
     def resize(self, newWidth, newHeight): #Change the value of width and height in one function
@@ -117,15 +120,16 @@ class MWidget:
         self.setWidth(newWidth)
 
     def setBackgroundColor(self, backgroundColor, constant = True): #Change the value of backgroundColor
-        self.backgroundColor = backgroundColor
-        if constant:
-            self._BACKGROUNDCOLOR = backgroundColor
-        else:
-            if self._type == "MApp":
-                self._addWidgetToReset(self)
+        if not (self.backgroundColor == self._BACKGROUNDCOLOR and self.backgroundColor == backgroundColor):
+            self.backgroundColor = backgroundColor
+            if constant:
+                self._BACKGROUNDCOLOR = backgroundColor
             else:
-                self._mapp._addWidgetToReset(self)
-        self.setShouldModify(True)
+                if self._type == "MApp":
+                    self._addWidgetToReset(self)
+                else:
+                    self._mapp._addWidgetToReset(self)
+            self.setShouldModify(True)
 
     def setCursorOnOverflight(self, cursorOnOverflight): #Return the value of cursorOnOverflight
         self.cursorOnOverflight = cursorOnOverflight
@@ -164,12 +168,19 @@ class MWidget:
         self.y = newY
         self.setShouldModify(True)
 
+    def softResetWidget(self): #Reset without graphics modification
+        self.mouseDown = -1
+        self.overflighted = False
+
     def _addChild(self, child): #Add a child to the widget
         if self.containsChild(child.getID()) == -1:
             self._children.append(child)
 
     def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp (function defined in MApp) or pass hit to his parent
         self.parent._declaringWidget(widget)
+
+    def _isGettingMouseDown(self, button): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+        pass
 
     def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         pass
@@ -241,6 +252,9 @@ class MApp(MWidget):
 
         self._fpsCount += 1
 
+        for i in self._widgets: #Soft reset all widget
+            i.softResetWidget()
+
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
             i.resetWidget()
 
@@ -269,6 +283,9 @@ class MApp(MWidget):
             if event.type == pygame.QUIT: #Quit pygame
                 pygame.quit()
                 exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
+                overflightedWidget.mouseDown = event.button
+                overflightedWidget._isGettingMouseDown(event.button)
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
