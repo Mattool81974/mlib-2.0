@@ -13,8 +13,10 @@ class MWidget:
         global _nbWidget
         self.backgroundColor = backgroundColor
         self.cursorOnOverflight = cursorOnOverflight
+        self.focused = False
         self.height = height
         self.mouseDown = -1
+        self.mouseUp = -1
         self.overflighted = False
         self.parent = 0
         self.setShouldModify(True)
@@ -71,6 +73,9 @@ class MWidget:
     
     def getCursorOnOverflight(self): #Return the value of cursorOnOverflight
         return self.cursorOnOverflight
+    
+    def getFocused(self): #Return the value of focused
+        return self.focused
 
     def getHeight(self): #Return the value of height
         return self.height
@@ -80,6 +85,9 @@ class MWidget:
     
     def getMouseDown(self): #Return the value of mouseDown
         return self.mouseDown
+    
+    def getMouseUp(self): #Return the value of mouseUp
+        return self.mouseUp
     
     def getOverflighted(self): #Return if the widget is overflighted or not
         return self.overflighted
@@ -133,7 +141,6 @@ class MWidget:
 
     def setCursorOnOverflight(self, cursorOnOverflight): #Return the value of cursorOnOverflight
         self.cursorOnOverflight = cursorOnOverflight
-        self.setShouldModify(True)
     
     def setHeight(self, newHeight): #Change the value of height
         self.height = newHeight
@@ -170,6 +177,7 @@ class MWidget:
 
     def softResetWidget(self): #Reset without graphics modification
         self.mouseDown = -1
+        self.mouseUp = -1
         self.overflighted = False
 
     def _addChild(self, child): #Add a child to the widget
@@ -180,6 +188,9 @@ class MWidget:
         self.parent._declaringWidget(widget)
 
     def _isGettingMouseDown(self, button): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+        pass
+
+    def _isGettingMouseUp(self, button): #Function usefull for heritage, call by MApp when the widget is stopping of being clicked (called for only one frame) with button = left button (1) and right button (2)
         pass
 
     def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
@@ -223,6 +234,7 @@ class MApp(MWidget):
     def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, backgroundColor = (0, 0, 0), cursorOnOnverflight = pygame.SYSTEM_CURSOR_ARROW, printFps = False): #MApp's constructor
         MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, backgroundColor, cursorOnOnverflight, "MApp") #Parent class constructor call
         self.deltaTime = 0
+        self.focusedWidget = self
         self.fps = 0
         self.printFps = printFps
         self.setWindowTitle(windowTitle)
@@ -286,6 +298,12 @@ class MApp(MWidget):
             elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
                 overflightedWidget.mouseDown = event.button
                 overflightedWidget._isGettingMouseDown(event.button)
+                self.focusedWidget.focused = False
+                self.focusedWidget = overflightedWidget
+                self.focusedWidget.focused = True
+            elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
+                overflightedWidget.mouseUp = event.button
+                overflightedWidget._isGettingMouseUp(event.button)
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))

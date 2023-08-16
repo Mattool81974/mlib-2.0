@@ -62,6 +62,11 @@
             Paramètres : aucun</br>
             Retourne le boutton clické sur le widget <a href="mouseDown">mouseDown</a>.
         </div>
+        <h3 id="getMouseUp">getMouseUp()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le boutton clické sur le widget <a href="mouseUp">mouseUp</a>.
+        </div>
         <h3 id="getOverflighted">getOverflighted()</h3>
         <div>
             Paramètres : aucun</br>
@@ -181,6 +186,13 @@
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.
         </div>
+        <h3 id = "_isGettingMouseUp">_isGettingMouseUp()</h3>
+        <div>
+            Paramètres : button (nombre entier du bouton de souris clické)</br>
+            Fonction appelé lorsque le widget n'est plus clické (après <a href="#_isGettingMouseDown">_isGettingMouseDown</a>).</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.
+        </div>
         <h3 id = "_isGettingOverflighted">_isGettingOverflighted()</h3>
         <div>
             Paramètres : aucun</br>
@@ -231,6 +243,10 @@
             Icône du curseur lors du survol du widget.</br>
             L'icône doit être un icône de <a href="https://www.pygame.org/docs/ref/cursors.html">pygame</a>.
         </div>
+        <h3 id = "focused">focused</h3>
+        <div>
+            Booléen qui indique si le widget est le widget focus selon <a href="./mapp.html#focusedWidget">MApp</a>.
+        </div>
         <h3 id = "height">height</h3>
         <div>
             Hauteur du widget.
@@ -239,7 +255,13 @@
         <div>
             Nombre qui représente , soit le bouton de la souris par lequel il est clické, soit -1.</br>
             Si bouton est "1", la touche clické est la touche gauche, si bouton est "2", la touche clické est la molette, si bouton est "3", la touche clické est la touche droite.</br>
-            Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseDown">_isGettingOverflighted</a>.
+            Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseDown">_isGettingMouseDown</a>.
+        </div>
+        <h3 id = "mouseUp">mouseUp</h3>
+        <div>
+            Nombre qui représente , soit le bouton de la souris par lequel il n'est plus clické, soit -1.</br>
+            Si bouton est "1", la touche clické est la touche gauche, si bouton est "2", la touche clické est la molette, si bouton est "3", la touche clické est la touche droite.</br>
+            Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseUp">_isGettingMouseUp</a>.
         </div>
         <h3 id = "overflighted">overflighted</h3>
         <div>
