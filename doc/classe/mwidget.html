@@ -87,6 +87,11 @@
             Paramètres : aucun</br>
             Retourne la valeur de <a href="#shouldModify">shouldModify</a> du widget.
         </div>
+        <h3 id="getVisible">getVisible()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la valeur de <a href="#visible">visible</a>.
+        </div>
         <h3 id="getWidth">getWidth()</h3>
         <div>
             Paramètres : aucun</br>
@@ -143,6 +148,11 @@
         <div>
             Paramètres : newParent (nouveau parent)</br>
             Change le <a href="#parent">"parent"</a> du widget à newParent.
+        </div>
+        <h3 id="setVisible">setVisible()</h3>
+        <div>
+            Paramètres : visible (nouvelle valeur de <a href="#visible">visible</a>)</br>
+            Change la valeur de <a href="#visible">visible</a> par "visible".
         </div>
         <h3 id="setWidth">setWidth()</h3>
         <div>
@@ -229,7 +239,7 @@
         <h3 id = "_renderHierarchy">_renderHierarchy()</h3>
         <div>
             Paramètres : surface (surface parent)</br>
-            Met la surface "surface" à jour avec la hiérarchie du widget et retourne "surface" mis à jour.<br>
+            Met la surface "surface" à jour avec la hiérarchie du widget (les widgets enfants avec <a href="#visible">visible</a> à True) et retourne "surface" mis à jour.<br>
             Cette fonction est appelée entre <a href="#_renderBeforeHierarchy">_renderBeforeHierarchy()</a> et <a href="#_renderAfterHierarchy">_renderAfterHierarchy()</a>.
         </div>
 
@@ -275,6 +285,10 @@
         <h3 id = "shouldModify">shouldModify</h3>
         <div>
             Booléen qui indique si le widget doit se <a href="#_render">render</a> pendant cette frame ou non.
+        </div>
+        <h3 id = "visible">visible</h3>
+        <div>
+            Booléen qui indique si le widget est visible ou non.
         </div>
         <h3 id = "width">width</h3>
         <div>

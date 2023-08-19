@@ -9,6 +9,7 @@ TAILLE = (700, 700)
 
 fenetre = display.set_mode(TAILLE)
 mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
+mapp.setBackgroundColor((0, 0, 0))
 
 colors = []
 widgets = []
@@ -41,6 +42,7 @@ while True:
     if clicked1 != 0:
         colors[clicked1[0]][clicked1[1]] = (255, 255, 255)
         widgets[clicked1[0]][clicked1[1]].setBackgroundColor((255, 255, 255))
+        widgets[clicked1[0]][clicked1[1]].setVisible(False)
 
     mapp.frameGraphics()
     pygame.display.flip()

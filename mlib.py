@@ -20,6 +20,7 @@ class MWidget:
         self.overflighted = False
         self.parent = 0
         self.setShouldModify(True)
+        self.visible = True
         self.width = width
         self.x = x
         self.y = y
@@ -101,6 +102,9 @@ class MWidget:
     def getShouldModify(self): #Return the value of should modify
         return self.shouldModify
     
+    def getVisible(self): #Return the value of visible
+        return self.visible
+    
     def getWidth(self): #Return the value of width
         return self.width
     
@@ -162,6 +166,11 @@ class MWidget:
                 self.parent.setShouldModify(True)
         else:
             self.shouldModify = False
+            
+    def setVisible(self, visible): #Return the value of visible
+        if visible != self.visible:
+            self.visible = visible
+            self.setShouldModify(True)
 
     def setWidth(self, newWidth): #Change the value of width
         self.width = newWidth
@@ -226,7 +235,8 @@ class MWidget:
     
     def _renderHierarchy(self, surface): #Render hierarchy on surface
         for child in self._children: #Get the _render of all the children
-            surface.blit(child._render(), child.getRect())
+            if child.getVisible():
+                surface.blit(child._render(), child.getRect())
         return surface
 
 ###################### Main application class
