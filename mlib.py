@@ -9,10 +9,10 @@ _nbWidget = 0
 
 ###################### Base widget class
 class MWidget:
-    def __init__(self, x, y, width, height, parent, backgroundColor = (0, 0, 0), cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW, widgetType = "MWidget"): #MWidget's constructor
+    def __init__(self, x, y, width, height, parent, widgetType = "MWidget"): #MWidget's constructor
         global _nbWidget
-        self.backgroundColor = backgroundColor
-        self.cursorOnOverflight = cursorOnOverflight
+        self.backgroundColor = (255, 255, 255)
+        self.cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW
         self.focused = False
         self.height = height
         self.mouseDown = -1
@@ -23,7 +23,7 @@ class MWidget:
         self.width = width
         self.x = x
         self.y = y
-        self._BACKGROUNDCOLOR = backgroundColor
+        self._BACKGROUNDCOLOR = self.backgroundColor
         self._children = []
         self._id = _nbWidget
         self._lastSurface = 0
@@ -231,8 +231,8 @@ class MWidget:
 
 ###################### Main application class
 class MApp(MWidget):
-    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, backgroundColor = (0, 0, 0), cursorOnOnverflight = pygame.SYSTEM_CURSOR_ARROW, printFps = False): #MApp's constructor
-        MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, backgroundColor, cursorOnOnverflight, "MApp") #Parent class constructor call
+    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, printFps = False): #MApp's constructor
+        MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, "MApp") #Parent class constructor call
         self.deltaTime = 0
         self.focusedWidget = self
         self.fps = 0

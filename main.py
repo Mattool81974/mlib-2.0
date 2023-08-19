@@ -8,7 +8,7 @@ from time import sleep
 TAILLE = (700, 700)
 
 fenetre = display.set_mode(TAILLE)
-mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], backgroundColor=(255, 255, 255), printFps=True)
+mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
 
 colors = []
 widgets = []
@@ -21,7 +21,9 @@ for j in range(7):
     for i in range(7):
         color = ((255/7) * i, 0, (255/7) * j)
         colorColumn.append(color)
-        widgetColumn.append(MWidget(i * 100, j * 100, 100, 100, mapp, color, cursors[randint(0, 4)]))
+        widgetColumn.append(MWidget(i * 100, j * 100, 100, 100, mapp))
+        widgetColumn[-1].setBackgroundColor(color)
+        widgetColumn[-1].setCursorOnOverflight(cursors[randint(0, 4)])
     colors.append(colorColumn)
     widgets.append(widgetColumn)
 
