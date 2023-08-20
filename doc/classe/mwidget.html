@@ -14,7 +14,7 @@
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>)</br>
+            Paramètres : x (assignée à la variabe <a href="#x">x</a>), y (assignée à la variabe <a href="#y">y</a>), width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MWidget")</br>
             Construit un objet widget.
         </div>
         <h3 id="absolutePos">absolutePos()</h3>
@@ -232,8 +232,9 @@
         <h3 id = "_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>
             Paramètres : surface (surface parent)</br>
-            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
-            Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
+            Pour MWidget, il applique la couleur d'arrière plan <a href="#backgroundColor">backgroundColor</a>.</br>
+            Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.</br>
             Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
         </div>
         <h3 id = "_renderHierarchy">_renderHierarchy()</h3>
@@ -327,6 +328,7 @@
             Nom (de type str) pour décrire le type du widget.</br>
             Voici les différents types :</br>
             -MApp : représente les widgets de classe <a href="./mapp.html">MApp</a>.
+            -MFrame : représente les widgets de classe <a href="./mframe.html">MFrame</a>.
         </div>
     </body>
 </html>

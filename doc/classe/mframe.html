@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MWidget</title>
+    </head>
+    <body>
+        <h1>MWidget</h1>
+        <div>
+            MWidget est une classe peremttant de créer des objets graphiques avec une bordure.</br>
+            Elle hérite de <a href="./mwidget.html">MWidget</a>.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>)</br>
+            Construit un objet MFrame.
+        </div>
+        <h3 id="getFrameBeforeHierarchy">getFrameBeforeHierarchy()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="frameBeforeHierarchy">frameBeforeHierarchy</a>.
+        </div>
+        <h3 id="getFrameColor">getFrameColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la couleur de bordure <a href="#frameColor">frameColor</a>.
+        </div>
+        <h3 id="getFrameWidth">getFrameWidth()</h3>
+        <div>
+            Paramètres : index (bordure à retourner)</br>
+            Retourne la largeur de la bordure selon index.</br>
+            Si index est à 0, retourne <a href="#frameTopWidth">frameTopWidth</a>.</br>
+            Si index est à 1, retourne <a href="#frameLeftWidth">frameLeftWidth</a>.</br>
+            Si index est à 2, retourne <a href="#frameBottomWidth">frameBottomWidth</a>.</br>
+            Si index est à 3, retourne <a href="#frameRightWidth">frameRightWidth</a>.
+        </div>
+        <h3 id="setFrameBeforeHierarchy">setFrameBeforeHierarchy()</h3>
+        <div>
+            Paramètres : frameBeforeHierarchy (nouvelle valeur de <a href="frameBeforeHierarchy">frameBeforeHierarchy</a>)</br>
+            Change la valeur de <a href="frameBeforeHierarchy">frameBeforeHierarchy</a> pour "frameBeforeHierarchy".
+        </div>
+        <h3 id="setFrameColor">setFrameColor()</h3>
+        <div>
+            Paramètres : color (nouvelle <a href="#frameColor">couleur</a> de la bordure)</br>
+            Modifie la couleur de bordure <a href="#frameColor">frameColor</a> par "color".
+        </div>
+        <h3 id="setFrameWidth">setFrameWidth()</h3>
+        <div>
+            Paramètres : width (nouvelle largeur de la bordure), index (bordure à modifier)</br>
+            Retourne la largeur de la bordure selon index à "width".</br>
+            Si index est à 0, modifie <a href="#frameTopWidth">frameTopWidth</a>.</br>
+            Si index est à 1, modifie <a href="#frameLeftWidth">frameLeftWidth</a>.</br>
+            Si index est à 2, modifie <a href="#frameBottomWidth">frameBottomWidth</a>.</br>
+            Si index est à 3, modifie <a href="#frameRightWidth">frameRightWidth</a>.
+        </div>
+        <h3 id = "_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
+            Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.
+            Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
+        </div>
+
+        <h2>Variables</h2>
+        <h3 id="frameBeforeHierarchy">frameBeforeHierarchy</h3>
+        <div>
+            Booléen qui décrit si la bordure est dessiné avant ou après la hiérarchie.
+        </div>
+        <h3 id="frameBottomWidth">frameBottomWidth</h3>
+        <div>
+            Largeur en pixel de la largeur en bas.
+        </div>
+        <h3 id="frameColor">frameColor</h3>
+        <div>
+            Couleur de la bordure.
+        </div>
+        <h3 id="frameLeftWidth">frameLeftWidth</h3>
+        <div>
+            Largeur en pixel de la largeur à gauche.
+        </div>
+        <h3 id="frameRightWidth">frameRightWidth</h3>
+        <div>
+            Largeur en pixel de la largeur à droite.
+        </div>
+        <h3 id="frameTopWidth">frameTopWidth</h3>
+        <div>
+            Largeur en pixel de la largeur en haut.
+        </div>
+    </body>
+</html>

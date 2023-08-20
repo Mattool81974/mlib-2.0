@@ -22,7 +22,7 @@ for j in range(7):
     for i in range(7):
         color = ((255/7) * i, 0, (255/7) * j)
         colorColumn.append(color)
-        widgetColumn.append(MWidget(i * 100, j * 100, 100, 100, mapp))
+        widgetColumn.append(MFrame(i * 100, j * 100, 100, 100, mapp))
         widgetColumn[-1].setBackgroundColor(color)
         widgetColumn[-1].setCursorOnOverflight(cursors[randint(0, 4)])
     colors.append(colorColumn)
@@ -40,9 +40,9 @@ while True:
                 clicked1 = (i, j)
 
     if clicked1 != 0:
-        colors[clicked1[0]][clicked1[1]] = (255, 255, 255)
-        widgets[clicked1[0]][clicked1[1]].setBackgroundColor((255, 255, 255))
-        widgets[clicked1[0]][clicked1[1]].setVisible(False)
+        widgets[clicked1[0]][clicked1[1]].setFrameWidth(5)
+        #colors[clicked1[0]][clicked1[1]] = (255, 255, 255)
+        #widgets[clicked1[0]][clicked1[1]].setBackgroundColor((255, 255, 255))
 
     mapp.frameGraphics()
     pygame.display.flip()

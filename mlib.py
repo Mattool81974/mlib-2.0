@@ -214,7 +214,6 @@ class MWidget:
 
         if self.getShouldModify(): #If the widget should do the render, do it
             widgetSurface = Surface((self.width, self.height), pygame.SRCALPHA)
-            widgetSurface.fill(self.backgroundColor, (0, 0, self.getWidth(), self.getHeight()))
 
             widgetSurface.blit(self._renderBeforeHierarchy(widgetSurface), (0, 0, self.getWidth(), self.getHeight()))
             widgetSurface.blit(self._renderHierarchy(widgetSurface), (0, 0, self.getWidth(), self.getHeight()))
@@ -231,6 +230,7 @@ class MWidget:
         return surface
     
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+        surface.fill(self.backgroundColor, (0, 0, self.getWidth(), self.getHeight()))
         return surface
     
     def _renderHierarchy(self, surface): #Render hierarchy on surface
@@ -351,3 +351,76 @@ class MApp(MWidget):
         if not self._containsWidget(widget):
             self._widgets.append(widget)
             widget._mapp = self
+
+class MFrame(MWidget):
+    def __init__(self, x, y, width, height, parent):
+        super().__init__(x, y, width, height, parent, "MFrame")
+
+        self.frameBeforeHierarchy = True
+        self.frameBottomWidth = 0
+        self.frameColor = (0, 0, 0)
+        self.frameLeftWidth = 0
+        self.frameRightWidth = 0
+        self.frameTopWidth = 0
+
+    def getFrameBeforeHierarchy(self): #Return the value of frameBeforeHierarchy
+        return self.frameBeforeHierarchy
+    
+    def getFrameColor(self): #Return frameColor
+        return self.frameColor
+    
+    def getFrameWidth(self, index = 0): #Return the value of frameBottomWidth if 1, frameLeftWidth if 2, frameRightWidth if 3, frameTopWidth if 4
+        if index == 0:
+            return self.frameTopWidth
+        elif index == 1:
+            return self.frameLeftWidth
+        elif index == 2:
+            return self.frameBottomWidth
+        else:
+            return self.frameRightWidth
+    
+    def setFrameBeforeHierarchy(self, frameBeforeHierarchy): #Return the value of frameBeforeHierarchy
+        if self.frameBeforeHierarchy != frameBeforeHierarchy:
+            self.frameBeforeHierarchy = frameBeforeHierarchy
+            self.setShouldModify(True)
+
+    def setFrameColor(self, color): #Return frameColor
+        if self.frameColor != color:
+            self.frameColor = color
+            self.setShouldModify(True)
+
+    def setFrameWidth(self, frameWidth, index = -1): #Change the value of frameBottomWidth if 1, frameLeftWidth if 2, frameRightWidth if 3, frameTopWidth if 4
+        if index == 0:
+            if self.frameTopWidth != frameWidth:
+                self.frameTopWidth = frameWidth
+                self.setShouldModify(True)
+        elif index == 1:
+            if self.frameLeftWidth != frameWidth:
+                self.frameLeftWidth = frameWidth
+                self.setShouldModify(True)
+        elif index == 2:
+            if self.frameBottomWidth != frameWidth:
+                self.frameBottomWidth = frameWidth
+                self.setShouldModify(True)
+        elif index == 3:
+            if self.frameRightWidth != frameWidth:
+                self.frameRightWidth = frameWidth
+                self.setShouldModify(True)
+        else:
+            if not (self.frameTopWidth == frameWidth and self.frameLeftWidth == frameWidth and self.frameBottomWidth == frameWidth and self.frameRightWidth == frameWidth):
+                self.frameBottomWidth = frameWidth
+                self.frameLeftWidth = frameWidth
+                self.frameRightWidth = frameWidth
+                self.frameTopWidth = frameWidth
+                self.setShouldModify(True)
+
+    def _renderAfterHierarchy(self, surface): #Render widget on surface after hierarchy render
+        if not self.frameBeforeHierarchy:
+            surface.fill(self.frameColor, (0, 0, self.getWidth(), self.getHeight()))
+        surface.fill(self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))))
+        return surface
+
+    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+        if not self.frameBeforeHierarchy:
+            surface.fill(self.frameColor, (0, 0, self.getWidth(), self.getHeight()))
+        return surface
