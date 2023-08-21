@@ -18,6 +18,15 @@
             Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>)</br>
             Construit un objet MFrame.
         </div>
+        <h3 id="getCornerRadius">getCornerRadius()</h3>
+        <div>
+            Paramètres : index (coin à retourner)</br>
+            Retourne le rayon du coin selon l'index.</br>
+            Si index est à 0, retourne <a href="#leftTopCornerRadius">leftTopCornerRadius</a>.</br>
+            Si index est à 1, retourne <a href="#leftBottomCornerRadius">leftBottomCornerRadius</a>.</br>
+            Si index est à 2, retourne <a href="#rightBottomCornerRadius">rightBottomCornerRadius</a>.</br>
+            Si index est à 3, retourne <a href="#rightTopCornerRadius">rightBottomCornerRadius</a>.
+        </div>
         <h3 id="getFrameBeforeHierarchy">getFrameBeforeHierarchy()</h3>
         <div>
             Paramètres : aucun</br>
@@ -37,6 +46,15 @@
             Si index est à 2, retourne <a href="#frameBottomWidth">frameBottomWidth</a>.</br>
             Si index est à 3, retourne <a href="#frameRightWidth">frameRightWidth</a>.
         </div>
+        <h3 id="setCornerRadius">setCornerRadius()</h3>
+        <div>
+            Paramètres : radius (nouveau rayon du coin), index (coin à retourner)</br>
+            Change le rayon du coin selon l'index à radius.</br>
+            Si index est à 0, modifie <a href="#leftTopCornerRadius">leftTopCornerRadius</a>.</br>
+            Si index est à 1, modifie <a href="#leftBottomCornerRadius">leftBottomCornerRadius</a>.</br>
+            Si index est à 2, modifie <a href="#rightBottomCornerRadius">rightBottomCornerRadius</a>.</br>
+            Si index est à 3, modifie <a href="#rightTopCornerRadius">rightBottomCornerRadius</a>.
+        </div>
         <h3 id="setFrameBeforeHierarchy">setFrameBeforeHierarchy()</h3>
         <div>
             Paramètres : frameBeforeHierarchy (nouvelle valeur de <a href="frameBeforeHierarchy">frameBeforeHierarchy</a>)</br>
@@ -45,12 +63,12 @@
         <h3 id="setFrameColor">setFrameColor()</h3>
         <div>
             Paramètres : color (nouvelle <a href="#frameColor">couleur</a> de la bordure)</br>
-            Modifie la couleur de bordure <a href="#frameColor">frameColor</a> par "color".
+            Change la couleur de bordure <a href="#frameColor">frameColor</a> par "color".
         </div>
         <h3 id="setFrameWidth">setFrameWidth()</h3>
         <div>
             Paramètres : width (nouvelle largeur de la bordure), index (bordure à modifier)</br>
-            Retourne la largeur de la bordure selon index à "width".</br>
+            Change la largeur de la bordure selon index à "width".</br>
             Si index est à 0, modifie <a href="#frameTopWidth">frameTopWidth</a>.</br>
             Si index est à 1, modifie <a href="#frameLeftWidth">frameLeftWidth</a>.</br>
             Si index est à 2, modifie <a href="#frameBottomWidth">frameBottomWidth</a>.</br>
@@ -88,6 +106,22 @@
         <h3 id="frameTopWidth">frameTopWidth</h3>
         <div>
             Largeur en pixel de la largeur en haut.
+        </div>
+        <h3 id="leftBottomCornerRadius">leftBottomCornerRadius</h3>
+        <div>
+            Rayon du coin inférieur gauche de la bordure.
+        </div>
+        <h3 id="leftTopCornerRadius">leftTopCornerRadius</h3>
+        <div>
+            Rayon du coin supérieur gauche de la bordure.
+        </div>
+        <h3 id="rightBottomCornerRadius">rightBottomCornerRadius</h3>
+        <div>
+            Rayon du coin inférieur droit de la bordure.
+        </div>
+        <h3 id="rightTopCornerRadius">rightTopCornerRadius</h3>
+        <div>
+            Rayon du coin supérieur droit de la bordure.
         </div>
     </body>
 </html>

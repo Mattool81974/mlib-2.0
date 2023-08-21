@@ -40,6 +40,8 @@ while True:
                 clicked1 = (i, j)
 
     if clicked1 != 0:
+        widgets[clicked1[0]][clicked1[1]].setCornerRadius(25)
+        widgets[clicked1[0]][clicked1[1]].setFrameColor((0, 255, 0))
         widgets[clicked1[0]][clicked1[1]].setFrameWidth(5)
         #colors[clicked1[0]][clicked1[1]] = (255, 255, 255)
         #widgets[clicked1[0]][clicked1[1]].setBackgroundColor((255, 255, 255))

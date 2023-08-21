@@ -362,6 +362,20 @@ class MFrame(MWidget):
         self.frameLeftWidth = 0
         self.frameRightWidth = 0
         self.frameTopWidth = 0
+        self.leftBottomCornerRadius = 0
+        self.leftTopCornerRadius = 0
+        self.rightBottomCornerRadius = 0
+        self.rightTopCornerRadius = 0
+
+    def getCornerRadius(self, index = 0): #Return the value of leftTopCornerRadius if 0, leftBottomCornerRadius if 1, rightBottomCornerRadius if 2, rightTopCornerRadius if 3
+        if index == 0:
+            return self.leftTopCornerRadius
+        elif index == 1:
+            return self.leftBottomCornerRadius
+        elif index == 2:
+            return self.rightBottomCornerRadius
+        else:
+            return self.rightTopCornerRadius
 
     def getFrameBeforeHierarchy(self): #Return the value of frameBeforeHierarchy
         return self.frameBeforeHierarchy
@@ -378,6 +392,32 @@ class MFrame(MWidget):
             return self.frameBottomWidth
         else:
             return self.frameRightWidth
+        
+    def setCornerRadius(self, cornerRadius, index = -1): #Return the value of leftTopCornerRadius if 0, leftBottomCornerRadius if 1, rightBottomCornerRadius if 2, rightTopCornerRadius if 3
+        if index == 0:
+            if self.leftTopCornerRadius != cornerRadius:
+                print(self.leftTopCornerRadius, cornerRadius)
+                self.leftTopCornerRadius = cornerRadius
+                self.setShouldModify(True)
+        elif index == 1:
+            if self.leftBottomCornerRadius != cornerRadius:
+                self.leftBottomCornerRadius = cornerRadius
+                self.setShouldModify(True)
+        elif index == 2:
+            if self.rightBottomCornerRadius != cornerRadius:
+                self.rightBottomCornerRadius = cornerRadius
+                self.setShouldModify(True)
+        elif index == 3:
+            if self.rightTopCornerRadius != cornerRadius:
+                self.rightTopCornerRadius = cornerRadius
+                self.setShouldModify(True)
+        else:
+            if not (self.leftTopCornerRadius == cornerRadius and self.leftBottomCornerRadius == cornerRadius and self.rightBottomCornerRadius == cornerRadius and self.rightTopCornerRadius == cornerRadius):
+                self.leftTopCornerRadius = cornerRadius
+                self.leftBottomCornerRadius = cornerRadius
+                self.rightBottomCornerRadius = cornerRadius
+                self.rightTopCornerRadius = cornerRadius
+                self.setShouldModify(True)
     
     def setFrameBeforeHierarchy(self, frameBeforeHierarchy): #Return the value of frameBeforeHierarchy
         if self.frameBeforeHierarchy != frameBeforeHierarchy:
@@ -416,11 +456,11 @@ class MFrame(MWidget):
 
     def _renderAfterHierarchy(self, surface): #Render widget on surface after hierarchy render
         if not self.frameBeforeHierarchy:
-            surface.fill(self.frameColor, (0, 0, self.getWidth(), self.getHeight()))
-        surface.fill(self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))))
+            pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
+        pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
-        if not self.frameBeforeHierarchy:
-            surface.fill(self.frameColor, (0, 0, self.getWidth(), self.getHeight()))
+        if self.frameBeforeHierarchy:
+            pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
