@@ -3,19 +3,19 @@
     <head>
         <link rel="stylesheet" href="../style.css">
         <meta charset="utf-8">
-        <title>MLib - MWidget</title>
+        <title>MLib - MFrame</title>
     </head>
     <body>
-        <h1>MWidget</h1>
+        <h1>MFrame</h1>
         <div>
-            MWidget est une classe peremttant de créer des objets graphiques avec une bordure.</br>
+            MFrame est une classe peremttant de créer des objets graphiques avec une bordure.</br>
             Elle hérite de <a href="./mwidget.html">MWidget</a>.
         </div>
 
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>)</br>
+            Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MFrame")</br>
             Construit un objet MFrame.
         </div>
         <h3 id="getCornerRadius">getCornerRadius()</h3>
@@ -74,12 +74,19 @@
             Si index est à 2, modifie <a href="#frameBottomWidth">frameBottomWidth</a>.</br>
             Si index est à 3, modifie <a href="#frameRightWidth">frameRightWidth</a>.
         </div>
+        <h3 id = "_renderAfterHierarchy">_renderAfterHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
+            Dans MFrame, elle s'occupe de dessiner la bordure si <a href="#frameBeforeHierarchy">frameBeforeHierarchy</a> est à False.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_renderAfterHierarchy">MWidget</a>.
+        </div>
         <h3 id = "_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>
             Paramètres : surface (surface parent)</br>
-            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.<br>
-            Cette fonction est appelée avant le render de la hiérarchie dans <a href="#_render">_render</a>.
-            Il est <b>fortement conseillé</b> d'utiliser cette fonction dans l'héritage.
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
+            Dans MFrame, elle s'occupe de dessiner la bordure si <a href="#frameBeforeHierarchy">frameBeforeHierarchy</a> est à True.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.
         </div>
 
         <h2>Variables</h2>

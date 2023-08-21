@@ -353,8 +353,8 @@ class MApp(MWidget):
             widget._mapp = self
 
 class MFrame(MWidget):
-    def __init__(self, x, y, width, height, parent):
-        super().__init__(x, y, width, height, parent, "MFrame")
+    def __init__(self, x, y, width, height, parent, widgetType = "MFrame"):
+        super().__init__(x, y, width, height, parent, widgetType)
 
         self.frameBeforeHierarchy = True
         self.frameBottomWidth = 0
@@ -457,10 +457,65 @@ class MFrame(MWidget):
     def _renderAfterHierarchy(self, surface): #Render widget on surface after hierarchy render
         if not self.frameBeforeHierarchy:
             pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
-        pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         if self.frameBeforeHierarchy:
             pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
+        pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
+        return surface
+
+class MText(MFrame):
+    def __init__(self, text, x, y, width, height, parent, widgetType = "MText"):
+        super().__init__(x, y, width, height, parent, widgetType)
+
+        self.font = "arial"
+        self.fontSize = 12
+        self.text = text
+        self.textColor = (0, 0, 0)
+
+    def getFont(self):
+        return self.font
+    
+    def getFontSize(self):
+        return self.fontSize
+
+    def getText(self):
+        return self.text
+    
+    def getTextColor(self):
+        return self.textColor
+    
+    def setFont(self, font):
+        if self.font != font:
+            self.font = font
+            self.setShouldModify(True)
+    
+    def setFontSize(self, fontSize):
+        if self.fontSize != fontSize:
+            self.fontSize = fontSize
+            self.setShouldModify(True)
+    
+    def setText(self, text):
+        if self.text != text:
+            self.text = text
+            self.setShouldModify(True)
+
+    def setTextColor(self, textColor):
+        if self.textColor != textColor:
+            self.textColor = textColor
+            self.setShouldModify(True)
+
+    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+        surface = super()._renderBeforeHierarchy(surface)
+
+        generator = pygame.font.SysFont(self.font, self.fontSize)
+        pieces = self.text.split("\n")
+        y = 0
+
+        for piece in pieces:
+            textSurface = generator.render(piece, False, self.textColor)
+            surface.blit(textSurface, (0, y, textSurface.get_width(), textSurface.get_height()))
+            y += textSurface.get_height()
+
         return surface

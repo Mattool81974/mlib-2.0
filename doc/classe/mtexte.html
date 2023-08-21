@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MText</title>
+    </head>
+    <body>
+        <h1>MText</h1>
+        <div>
+            MText est une classe permettant de d'afficher du texte.</br>
+            Elle hérite de <a href="./mframe.html">MFrame</a>.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : text (assignée à la variable <a href="#text">text</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MText")</br>
+            Construit un objet MText.
+        </div>
+        <h3 id="getFont">getFont()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="font">police</a> du texte à afficher.
+        </div>
+        <h3 id="getFontSize">getFontSize()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="fontSize">taille de police</a> du texte à afficher.
+        </div>
+        <h3 id="getText">getText()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#text">texte affiché</a>.
+        </div>
+        <h3 id="getTextColor">getTextColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#textColor">couleur du texte</a>.
+        </div>
+        <h3 id="setFont">setFont()</h3>
+        <div>
+            Paramètres : font (nouvelle police)</br>
+            Change la <a href="font">police</a> du texte à afficher à "font".
+        </div>
+        <h3 id="setFontSize">setFontSize()</h3>
+        <div>
+            Paramètres : fontSize (nouvelle taille de police)</br>
+            Change la <a href="fontSize">taille de police</a> du texte à afficher à "fontSize".
+        </div>
+        <h3 id="setText">setText()</h3>
+        <div>
+            Paramètres : text (nouveau texte à afficher)</br>
+            Change la valeur de <a href="#text">text</a> à "text".
+        </div>
+        <h3 id="setTextColor">setTextColor()</h3>
+        <div>
+            Paramètres : textColor (nouvelle couleur du texte)</br>
+            Change la <a href="#textColor">couleur du texte</a> à "textColor".
+        </div>
+        <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
+            Dans MText, elle s'occupe du texte à afficher.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.
+        </div>
+
+        <h2>Variables</h2>
+        <h3 id="font">font</h3>
+        <div>
+            Police du text à afficher.
+        </div>
+        <h3 id="fontSize">fontSize</h3>
+        <div>
+            Taille de police du text à afficher.
+        </div>
+        <h3 id="text">text</h3>
+        <div>
+            Texte affiché par le widget.
+        </div>
+        <h3 id="textColor">textColor</h3>
+        <div>
+            Couleur du texte à afficher.
+        </div>
+    </body>
+</html>
