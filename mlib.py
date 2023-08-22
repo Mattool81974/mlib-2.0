@@ -419,12 +419,12 @@ class MFrame(MWidget):
                 self.rightTopCornerRadius = cornerRadius
                 self.setShouldModify(True)
     
-    def setFrameBeforeHierarchy(self, frameBeforeHierarchy): #Return the value of frameBeforeHierarchy
+    def setFrameBeforeHierarchy(self, frameBeforeHierarchy): #Change the value of frameBeforeHierarchy
         if self.frameBeforeHierarchy != frameBeforeHierarchy:
             self.frameBeforeHierarchy = frameBeforeHierarchy
             self.setShouldModify(True)
 
-    def setFrameColor(self, color): #Return frameColor
+    def setFrameColor(self, color): #Change the value of frameColor
         if self.frameColor != color:
             self.frameColor = color
             self.setShouldModify(True)
@@ -469,39 +469,57 @@ class MText(MFrame):
     def __init__(self, text, x, y, width, height, parent, widgetType = "MText"):
         super().__init__(x, y, width, height, parent, widgetType)
 
+        self.dynamicTextCut = False
+        self.dynamicTextCutType = 1
         self.font = "arial"
         self.fontSize = 12
         self.text = text
         self.textColor = (0, 0, 0)
 
-    def getFont(self):
+    def getDynamicTextCut(self): #Return dynamicTextCut
+        return self.dynamicTextCut
+    
+    def getDynamicTextCutType(self): #Return dynamicTextCutType
+        return self.dynamicTextCutType
+
+    def getFont(self): #Return font
         return self.font
     
-    def getFontSize(self):
+    def getFontSize(self): #Return fontSize
         return self.fontSize
 
-    def getText(self):
+    def getText(self): #Return text
         return self.text
     
-    def getTextColor(self):
+    def getTextColor(self): #Return textColor
         return self.textColor
     
-    def setFont(self, font):
+    def setDynamicTextCut(self, dynamicTextCut): #Change the value of dynamicTextCut
+        if self.dynamicTextCut != dynamicTextCut:
+            self.dynamicTextCut = dynamicTextCut
+            self.setShouldModify(True)
+
+    def setDynamicTextCutType(self, dynamicTextCutType): #Return dynamicTextCutType
+        if self.dynamicTextCutType != dynamicTextCutType:
+            self.dynamicTextCutType = dynamicTextCutType
+            self.setShouldModify(True)
+    
+    def setFont(self, font): #Change the value of font
         if self.font != font:
             self.font = font
             self.setShouldModify(True)
     
-    def setFontSize(self, fontSize):
+    def setFontSize(self, fontSize): #Change the value of fontSize
         if self.fontSize != fontSize:
             self.fontSize = fontSize
             self.setShouldModify(True)
     
-    def setText(self, text):
+    def setText(self, text): #Change the value of text
         if self.text != text:
             self.text = text
             self.setShouldModify(True)
 
-    def setTextColor(self, textColor):
+    def setTextColor(self, textColor): #Change the value of textColor
         if self.textColor != textColor:
             self.textColor = textColor
             self.setShouldModify(True)
@@ -510,12 +528,51 @@ class MText(MFrame):
         surface = super()._renderBeforeHierarchy(surface)
 
         generator = pygame.font.SysFont(self.font, self.fontSize)
-        pieces = self.text.split("\n")
-        y = 0
+        pieces = []
+        spaceWidth = generator.size(" ")[0]
+        textWidth = self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3))
+        x = self.getFrameWidth(1)
+        y = self.getFrameWidth(0)
 
-        for piece in pieces:
+        if self.dynamicTextCut: #Cut lines into pieces
+            pieces = self.text.split("\n")
+        else:
+            lines = self.text.split("\n")
+            for line in lines:
+                firstI = 0
+                lastI = 0
+                lineWidth = 0
+                toAnalyze = line
+                if self.dynamicTextCutType == 1:
+                    toAnalyze = line.split(" ")
+
+                for letter in toAnalyze: #Analyze caracter by caracter/word by word
+                    letterSize = generator.size(letter)
+                    if lineWidth + letterSize[0] > textWidth and firstI != lastI:
+                        toAdd = ""
+                        for i in range(firstI, lastI):
+                            toAdd += toAnalyze[i]
+                            if self.dynamicTextCutType == 1 and i != lastI - 1:
+                                toAdd += " "
+                        pieces.append(toAdd)
+                        firstI = lastI
+                        lineWidth = 0
+                    lastI += 1
+                    lineWidth += letterSize[0]
+                    if self.dynamicTextCutType == 1:
+                        lineWidth += spaceWidth
+
+                if firstI < len(toAnalyze):
+                    toAdd = ""
+                    for i in range(firstI, len(toAnalyze)):
+                        toAdd += toAnalyze[i]
+                        if self.dynamicTextCutType == 1 and i != len(toAnalyze) - 1:
+                            toAdd += " "
+                    pieces.append(toAdd)
+
+        for piece in pieces: #Render text into pieces
             textSurface = generator.render(piece, False, self.textColor)
-            surface.blit(textSurface, (0, y, textSurface.get_width(), textSurface.get_height()))
+            surface.blit(textSurface, (x, y, textSurface.get_width(), textSurface.get_height()))
             y += textSurface.get_height()
 
         return surface

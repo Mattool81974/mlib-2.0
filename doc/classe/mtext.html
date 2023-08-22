@@ -18,6 +18,16 @@
             Paramètres : text (assignée à la variable <a href="#text">text</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MText")</br>
             Construit un objet MText.
         </div>
+        <h3 id="getDynamicTextCut">getDynamicTextCut</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#dynamicTextCut">dynamicTextCut</a>.
+        </div>
+        <h3 id="getDynamicTextCutType">getDynamicTextCutType</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#dynamicTextCutType">dynamicTextCutType</a>.
+        </div>
         <h3 id="getFont">getFont()</h3>
         <div>
             Paramètres : aucun</br>
@@ -37,6 +47,16 @@
         <div>
             Paramètres : aucun</br>
             Retourne la <a href="#textColor">couleur du texte</a>.
+        </div>
+        <h3 id="setDynamicTextCut">setDynamicTextCut</h3>
+        <div>
+            Paramètres : aucun</br>
+            Change la valeur de <a href="#dynamicTextCut">dynamicTextCut</a> à "dynamicTextCut".
+        </div>
+        <h3 id="setDynamicTextCutType">setDynamicTextCutType</h3>
+        <div>
+            Paramètres : dynamicTextCutType (nouvelle valeur de <a href="#dynamicTextCutType">dynamicTextCutType</a>)</br>
+            Change la valeur de <a href="#dynamicTextCutType">dynamicTextCutType</a> à "dynamicTextCutType".
         </div>
         <h3 id="setFont">setFont()</h3>
         <div>
@@ -62,11 +82,23 @@
         <div>
             Paramètres : surface (surface parent)</br>
             Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
-            Dans MText, elle s'occupe du texte à afficher.</br>
+            Dans MText, elle s'occupe du texte à afficher. L'ordre précis est :</br>
+            -Découpe des lignes à afficher (avec ou sans <a href="#dynamicTextCut">dynamicTextCut</a>)</br>
+            -Rendu du texte</br>
             Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.
         </div>
 
         <h2>Variables</h2>
+        <h3 id="dynamicTextCut">dynamicTextCut</h3>
+        <div>
+            Booléen qui indique si le texte doit être coupé en ligne si il est trop long.
+        </div>
+        <h3 id="dynamicTextCutType">dynamicTextCutType</h3>
+        <div>
+            Type de découpe si <a href="#dynamicTextCut">dynamicTextCut</a> est True.</br>
+            Si dynamicTextCutType est à 0 : la découpe se fait caractère par caractère.</br>
+            Si dynamicTextCutType est à 1 : la découpe se fait mot par mot.
+        </div>
         <h3 id="font">font</h3>
         <div>
             Police du text à afficher.
