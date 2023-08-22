@@ -204,6 +204,12 @@ class MWidget:
 
     def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         pass
+
+    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        pass
+
+    def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        pass
     
     def _removeChild(self, child): #Remove a child to the widget
         id = self.containsChild(child.getId())
@@ -246,6 +252,7 @@ class MApp(MWidget):
         self.deltaTime = 0
         self.focusedWidget = self
         self.fps = 0
+        self.pressedKey = []
         self.printFps = printFps
         self.setWindowTitle(windowTitle)
         self._deltaTimeCache = time_ns()
@@ -273,6 +280,8 @@ class MApp(MWidget):
                 print(self.fps)
 
         self._fpsCount += 1
+
+        self.pressedKey.clear()
 
         for i in self._widgets: #Soft reset all widget
             i.softResetWidget()
@@ -314,6 +323,11 @@ class MApp(MWidget):
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button)
+            elif event.type == pygame.KEYDOWN: #If a key is pressed on the keyboard
+                overflightedWidget._isKeyGettingPressed(event.key)
+                self.pressedKey.append(event.key)
+            elif event.type == pygame.KEYUP: #If a key is dropped on the keyboard
+                overflightedWidget._isKeyGettingDropped(event.key)
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
@@ -324,11 +338,20 @@ class MApp(MWidget):
     def getFps(self): #Return fps
         return self.fps
     
+    def getPressedKey(self): #Return pressedKey
+        return self.pressedKey
+    
     def getPrintFps(self): #Return printFps
         return self.printFps
     
     def getWidgets(self): #Return _widget
         return self._widgets
+    
+    def isKeyPressed(self, key): #Return if the key is pressed
+        for i in self.pressedKey:
+            if key == i:
+                return True
+        return False
     
     def setPrintFps(self, printFps): #Change the value of printFps
         self.printFps = printFps
