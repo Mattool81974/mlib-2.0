@@ -205,10 +205,13 @@ class MWidget:
     def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         pass
 
-    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
         pass
 
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        pass
+
+    def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
     def _removeChild(self, child): #Remove a child to the widget
@@ -328,6 +331,8 @@ class MApp(MWidget):
                 self.pressedKey.append(event.key)
             elif event.type == pygame.KEYUP: #If a key is dropped on the keyboard
                 overflightedWidget._isKeyGettingDropped(event.key)
+            elif event.type == pygame.TEXTINPUT: #If the user is enterring text
+                overflightedWidget._isTextGettingEntered(event.text)
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
@@ -496,6 +501,7 @@ class MText(MFrame):
         self.dynamicTextCutType = 1
         self.font = "arial"
         self.fontSize = 12
+        self.input = False
         self.text = text
         self.textColor = (0, 0, 0)
 
@@ -510,6 +516,9 @@ class MText(MFrame):
     
     def getFontSize(self): #Return fontSize
         return self.fontSize
+    
+    def getInput(self): #Return input
+        return self.input
 
     def getText(self): #Return text
         return self.text
@@ -536,6 +545,9 @@ class MText(MFrame):
         if self.fontSize != fontSize:
             self.fontSize = fontSize
             self.setShouldModify(True)
+
+    def setInput(self, input): #Change the value of input
+        self.input = input
     
     def setText(self, text): #Change the value of text
         if self.text != text:
@@ -546,6 +558,20 @@ class MText(MFrame):
         if self.textColor != textColor:
             self.textColor = textColor
             self.setShouldModify(True)
+
+    def appendText(self, text): #Append "text" to text
+        self.setText(self.getText() + text)
+
+    def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        if self.getInput():
+            if key == pygame.K_BACKSPACE:
+                self.setText(self.getText()[:-1])
+            elif key == pygame.K_RETURN:
+                self.appendText("\n")
+
+    def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is entering a text (applicated for only one frame)
+        if self.getInput():
+            self.appendText(text)
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)

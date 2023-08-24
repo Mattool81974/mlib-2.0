@@ -38,6 +38,11 @@
             Paramètres : aucun</br>
             Retourne la <a href="fontSize">taille de police</a> du texte à afficher.
         </div>
+        <h3 id="getInput">getInput()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne si le widget est utilisé comme <a href="#input">entré</a> ou non.
+        </div>
         <h3 id="getText">getText()</h3>
         <div>
             Paramètres : aucun</br>
@@ -68,6 +73,11 @@
             Paramètres : fontSize (nouvelle taille de police)</br>
             Change la <a href="fontSize">taille de police</a> du texte à afficher à "fontSize".
         </div>
+        <h3 id="setInput">setInput()</h3>
+        <div>
+            Paramètres : input (nouvelle valeur de si le widget est utilisé comme <a href="#input">entré</a>)</br>
+            Change si le widget est utilisé comme <a href="#input">entré</a> ou non à "input".
+        </div>
         <h3 id="setText">setText()</h3>
         <div>
             Paramètres : text (nouveau texte à afficher)</br>
@@ -77,6 +87,26 @@
         <div>
             Paramètres : textColor (nouvelle couleur du texte)</br>
             Change la <a href="#textColor">couleur du texte</a> à "textColor".
+        </div>
+        <h3 id="appendText">appendText()</h3>
+        <div>
+            Paramètres : text (text à ajouter)</br>
+            Ajoute le "text" à <a href="#text">text</a>.
+        </div>
+        <h3 id = "_isKeyGettingPressed">_isKeyGettingPressed()</h3>
+        <div>
+            Paramètres : key (touche pressée)</br>
+            Fonction appelé lorsque le widget est focus est qu'une touche est pressée.</br>
+            Ajoute la touche key dans le <a href="#text">texte</a> si <a href="#input">input</a> est True.</br>
+            Cette fonction est utilisé à la place de <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3> pour certains caractères spéciaux (comme le retour à la ligne).</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_isTextGettingEntered">MWidget</a>.
+        </div>
+        <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3>
+        <div>
+            Paramètres : text (texte entrée)</br>
+            Fonction appelé lorsque le widget est focus est que l'utilisateur rentre du texte.</br>
+            Ajoute le texte dans le <a href="#text">texte</a> si <a href="#input">input</a> est True.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_isTextGettingEntered">MWidget</a>.
         </div>
         <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>
@@ -106,6 +136,11 @@
         <h3 id="fontSize">fontSize</h3>
         <div>
             Taille de police du text à afficher.
+        </div>
+        <h3 id="input">input</h3>
+        <div>
+            Booléen qui indique si le MText est utilisé comme une entrée ou non.</br>
+            Si il est égal à True, alors le MText réagira aux entrées du clavier si il est focus grâce à <a href="./mwidget.html#_isKeyGettingPressed">_isKeyGettingPressed()</a> de MWidget.
         </div>
         <h3 id="text">text</h3>
         <div>

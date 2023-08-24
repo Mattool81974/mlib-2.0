@@ -16,6 +16,7 @@ phrase = ""
 texte = MText(phrase, 0, 0, TAILLE[0], TAILLE[1], mapp)
 texte.setFontSize(22)
 texte.setFrameWidth(5)
+texte.setInput(True)
 texte.setDynamicTextCutType(1)
 
 while True:
