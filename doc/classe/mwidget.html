@@ -225,6 +225,13 @@
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
         </div>
+        <h3 id = "_isNotFocusedAnymore">_isNotFocusedAnymore()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Fonction appelé lorsque le widget n'est plus focus.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
+        </div>
         <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3>
         <div>
             Paramètres : text (texte entrée)</br>
@@ -263,6 +270,12 @@
             Paramètres : surface (surface parent)</br>
             Met la surface "surface" à jour avec la hiérarchie du widget (les widgets enfants avec <a href="#visible">visible</a> à True) et retourne "surface" mis à jour.<br>
             Cette fonction est appelée entre <a href="#_renderBeforeHierarchy">_renderBeforeHierarchy()</a> et <a href="#_renderAfterHierarchy">_renderAfterHierarchy()</a>.
+        </div>
+        <h3 id = "_update">_update()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.
         </div>
 
         <h2>Variables</h2>

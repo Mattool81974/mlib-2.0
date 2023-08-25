@@ -1,3 +1,4 @@
+from math import *
 from pygame import *
 import pygame
 from time import time_ns
@@ -211,6 +212,9 @@ class MWidget:
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         pass
 
+    def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        pass
+
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
@@ -247,6 +251,9 @@ class MWidget:
             if child.getVisible():
                 surface.blit(child._render(), child.getRect())
         return surface
+    
+    def _update(self): #Function usefull for heritage, call by MApp every frame
+        pass
 
 ###################### Main application class
 class MApp(MWidget):
@@ -288,6 +295,7 @@ class MApp(MWidget):
 
         for i in self._widgets: #Soft reset all widget
             i.softResetWidget()
+            i._update(self.getDeltaTime())
 
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
             i.resetWidget()
@@ -319,10 +327,11 @@ class MApp(MWidget):
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
                 overflightedWidget.mouseDown = event.button
-                overflightedWidget._isGettingMouseDown(event.button)
                 self.focusedWidget.focused = False
+                self.focusedWidget._isNotFocusedAnymore()
                 self.focusedWidget = overflightedWidget
                 self.focusedWidget.focused = True
+                overflightedWidget._isGettingMouseDown(event.button)
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button)
@@ -504,6 +513,12 @@ class MText(MFrame):
         self.input = False
         self.text = text
         self.textColor = (0, 0, 0)
+        self._backspacePressed = False
+        self._backspacePressedTime = 0
+        self._backspaceNumber = 0
+        self._returnPressed = False
+        self._returnPressedTime = 0
+        self._returnNumber = 0
 
     def getDynamicTextCut(self): #Return dynamicTextCut
         return self.dynamicTextCut
@@ -562,12 +577,37 @@ class MText(MFrame):
     def appendText(self, text): #Append "text" to text
         self.setText(self.getText() + text)
 
+    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
+        if self.getInput():
+            if key == pygame.K_BACKSPACE:
+                self._backspacePressed = False
+                self._backspacePressedTime = 0
+                self._backspaceNumber = 0
+            elif key == pygame.K_RETURN:
+                self._returnPressed = False
+                self._returnPressedTime = 0
+                self._returnNumber = 0
+
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         if self.getInput():
             if key == pygame.K_BACKSPACE:
                 self.setText(self.getText()[:-1])
+                self._backspacePressed = True
+                self._backspacePressedTime = 0
+                self._backspaceNumber = 0
             elif key == pygame.K_RETURN:
                 self.appendText("\n")
+                self._returnPressed = True
+                self._returnPressedTime = 0
+                self._returnNumber = 0
+
+    def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        self._backspacePressed = False
+        self._backspacePressedTime = 0
+        self._backspaceNumber = 0
+        self._returnPressed = False
+        self._returnPressedTime = 0
+        self._returnNumber = 0
 
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is entering a text (applicated for only one frame)
         if self.getInput():
@@ -625,3 +665,21 @@ class MText(MFrame):
             y += textSurface.get_height()
 
         return surface
+    
+    def _update(self, deltaTime):
+
+        if self._backspacePressed:
+            self._backspacePressedTime += deltaTime
+            if self._backspacePressedTime > 0.5:
+                n = (self._backspacePressedTime - 0.5)*10
+                if ceil(n) >= self._backspaceNumber:
+                    self.setText(self.getText()[:-1])
+                    self._backspaceNumber += 0.5
+
+        if self._returnPressed:
+            self._returnPressedTime += deltaTime
+            if self._returnPressedTime > 0.5:
+                n = (self._returnPressedTime - 0.5)*10
+                if ceil(n) >= self._returnNumber:
+                    self.appendText("\n")
+                    self._returnNumber += 0.5
