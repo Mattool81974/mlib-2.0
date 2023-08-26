@@ -18,6 +18,8 @@ texte.setFontSize(22)
 texte.setFrameWidth(5)
 texte.setInput(True)
 texte.setDynamicTextCutType(1)
+texte.setTextHorizontalAlignment(0)
+texte.setTextVerticalAlignment(2)
 
 while True:
     mapp.frameEvent()

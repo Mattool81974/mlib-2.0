@@ -18,6 +18,11 @@
             Paramètres : text (assignée à la variable <a href="#text">text</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MText")</br>
             Construit un objet MText.
         </div>
+        <h3 id="getCursorVisible">getCursorVisible</h3>
+        <div>
+            paramètres : aucun</br>
+            Retourne si le <a href="#cursorVisible">curseur</a> est visible.
+        </div>
         <h3 id="getDynamicTextCut">getDynamicTextCut</h3>
         <div>
             Paramètres : aucun</br>
@@ -53,6 +58,21 @@
             Paramètres : aucun</br>
             Retourne la <a href="#textColor">couleur du texte</a>.
         </div>
+        <h3 id="getTextHorizontalAlignment">getTextHorizontalAlignment()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne l'<a href="#textHorizontalAlignment">alignement</a> horizontal du texte.
+        </div>
+        <h3 id="getTextVerticalAlignment">getTextVerticalAlignment()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne l'<a href="#textVerticalAlignment">alignement</a> vertical du texte.
+        </div>
+        <h3 id="setCursorVisible">setCursorVisible</h3>
+        <div>
+            paramètres : cursorVisible (nouvelle valeur de si le <a href="#cursorVisible">curseur</a> est visible)</br>
+            Change la valeur de si le <a href="#cursorVisible">curseur</a> est visible à "cursorVisible".
+        </div>
         <h3 id="setDynamicTextCut">setDynamicTextCut</h3>
         <div>
             Paramètres : aucun</br>
@@ -87,6 +107,16 @@
         <div>
             Paramètres : textColor (nouvelle couleur du texte)</br>
             Change la <a href="#textColor">couleur du texte</a> à "textColor".
+        </div>
+        <h3 id="setTextHorizontalAlignment">setTextHorizontalAlignment()</h3>
+        <div>
+            Paramètres : textHorizontalAlignment (nouvel <a href="#textHorizontalAlignment">alignement</a> horizontal du texte)</br>
+            Change l'<a href="#textHorizontalAlignment">alignement</a> horizontal du texte à "textHorizontalAlignment".
+        </div>
+        <h3 id="setTextVerticalAlignment">setTextVerticalAlignment()</h3>
+        <div>
+            Paramètres : textVerticalAlignment (nouvel <a href="#textVerticalAlignment">alignement</a> vertical du texte)</br>
+            Change l'<a href="#textVerticalAlignment">alignement</a> vertical du texte à "textVerticalAlignment".
         </div>
         <h3 id="appendText">appendText()</h3>
         <div>
@@ -139,6 +169,10 @@
         </div>
 
         <h2>Variables</h2>
+        <h3 id="cursorVisible">cursorVisible</h3>
+        <div>
+            Booléen qui indique si le curseur est visible ou non.
+        </div>
         <h3 id="dynamicTextCut">dynamicTextCut</h3>
         <div>
             Booléen qui indique si le texte doit être coupé en ligne si il est trop long.
@@ -169,6 +203,20 @@
         <h3 id="textColor">textColor</h3>
         <div>
             Couleur du texte à afficher.
+        </div>
+        <h3 id="textHorizontalAlignment">textHorizontalAlignment</h3>
+        <div>
+            Nombre qui correspond à l'alignement horizontale du texte.</br>
+            Si il est égal à 0, le texte est aligné vers la gauche.</br>
+            Si il est égal à 1, le texte est aligné vers le milieu.</br>
+            Si il est égal à 2, le texte est aligné vers la droite.
+        </div>
+        <h3 id="textVerticalAlignment">textVerticalAlignment</h3>
+        <div>
+            Nombre qui correspond à l'alignement verticale du texte.</br>
+            Si il est égal à 0, le texte est aligné vers le haut.</br>
+            Si il est égal à 1, le texte est aligné vers le milieu.</br>
+            Si il est égal à 2, le texte est aligné vers le bas.
         </div>
         <h3 id="_backspacePressed">_backspacePressed</h3>
         <div>

@@ -506,6 +506,7 @@ class MText(MFrame):
     def __init__(self, text, x, y, width, height, parent, widgetType = "MText"):
         super().__init__(x, y, width, height, parent, widgetType)
 
+        self.cursorVisible = False
         self.dynamicTextCut = False
         self.dynamicTextCutType = 1
         self.font = "arial"
@@ -513,12 +514,20 @@ class MText(MFrame):
         self.input = False
         self.text = text
         self.textColor = (0, 0, 0)
+        self.textHorizontalAlignment = 0
+        self.textVerticalAlignment = 0
         self._backspacePressed = False
         self._backspacePressedTime = 0
         self._backspaceNumber = 0
         self._returnPressed = False
         self._returnPressedTime = 0
         self._returnNumber = 0
+
+    def appendText(self, text): #Append "text" to text
+        self.setText(self.getText() + text)
+
+    def getCursorVisible(self): #Return cursorVisible
+        return self.cursorVisible
 
     def getDynamicTextCut(self): #Return dynamicTextCut
         return self.dynamicTextCut
@@ -541,12 +550,23 @@ class MText(MFrame):
     def getTextColor(self): #Return textColor
         return self.textColor
     
+    def getTextHorizontalAlignment(self): #Return textHorizontalAlignment
+        return self.textHorizontalAlignment
+    
+    def getTextVerticalAlignment(self): #Return textVerticalAlignment
+        return self.textVerticalAlignment
+    
+    def setCursorVisible(self, cursorVisible): #Return cursorVisible
+        if self.cursorVisible != cursorVisible:
+            self.cursorVisible = cursorVisible
+            self.setShouldModify(True)
+    
     def setDynamicTextCut(self, dynamicTextCut): #Change the value of dynamicTextCut
         if self.dynamicTextCut != dynamicTextCut:
             self.dynamicTextCut = dynamicTextCut
             self.setShouldModify(True)
 
-    def setDynamicTextCutType(self, dynamicTextCutType): #Return dynamicTextCutType
+    def setDynamicTextCutType(self, dynamicTextCutType): #Change the value of dynamicTextCutType
         if self.dynamicTextCutType != dynamicTextCutType:
             self.dynamicTextCutType = dynamicTextCutType
             self.setShouldModify(True)
@@ -574,8 +594,15 @@ class MText(MFrame):
             self.textColor = textColor
             self.setShouldModify(True)
 
-    def appendText(self, text): #Append "text" to text
-        self.setText(self.getText() + text)
+    def setTextHorizontalAlignment(self, textHorizonAlignment): #Change the value of textAlignment
+        if self.textHorizontalAlignment != textHorizonAlignment:
+            self.textHorizontalAlignment = textHorizonAlignment
+            self.setShouldModify(True)
+
+    def setTextVerticalAlignment(self, textVerticalAlignment): #Change the value of textAlignment
+        if self.textVerticalAlignment != textVerticalAlignment:
+            self.textVerticalAlignment = textVerticalAlignment
+            self.setShouldModify(True)
 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
         if self.getInput():
@@ -623,6 +650,9 @@ class MText(MFrame):
         x = self.getFrameWidth(1)
         y = self.getFrameWidth(0)
 
+        if self.getTextVerticalAlignment() == 2:
+            y = self.getHeight() - (self.getFrameWidth(0))
+
         if self.dynamicTextCut: #Cut lines into pieces
             pieces = self.text.split("\n")
         else:
@@ -659,10 +689,32 @@ class MText(MFrame):
                             toAdd += " "
                     pieces.append(toAdd)
 
+        if self.getTextVerticalAlignment() == 2:
+            pieces = pieces[::-1]
+
+        surfaces = []
+        textHeight = 0
         for piece in pieces: #Render text into pieces
             textSurface = generator.render(piece, False, self.textColor)
+            surfaces.append(textSurface)
+            textHeight += textSurface.get_height()
+
+        if self.getTextVerticalAlignment() == 1: #Calculate y including vertical alignment particularity
+            y = self.getHeight()/2 - textHeight/2
+
+        for textSurface in surfaces: #Place text
+            if self.getTextHorizontalAlignment() == 1:
+                x = self.getWidth()/2 - textSurface.get_width()/2
+            elif self.getTextHorizontalAlignment() == 2:
+                x = self.getWidth() - (self.getFrameWidth(3) + textSurface.get_width())
+
+            if self.getTextVerticalAlignment() == 2:
+                y -= textSurface.get_height()
+
             surface.blit(textSurface, (x, y, textSurface.get_width(), textSurface.get_height()))
-            y += textSurface.get_height()
+            
+            if self.getTextVerticalAlignment() != 2:
+                y += textSurface.get_height()
 
         return surface
     
