@@ -25,5 +25,7 @@ texte.setTextVerticalAlignment(0)
 while True:
     mapp.frameEvent()
 
+    print(texte.getFocused())
+
     mapp.frameGraphics()
     pygame.display.flip()

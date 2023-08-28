@@ -336,12 +336,12 @@ class MApp(MWidget):
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button)
             elif event.type == pygame.KEYDOWN: #If a key is pressed on the keyboard
-                overflightedWidget._isKeyGettingPressed(event.key)
+                self.focusedWidget._isKeyGettingPressed(event.key)
                 self.pressedKey.append(event.key)
             elif event.type == pygame.KEYUP: #If a key is dropped on the keyboard
-                overflightedWidget._isKeyGettingDropped(event.key)
+                self.focusedWidget._isKeyGettingDropped(event.key)
             elif event.type == pygame.TEXTINPUT: #If the user is enterring text
-                overflightedWidget._isTextGettingEntered(event.text)
+                self.focusedWidget._isTextGettingEntered(event.text)
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
