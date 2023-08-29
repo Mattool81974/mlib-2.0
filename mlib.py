@@ -521,6 +521,10 @@ class MText(MFrame):
         self._backspacePressed = False
         self._backspacePressedTime = 0
         self._backspaceNumber = 0
+        self._bottomArrowPressed = False
+        self._bottomArrowPressedAtThisFrame = False
+        self._bottomArrowPressedTime = 0
+        self._bottomArrowNumber = 0
         self._cursorFlashingTime = 0.5
         self._cursorIsVisible = True
         self._cursorVisibleTime = 0
@@ -533,6 +537,10 @@ class MText(MFrame):
         self._rightArrowPressed = False
         self._rightArrowPressedTime = 0
         self._rightArrowNumber = 0
+        self._topArrowPressed = False
+        self._topArrowPressedAtThisFrame = False
+        self._topArrowPressedTime = 0
+        self._topArrowNumber = 0
 
     def appendText(self, text, appendAtCursor = True, moveCursor = True): #Append "text" to text
         newText = self.getText()
@@ -548,12 +556,67 @@ class MText(MFrame):
 
     def getCursorPosition(self): #Return cursorPosition
         return self.cursorPosition
+    
+    #def getCursorRect(self, pieces = 0): #Return the rect of the cursor
 
     def getCursorVisible(self): #Return cursorVisible
         return self.cursorVisible
     
     def getCursorWidth(self): #Return cursorWidth
         return self.cursorWidth
+    
+    def getCuttedText(self, generator):
+        addLineToCursor = [] #Boolean list to see if the line is natural or not to the cursor
+        pieces = []
+        spaceWidth = generator.size(" ")[0]
+        textWidth = self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3))
+
+        if not self.getDynamicTextCut(): #Cut lines into pieces
+            pieces = self.text.split("\n")
+        else:
+            lines = self.text.split("\n")
+            for line in lines:
+                firstI = 0
+                lastI = 0
+                lineWidth = 0
+                toAnalyze = line
+                if self.dynamicTextCutType == 1:
+                    toAnalyze = line.split(" ")
+
+                for letter in toAnalyze: #Analyze caracter by caracter/word by word
+                    letterSize = generator.size(letter)
+                    if lineWidth + letterSize[0] > textWidth and firstI != lastI: #If words are bigger than one line
+                        toAdd = ""
+                        for i in range(firstI, lastI):
+                            toAdd += toAnalyze[i]
+                            if self.dynamicTextCutType == 1 and i != lastI - 1:
+                                toAdd += " "
+                        if self.getDynamicTextCutType() == 0:
+                            addLineToCursor.append(0)
+                        else:
+                            addLineToCursor.append(1)
+                        pieces.append(toAdd)
+                        firstI = lastI
+                        lineWidth = 0
+                    lastI += 1
+                    lineWidth += letterSize[0]
+                    if self.dynamicTextCutType == 1:
+                        lineWidth += spaceWidth
+
+                if firstI < len(toAnalyze): #If last word/caracter didn't get analyzed
+                    toAdd = ""
+                    for i in range(firstI, len(toAnalyze)):
+                        toAdd += toAnalyze[i]
+                        if self.dynamicTextCutType == 1 and i != len(toAnalyze) - 1:
+                            toAdd += " "
+                    pieces.append(toAdd)
+
+                if len(toAnalyze) == 0:
+                    pieces.append("")
+
+                addLineToCursor.append(2)
+
+        return pieces.copy(), addLineToCursor.copy()
 
     def getDynamicTextCut(self): #Return dynamicTextCut
         return self.dynamicTextCut
@@ -593,7 +656,10 @@ class MText(MFrame):
             self.setShouldModify(True)
 
     def setCursorWidth(self, cursorWidth): #Change the value of cursorWidth
-        self.cursorWidth = cursorWidth
+        if self.cursorWidth != cursorWidth:
+            self.cursorWidth = cursorWidth
+            if self.getCursorVisible() and self._getCursorIsVisible():
+                self.setShouldModify(True)
     
     def setDynamicTextCut(self, dynamicTextCut): #Change the value of dynamicTextCut
         if self.dynamicTextCut != dynamicTextCut:
@@ -643,6 +709,99 @@ class MText(MFrame):
     def _getCursorIsVisible(self): #Return the value of _cursorIsVisible
         return self._cursorIsVisible
     
+    def _getCursorLine(self, generator): #Return the line of the cursor
+        pieces, piecesLineReturn = self.getCuttedText(generator)
+
+        i = 0
+        yCursor = 0
+        textLength = 0
+        for piece in pieces: #Analyze text line par line
+            textLength += len(piece)
+
+            offset = 0
+            if piecesLineReturn[i] != 0:
+                textLength += 1
+            else:
+                offset = 1
+
+            if textLength <= self.getCursorPosition() - offset:
+                yCursor += 1
+            else:
+                return yCursor
+            
+            i += 1
+        return yCursor
+            
+    def _getCursorX(self, generator): #Return the x pos of the cursor
+        pieces, piecesLineReturn = self.getCuttedText(generator)
+
+        i = -1
+        lineSize = 0
+        textLength = 0
+        textSize = -1
+        for piece in pieces: #Analyze each lines
+            i += 1
+
+            textLength += len(piece)
+            if textLength >= self.getCursorPosition():
+                lineSize = generator.size(piece)[0]
+                textSize = generator.size(piece[0:(self.getCursorPosition()-(textLength-len(piece)))])[0]
+                break
+
+            if piecesLineReturn[i] != 0:
+                textLength += 1
+
+        if textSize == -1:
+            lineSize = generator.size(pieces[-1])[0]
+            textSize = lineSize
+
+        #return textSize
+        if self.getTextHorizontalAlignment() == 0: #Apply alignment modification
+            return textSize + self.getFrameWidth(1)
+        elif self.getTextHorizontalAlignment() == 1:
+            return (self.getWidth()/2-lineSize/2) + textSize
+        else:
+            return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize))
+    
+    def _getCursorY(self, generator): #Return the y pos of the cursor
+        surfaces = self._getTextRendered(generator)
+
+        i = 0
+        line = self._getCursorLine(generator)
+        textHeight = 0
+        yAssignee = True
+        yCursor = -1
+        for piece in surfaces: #Analyze each lines
+            textHeight += piece.get_height()
+
+            if i >= line and yAssignee:
+                yAssignee = False
+                yCursor = textHeight - piece.get_height()
+                
+            i += 1
+
+        if yCursor == -1:
+            yCursor = textHeight - surfaces[-1].get_height()
+
+        if self.getTextVerticalAlignment() == 0: #Apply alignment modification
+            yCursor += self.getFrameWidth(0)
+        elif self.getTextVerticalAlignment() == 1:
+            yCursor += (self.getHeight()/2-textHeight/2)
+        else:
+            yCursor += (self.getHeight()-(self.getFrameWidth(2)+textHeight))
+
+        return yCursor
+    
+    def _getTextRendered(self, generator): #Return a list with all the text rendered
+        pieces = self.getCuttedText(generator)[0]
+        
+        surfaces = []
+        for piece in pieces: #Render text into pieces
+            textSurface = generator.render(piece, False, self.textColor)
+            surfaces.append(textSurface)
+        
+        return surfaces
+    
     def _isGettingMouseDown(self, button): #Function usefull for heritage, call by MApp when the widget is clicked by the mouse
         if button == 1:
             if self.getCursorVisible():
@@ -651,15 +810,22 @@ class MText(MFrame):
                 self.setShouldModify(True)
 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
-        if self.getCursorVisible():
-            if key == pygame.K_LEFT:
-                self._leftArrowPressed = False
-                self._leftArrowPressedTime = 0
-                self._leftArrowNumber = 0
-            elif key == pygame.K_RIGHT:
-                self._rightArrowPressed = False
-                self._rightArrowPressedTime = 0
-                self._rightArrowNumber = 0
+        if key == pygame.K_DOWN:
+            self._bottomArrowPressed = False
+            self._bottomArrowPressedTime = 0
+            self._bottomArrowNumber = 0
+        elif key == pygame.K_LEFT:
+            self._leftArrowPressed = False
+            self._leftArrowPressedTime = 0
+            self._leftArrowNumber = 0
+        elif key == pygame.K_RIGHT:
+            self._rightArrowPressed = False
+            self._rightArrowPressedTime = 0
+            self._rightArrowNumber = 0
+        elif key == pygame.K_UP:
+            self._topArrowPressed = False
+            self._topArrowPressedTime = 0
+            self._topArrowNumber = 0
         
         if self.getInput():
             if key == pygame.K_BACKSPACE:
@@ -673,7 +839,14 @@ class MText(MFrame):
 
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         if self.getCursorVisible(): #Cursor navigation
-            if key == pygame.K_LEFT and len(self.getText()) > 0:
+            if key == pygame.K_DOWN:
+                self._bottomArrowPressedAtThisFrame = True
+                self.setShouldModify(True)
+
+                self._bottomArrowPressed = True
+                self._bottomArrowPressedTime = 0
+                self._bottomArrowNumber = 0
+            elif key == pygame.K_LEFT and len(self.getText()) > 0:
                 self.setCursorPosition(self.getCursorPosition() - 1)
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
@@ -689,17 +862,20 @@ class MText(MFrame):
                 self._rightArrowPressed = True
                 self._rightArrowPressedTime = 0
                 self._rightArrowNumber = 0
+            elif key == pygame.K_UP:
+                self._topArrowPressedAtThisFrame = True
+                self.setShouldModify(True)
+
+                self._topArrowPressed = True
+                self._topArrowPressedTime = 0
+                self._topArrowNumber = 0
         
         if self.getInput(): #Special touch handle
             if key == pygame.K_BACKSPACE:
-                firstI = self.getCursorPosition()-1
-                if firstI == -1:
-                    firstI = 0
-                self.setText(self.getText()[:firstI] + self.getText()[self.getCursorPosition():])
+                self._removeTextAtCursor(1)
                 self._backspacePressed = True
                 self._backspacePressedTime = 0
                 self._backspaceNumber = 0
-                self.setCursorPosition(self.getCursorPosition() - 1)
             elif key == pygame.K_RETURN:
                 self.appendText("\n")
                 self._returnPressed = True
@@ -721,92 +897,34 @@ class MText(MFrame):
         if self.getInput():
             self.appendText(text)
 
+    def _removeTextAtCursor(self, length): #Remove a length-sized piece of text at the cursor
+        firstI = self.getCursorPosition() - length
+        if firstI <= -1:
+            firstI = 0
+        self.setText(self.getText()[:firstI] + self.getText()[self.getCursorPosition():])
+        self.setCursorPosition(self.getCursorPosition() - length)
+
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
         generator = pygame.font.SysFont(self.font, self.fontSize)
-        pieces = []
-        spaceWidth, spaceHeight = generator.size(" ")
-        textWidth = self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3))
+        heightCursor = generator.size(" ")[1]
         x = self.getFrameWidth(1)
         y = self.getFrameWidth(0)
-
-        addLineToCursor = [] #Boolean list to see if the line is natural or not to the cursor
-        heightCursor = spaceHeight
-        surfaceCursorWidth = 0 #Width of the surface where is the cursor
-        xCursor = -1
-        yCursor = 0
 
         if self.getTextVerticalAlignment() == 2:
             y = self.getHeight() - (self.getFrameWidth(0))
 
-        if self.dynamicTextCut: #Cut lines into pieces
-            pieces = self.text.split("\n")
-        else:
-            lines = self.text.split("\n")
-            for line in lines:
-                firstI = 0
-                lastI = 0
-                lineWidth = 0
-                toAnalyze = line
-                if self.dynamicTextCutType == 1:
-                    toAnalyze = line.split(" ")
-
-                for letter in toAnalyze: #Analyze caracter by caracter/word by word
-                    letterSize = generator.size(letter)
-                    if lineWidth + letterSize[0] > textWidth and firstI != lastI: #If words are bigger than one line
-                        toAdd = ""
-                        for i in range(firstI, lastI):
-                            toAdd += toAnalyze[i]
-                            if self.dynamicTextCutType == 1 and i != lastI - 1:
-                                toAdd += " "
-                        addLineToCursor.append(0)
-                        pieces.append(toAdd)
-                        firstI = lastI
-                        lineWidth = 0
-                    lastI += 1
-                    lineWidth += letterSize[0]
-                    if self.dynamicTextCutType == 1:
-                        lineWidth += spaceWidth
-
-                if firstI < len(toAnalyze): #If last word/caracter didn't get analyzed
-                    toAdd = ""
-                    for i in range(firstI, len(toAnalyze)):
-                        toAdd += toAnalyze[i]
-                        if self.dynamicTextCutType == 1 and i != len(toAnalyze) - 1:
-                            toAdd += " "
-                    addLineToCursor.append(0)
-                    pieces.append(toAdd)
-
-                addLineToCursor.append(1)
-
-        if self.getTextVerticalAlignment() == 2:
-            pieces = pieces[::-1]
-
-        surfaces = []
+        surfaces = self._getTextRendered(generator) #Get the text rendered into surface
         textHeight = 0
-        textLength = 0
-        yCursorAssigned = False
-        for piece in pieces: #Render text into pieces
-            textSurface = generator.render(piece, False, self.textColor)
-            surfaces.append(textSurface)
+        for textSurface in surfaces:
             textHeight += textSurface.get_height()
-            textLength += len(piece)
-
-            if self.getCursorVisible() and self._getCursorIsVisible() and self.getFocused(): #Calculate the lines where is the cursor
-                if textLength <= self.getCursorPosition() - 1:
-                    yCursor -= 1 #Negatives number of the line which has the cursor
-                elif not yCursorAssigned: #Calculate the x of the cursor
-                    if self.getTextHorizontalAlignment() == 2:
-                        xCursor = generator.size(piece[(textLength-self.getCursorPosition()):])[0]
-                    else:
-                        xCursor = generator.size(piece[0:(self.getCursorPosition()-(textLength-len(piece)))])[0]
-                    yCursorAssigned = True
-
-            textLength += 1 #Count the "\n"
 
         if self.getTextVerticalAlignment() == 1: #Calculate y including vertical alignment particularity
             y = self.getHeight()/2 - textHeight/2
+
+        if self.getTextVerticalAlignment() == 2:
+            surfaces = surfaces[::-1]
 
         for textSurface in surfaces: #Place text
             if self.getTextHorizontalAlignment() == 1:
@@ -817,24 +935,14 @@ class MText(MFrame):
             if self.getTextVerticalAlignment() == 2:
                 y -= textSurface.get_height()
 
-            if yCursor == 0: #Check if the cursor is on this line
-                surfaceCursorWidth = textSurface.get_width()
-                yCursor = y
-            elif yCursor < 0:
-                yCursor += 1
-
             surface.blit(textSurface, (x, y, textSurface.get_width(), textSurface.get_height()))
             
             if self.getTextVerticalAlignment() != 2:
                 y += textSurface.get_height()
 
         if self.getCursorVisible() and self._getCursorIsVisible() and self.getFocused(): #Draw cursor
-            if self.getTextHorizontalAlignment() == 0:
-                xCursor += self.getFrameWidth(1)
-            elif self.getTextHorizontalAlignment() == 1:
-                xCursor += self.getWidth()/2 - surfaceCursorWidth/2
-            else:
-                xCursor -= self.getFrameWidth(3)
+            xCursor = self._getCursorX(generator)
+            yCursor = self._getCursorY(generator)
             pygame.draw.rect(surface, (0, 0, 0), (xCursor, yCursor, self.getCursorWidth(), heightCursor))
 
         return surface
@@ -851,12 +959,16 @@ class MText(MFrame):
             if self._backspacePressedTime > 0.5:
                 n = (self._backspacePressedTime - 0.5)*10
                 if ceil(n) >= self._backspaceNumber:
-                    firstI = self.getCursorPosition()-1
-                    if firstI == -1:
-                        firstI = 0
-                    self.setCursorPosition(self.getCursorPosition() - 1)
-                    self.setText(self.getText()[:firstI] + self.getText()[self.getCursorPosition():])
+                    self._removeTextAtCursor(1)
                     self._backspaceNumber += 0.5
+
+        if self._bottomArrowPressed:
+            self._bottomArrowPressedTime += deltaTime
+            if self._bottomArrowPressedTime > 0.5:
+                n = (self._bottomArrowPressedTime - 0.5)*10
+                if ceil(n) >= self._bottomArrowNumber:
+                    self._bottomArrowPressedAtThisFrame = True
+                    self._bottomArrowNumber += 0.5
 
         if self._leftArrowPressed:
             self._leftArrowPressedTime += deltaTime
@@ -885,6 +997,14 @@ class MText(MFrame):
                     self._cursorVisibleTime = 0
                     self._setCursorIsVisible(True)
                     self._rightArrowNumber += 0.5
+
+        if self._topArrowPressed:
+            self._topArrowPressedTime += deltaTime
+            if self._topArrowPressedTime > 0.5:
+                n = (self._topArrowPressedTime - 0.5)*10
+                if ceil(n) >= self._topArrowNumber:
+                    self._topArrowPressedAtThisFrame = True
+                    self._topArrowNumber += 0.5
 
         if self.getCursorVisible() and self.getFocused():
             self._cursorVisibleTime += deltaTime
