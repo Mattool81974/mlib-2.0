@@ -36,7 +36,5 @@ for i in range(3):
 while True:
     mapp.frameEvent()
 
-    #print(textes[0][0].getCursorPosition(), len(textes[0][0].getText()))
-
     mapp.frameGraphics()
     pygame.display.flip()

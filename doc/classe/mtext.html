@@ -148,6 +148,11 @@
             Paramètres : textVerticalAlignment (nouvel <a href="#textVerticalAlignment">alignement</a> vertical du texte)</br>
             Change l'<a href="#textVerticalAlignment">alignement</a> vertical du texte à "textVerticalAlignment".
         </div>
+        <h3 id="_cursorBottom">_cursorBottom()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Monte le curseur à la ligne d'au dessus.
+        </div>
         <h3 id="_getCursorIsVisible">_getCursorIsVisible()</h3>
         <div>
             Paramètres : aucun</br>
@@ -159,6 +164,11 @@
             Analyse le texte dans "pieces" et retourne la ligne du curseur.</br>
             Si pieces est à 0, pieces sera égal à <a href="#getCuttedPiece">getCuttedPiece</a>.
         </div>
+        <h3 id="_getCursorPositionAtPos">_getCursorPositionAtPos()</h3>
+        <div>
+            Paramètres : generator (générateur de texte), pos (position à vérifier)</br>
+            Retourne la position du curseur à une certaine position sur la partie graphique du texte.
+        </div>
         <h3 id="_getCursorX">_getCursorX()</h3>
         <div>
             Paramètres : generator (générateur de texte)</br>
@@ -169,6 +179,11 @@
             Paramètres : generator (générateur de texte)</br>
             Retourne la valeur de la coordonnée y du curseur.
         </div>
+        <h3 id="_getTextHeight">_getTextHeight()</h3>
+        <div>
+            Paramètres : generator (générateur de texte)</br>
+            Retourne la hauteur du texte en pixel.
+        </div>
         <h3 id="_getTextRendered">getTextRendered()</h3>
         <div>
             Paramètres : generator (générateur de texte), pieces (texte à générer, basiquement à 0)</br>
@@ -177,10 +192,11 @@
         </div>
         <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
         <div>
-            Paramètres : button (nombre entier du bouton de souris clické)</br>
+            Paramètres : button (nombre entier du bouton de souris clické), relativePos (position relative au widget du curseur de la souris)</br>
             Fonction appelé lorsque le widget est clické.</br>
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
             Ordonne une modification du widget lors d'un click pour commencer à animer le curseur si nécessaire et si la touche pressée est le click gauche.</br>
+            Permet aussi de déplacer le curseur au niveau du click.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isGettingMouseDown">MWidget</a>.
         </div>
         <h3 id = "_isKeyGettingDropped">_isKeyGettingDropped()</h3>

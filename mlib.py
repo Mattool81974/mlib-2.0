@@ -197,7 +197,7 @@ class MWidget:
     def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp (function defined in MApp) or pass hit to his parent
         self.parent._declaringWidget(widget)
 
-    def _isGettingMouseDown(self, button): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+    def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
         pass
 
     def _isGettingMouseUp(self, button): #Function usefull for heritage, call by MApp when the widget is stopping of being clicked (called for only one frame) with button = left button (1) and right button (2)
@@ -331,7 +331,7 @@ class MApp(MWidget):
                 self.focusedWidget._isNotFocusedAnymore()
                 self.focusedWidget = overflightedWidget
                 self.focusedWidget.focused = True
-                overflightedWidget._isGettingMouseDown(event.button)
+                overflightedWidget._isGettingMouseDown(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button)
@@ -706,6 +706,34 @@ class MText(MFrame):
             self.textVerticalAlignment = textVerticalAlignment
             self.setShouldModify(True)
 
+    def _cursorBottom(self): #Put up the cursor into the line at the top
+        self._setCursorIsVisible(True)
+
+        generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
+        heightCursor = generator.size(" ")[1]
+
+        x = self._getCursorX(generator)
+        y = self._getCursorY(generator) + heightCursor + heightCursor/2
+
+        pos = self._getCursorPositionAtPos(generator, (x, y))
+
+        self.setCursorPosition(pos)
+
+    def _cursorTop(self): #Put down the cursor into the line at the top
+        self._setCursorIsVisible(True)
+
+        generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
+        heightCursor = generator.size(" ")[1]
+
+        x = self._getCursorX(generator)
+        y = self._getCursorY(generator) - heightCursor/2
+
+        pos = self._getCursorPositionAtPos(generator, (x, y))
+        if y < 0:
+            pos = 0
+
+        self.setCursorPosition(pos)
+    
     def _getCursorIsVisible(self): #Return the value of _cursorIsVisible
         return self._cursorIsVisible
     
@@ -731,7 +759,58 @@ class MText(MFrame):
             
             i += 1
         return yCursor
-            
+
+    def _getCursorPositionAtPos(self, generator, pos): #Return the position of the cursor at one pos
+        pieces = self.getCuttedText(generator)
+        
+        i = 0
+        lineLength = 0
+        textLength = 0
+        x = self.getFrameWidth(1)
+        y = self.getFrameWidth(0)
+
+        if self.getTextVerticalAlignment() == 1:
+            y = self.getHeight()/2 - self._getTextHeight(generator)/2
+        elif self.getTextVerticalAlignment() == 2:
+            y = self.getHeight() - (self.getFrameWidth(0) + self._getTextHeight(generator))
+
+        if pos[1] < y:
+            return 0
+
+        for piece in pieces[0]: #Search for y
+            size = generator.size(piece)
+
+            lineLength = size[0]
+            y += size[1]
+            if y > pos[1]:
+                break
+            else:
+                textLength += len(piece)
+
+            if pieces[1][i] != 0:
+                textLength += 1
+
+            i += 1
+
+        if i == len(pieces[0]):
+            i -= 1
+
+        if self.getTextHorizontalAlignment() == 1:
+            x = self.getWidth()/2 - lineLength/2
+        elif self.getTextHorizontalAlignment() == 2:
+            x = self.getWidth() - (self.getFrameWidth(3) + lineLength)
+
+        for piece in pieces[0][i]: #Search for x
+            textLength += 1
+            toAdd = generator.size(piece)[0]
+            x += toAdd
+            if x > pos[0]:
+                if (x - pos[0]) > (pos[0] - (x - toAdd)):
+                    textLength -= 1
+                break
+
+        return textLength
+
     def _getCursorX(self, generator): #Return the x pos of the cursor
         pieces, piecesLineReturn = self.getCuttedText(generator)
 
@@ -792,6 +871,14 @@ class MText(MFrame):
 
         return yCursor
     
+    def _getTextHeight(self, generator): #Return the height of the text
+        pieces = self.getCuttedText(generator)[0]
+        textHeight = 0
+
+        for piece in pieces:
+            textHeight += generator.size(piece)[1]
+        return textHeight
+    
     def _getTextRendered(self, generator): #Return a list with all the text rendered
         pieces = self.getCuttedText(generator)[0]
         
@@ -802,11 +889,12 @@ class MText(MFrame):
         
         return surfaces
     
-    def _isGettingMouseDown(self, button): #Function usefull for heritage, call by MApp when the widget is clicked by the mouse
+    def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked by the mouse
         if button == 1:
             if self.getCursorVisible():
                 self._cursorIsVisible = True
                 self._cursorVisibleTime = 0
+                self.setCursorPosition(self._getCursorPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos))
                 self.setShouldModify(True)
 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
@@ -840,6 +928,7 @@ class MText(MFrame):
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         if self.getCursorVisible(): #Cursor navigation
             if key == pygame.K_DOWN:
+                self._cursorBottom()
                 self._bottomArrowPressedAtThisFrame = True
                 self.setShouldModify(True)
 
@@ -863,6 +952,7 @@ class MText(MFrame):
                 self._rightArrowPressedTime = 0
                 self._rightArrowNumber = 0
             elif key == pygame.K_UP:
+                self._cursorTop()
                 self._topArrowPressedAtThisFrame = True
                 self.setShouldModify(True)
 
@@ -969,6 +1059,7 @@ class MText(MFrame):
                 if ceil(n) >= self._bottomArrowNumber:
                     self._bottomArrowPressedAtThisFrame = True
                     self._bottomArrowNumber += 0.5
+                    self._cursorBottom()
 
         if self._leftArrowPressed:
             self._leftArrowPressedTime += deltaTime
@@ -1005,6 +1096,7 @@ class MText(MFrame):
                 if ceil(n) >= self._topArrowNumber:
                     self._topArrowPressedAtThisFrame = True
                     self._topArrowNumber += 0.5
+                    self._cursorTop()
 
         if self.getCursorVisible() and self.getFocused():
             self._cursorVisibleTime += deltaTime
