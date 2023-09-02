@@ -15,23 +15,7 @@ phrase = "Le T-90 est un char de combat russe associant le char T-72B et certain
 nb = 0
 temps = 0
 
-textes = []
-
-for i in range(3):
-    tex = []
-    for j in range(3):
-        texte = MText(phrase, (TAILLE[0]/3)*i, (TAILLE[0]/3)*j, TAILLE[0]/3, TAILLE[1]/3, mapp)
-        texte.setCursorPosition(len(texte.getText()))
-        texte.setCursorVisible(True)
-        texte.setFontSize(22)
-        texte.setFrameWidth(5)
-        texte.setInput(True)
-        texte.setDynamicTextCut(True)
-        texte.setDynamicTextCutType(0)
-        texte.setTextHorizontalAlignment(i)
-        texte.setTextVerticalAlignment(j)
-        tex.append(texte)
-    textes.append(tex)
+image = MImage("C:\\Users\\Matt_o\\Pictures\\brutus.png", 0, 0, 500, 500, mapp)
 
 while True:
     mapp.frameEvent()

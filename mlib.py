@@ -252,7 +252,7 @@ class MWidget:
                 surface.blit(child._render(), child.getRect())
         return surface
     
-    def _update(self): #Function usefull for heritage, call by MApp every frame
+    def _update(self, deltaTime): #Function usefull for heritage, call by MApp every frame
         pass
 
 ###################### Main application class
@@ -389,6 +389,7 @@ class MApp(MWidget):
             self._widgets.append(widget)
             widget._mapp = self
 
+###################### Usefull class to do widget with frame
 class MFrame(MWidget):
     def __init__(self, x, y, width, height, parent, widgetType = "MFrame"):
         super().__init__(x, y, width, height, parent, widgetType)
@@ -502,6 +503,29 @@ class MFrame(MWidget):
         pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
 
+###################### Usefull class to show image
+class MImage(MFrame):
+    def __init__(self, imageLink, x, y, width, height, parent, widgetType = "MImage"):
+        super().__init__(x, y, width, height, parent, widgetType)
+
+        self.imageLink = imageLink
+
+    def getImageLink(self):
+        return self.imageLink
+    
+    def setImageLink(self, imageLink):
+        self.imageLink = imageLink
+        self.setShouldModify(True)
+
+    def _renderBeforeHierarchy(self, surface):
+        surface = super()._renderBeforeHierarchy(surface)
+
+        imageToDraw = image.load(self.getImageLink())
+        surface.blit(imageToDraw, (0, 0, imageToDraw.get_width(), imageToDraw.get_height()))
+
+        return surface
+
+###################### Usefull class to use text
 class MText(MFrame):
     def __init__(self, text, x, y, width, height, parent, widgetType = "MText"):
         super().__init__(x, y, width, height, parent, widgetType)
@@ -557,8 +581,6 @@ class MText(MFrame):
     def getCursorPosition(self): #Return cursorPosition
         return self.cursorPosition
     
-    #def getCursorRect(self, pieces = 0): #Return the rect of the cursor
-
     def getCursorVisible(self): #Return cursorVisible
         return self.cursorVisible
     
