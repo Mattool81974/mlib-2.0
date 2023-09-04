@@ -1,6 +1,7 @@
 from math import *
 from pygame import *
 import pygame
+from os import *
 from time import time_ns
 
 pygame.init()
@@ -503,27 +504,129 @@ class MFrame(MWidget):
         pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
 
-###################### Usefull class to show image
+###################### Usefull class to display image
 class MImage(MFrame):
     def __init__(self, imageLink, x, y, width, height, parent, widgetType = "MImage"):
         super().__init__(x, y, width, height, parent, widgetType)
 
-        self.imageLink = imageLink
+        self.imageHorizontalAlignment = 0
+        self.imageLink = ""
+        self.imagePosition = (0, 0)
+        self.imageReframing = 0
+        self.imageSize = (0, 0)
+        self.imageVerticalAlignment = 0
+        self._image = 0
 
-    def getImageLink(self):
+        self.setImageLink(imageLink)
+
+    def getImageHorizontalAlignment(self): #Return "imageAlignment"
+        return self.imageHorizontalAlignment
+
+    def getImageLink(self): #Return "imageLink"
         return self.imageLink
     
-    def setImageLink(self, imageLink):
-        self.imageLink = imageLink
-        self.setShouldModify(True)
+    def getImagePosition(self): #Return "imagePosition"
+        return self.imagePosition
+    
+    def getImageReframing(self): #Return "imageReframing"
+        return self.imageReframing
+    
+    def getImageSize(self): #Return "imageSize"
+        return self.imageSize
+    
+    def getImageVerticalAlignment(self): #Return "imageVerticalAlignment"
+        return self.imageVerticalAlignment
+    
+    def setImageHorizontalAlignment(self, imageHorizontalAlignment): #Change "imageAlignment"
+        if imageHorizontalAlignment != self.imageHorizontalAlignment:
+            self.imageHorizontalAlignment = imageHorizontalAlignment
+            self.setShouldModify(True)
+    
+    def setImageLink(self, imageLink, editSize = True): #Change "imageLink"
+        if path.exists(imageLink):
+            if imageLink != self.imageLink:
+                self.imageLink = imageLink
+                self._image = image.load(imageLink)
+                self._imageToDraw = self._image
 
-    def _renderBeforeHierarchy(self, surface):
+                if editSize:
+                    self.imageSize = self._image.get_size()
+                self._resizeImage()
+                self.setShouldModify(True)
+        else:
+            print("Attention, l'image au lien ", imageLink, "n'existe pas.")
+
+    def setImagePosition(self, imagePosition): #Change "imagePosition"
+        if imagePosition != self.imagePosition:
+            self.imagePosition = imagePosition
+            if self.getImageHorizontalAlignment() == -1 or self.getImageVerticalAlignment() == -1:
+                self.setShouldModify(True)
+
+    def setImageReframing(self, imageReframing): #Change imageReframing
+        if self.imageReframing != imageReframing:
+            self.imageReframing = imageReframing
+            self._resizeImage()
+            self.setShouldModify(True)
+
+    def setImageSize(self, imageSize): #Change imageSize
+        if self.imageSize != imageSize:
+            self.imageSize = imageSize
+            if self.getImageReframing() == 4:
+                self._resizeImage()
+                self.setShouldModify(True)
+
+    def setImageVerticalAlignment(self, imageVerticalAlignment): #Change imageVerticalAlignment
+        if imageVerticalAlignment != self.imageVerticalAlignment:
+            self.imageVerticalAlignment = imageVerticalAlignment
+            self.setShouldModify(True)
+
+    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
-        imageToDraw = image.load(self.getImageLink())
-        surface.blit(imageToDraw, (0, 0, imageToDraw.get_width(), imageToDraw.get_height()))
+        if self._image != 0:
+            imageToDraw = self._imageToDraw
+            x = 0
+            y = 0
+
+            if self.getImageHorizontalAlignment() == -1:
+                x = self.getImagePosition()[0]
+            elif self.getImageHorizontalAlignment() == 0:
+                x = self.getFrameWidth(1)
+            elif self.getImageHorizontalAlignment() == 1:
+                x = self.getWidth()/2 - imageToDraw.get_width()/2
+            else:
+                x = self.getWidth() - (self.getFrameWidth(3) + imageToDraw.get_width())
+
+            if self.getImageVerticalAlignment() == -1:
+                y = self.getImagePosition()[1]
+            elif self.getImageVerticalAlignment() == 0:
+                y = self.getFrameWidth(0)
+            elif self.getImageVerticalAlignment() == 1:
+                y = self.getHeight()/2 - imageToDraw.get_height()/2
+            else:
+                y = self.getHeight() - (self.getFrameWidth(2) + imageToDraw.get_height())
+
+            surface.blit(imageToDraw, (x, y, imageToDraw.get_width(), imageToDraw.get_height()))
 
         return surface
+
+    def _resizeImage(self): #Resize image (only with reframing)
+        if self.getImageReframing() != 0:
+            if self.getImageReframing() == 1:
+                resizeNumber = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)))/self._image.get_width()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+            elif self.getImageReframing() == 2:
+                resizeNumber = (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))/self._image.get_height()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+            elif self.getImageReframing() == 3:
+                resizeNumberW = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)))/self._image.get_width()
+                resizeNumberH = (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))/self._image.get_height()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+            else:
+                resizeNumberW = self.getImageSize()[0]/self._image.get_width()
+                resizeNumberH = self.getImageSize()[1]/self._image.get_height()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+            self.setShouldModify(True)
 
 ###################### Usefull class to use text
 class MText(MFrame):
