@@ -1,6 +1,7 @@
 from math import *
 from pygame import *
 import pygame
+from os import *
 from time import time_ns
 
 pygame.init()
@@ -503,27 +504,80 @@ class MFrame(MWidget):
         pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
         return surface
 
-###################### Usefull class to show image
+###################### Usefull class to display image
 class MImage(MFrame):
     def __init__(self, imageLink, x, y, width, height, parent, widgetType = "MImage"):
         super().__init__(x, y, width, height, parent, widgetType)
 
-        self.imageLink = imageLink
+        self._image = 0
+        self.imageLink = ""
+        self.imageReframing = 0
+        self.imageSize = (0, 0)
 
-    def getImageLink(self):
+        self.setImageLink(imageLink)
+
+    def getImageLink(self): #Return "imageLink"
         return self.imageLink
     
-    def setImageLink(self, imageLink):
-        self.imageLink = imageLink
-        self.setShouldModify(True)
+    def getImageReframing(self): #Return "imageReframing"
+        return self.imageReframing
+    
+    def getImageSize(self): #Return "imageSize"
+        return self.imageSize
+    
+    def setImageLink(self, imageLink, editSize = True): #Change "imageLink"
+        if path.exists(imageLink):
+            if imageLink != self.imageLink:
+                self.imageLink = imageLink
+                self._image = image.load(imageLink)
+                self._imageToDraw = self._image
 
-    def _renderBeforeHierarchy(self, surface):
+                if editSize:
+                    self.imageSize = self._image.get_size()
+                self._resizeImage()
+                self.setShouldModify(True)
+        else:
+            print("Attention, l'image au lien ", imageLink, "n'existe pas.")
+
+    def setImageReframing(self, imageReframing): #Change imageReframing
+        if self.imageReframing != imageReframing:
+            self.imageReframing = imageReframing
+            self._resizeImage()
+            self.setShouldModify(True)
+
+    def setImageSize(self, imageSize): #Change imageSize
+        if self.imageSize != imageSize:
+            self.imageSize = imageSize
+            if self.getImageReframing() == 4:
+                self._resizeImage()
+                self.setShouldModify(True)
+
+    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
-        imageToDraw = image.load(self.getImageLink())
-        surface.blit(imageToDraw, (0, 0, imageToDraw.get_width(), imageToDraw.get_height()))
+        if self._image != 0:
+            imageToDraw = self._imageToDraw
+            surface.blit(imageToDraw, (0, 0, imageToDraw.get_width(), imageToDraw.get_height()))
 
         return surface
+
+    def _resizeImage(self): #Resize image (only with reframing)
+        if self.getImageReframing() != 0:
+            if self.getImageReframing() == 1:
+                resizeNumber = self.getWidth()/self._image.get_width()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+            elif self.getImageReframing() == 2:
+                resizeNumber = self.getWidth()/self._image.get_height()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+            elif self.getImageReframing() == 3:
+                resizeNumberW = self.getWidth()/self._image.get_width()
+                resizeNumberH = self.getWidth()/self._image.get_height()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+            else:
+                resizeNumberW = self.getImageSize()[0]/self.getWidth()
+                resizeNumberH = self.getImageSize()[1]/self.getWidth()
+                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+            self.setShouldModify(True)
 
 ###################### Usefull class to use text
 class MText(MFrame):

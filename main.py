@@ -5,7 +5,7 @@ from random import randint
 from time import sleep
 
 #TAILLE = (700, 394)
-TAILLE = (900, 900)
+TAILLE = (1000, 1000)
 
 fenetre = display.set_mode(TAILLE)
 mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
@@ -15,7 +15,18 @@ phrase = "Le T-90 est un char de combat russe associant le char T-72B et certain
 nb = 0
 temps = 0
 
-image = MImage("C:\\Users\\Matt_o\\Pictures\\brutus.png", 0, 0, 500, 500, mapp)
+image1 = MImage("C:\\Users\\there\\Pictures\\donaldTrump.png", 0, 0, 500, 500, mapp)
+image1.setImageReframing(1)
+
+image2 = MImage("C:\\Users\\there\\Pictures\\donaldTrump.png", 500, 0, 500, 500, mapp)
+image2.setImageReframing(2)
+
+image3 = MImage("C:\\Users\\there\\Pictures\\donaldTrump.png", 0, 500, 500, 500, mapp)
+image3.setImageReframing(3)
+
+image4 = MImage("C:\\Users\\there\\Pictures\\donaldTrump.png", 500, 500, 500, 500, mapp)
+image4.setImageReframing(4)
+image4.setImageSize((100, 100))
 
 while True:
     mapp.frameEvent()
