@@ -18,7 +18,7 @@
         <div>
             Paramètres : text (assignée à la variable <a href="#text">text</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MText")</br>
             Construit un objet MText.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="appendText">appendText()</h3>
         <div>
@@ -48,7 +48,7 @@
         <div>
             Paramètres : generator (générateur de texte)</br>
             Retourne le texte coupé pour le <a href="#_renderBeforeHierarchy">render</a> et la liste de booléen qui indique si tel ou tel ligne est une découpe du texte ou effectuée par la fonction.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="getDynamicTextCut">getDynamicTextCut()</h3>
         <div>
@@ -97,6 +97,16 @@
             Paramètres : aucun</br>
             Retourne l'<a href="#textHorizontalAlignment">alignement</a> horizontal du texte.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="getTextOffset">getTextOffset()</h3>
+        <div>
+            Paramètres : index (numéro de l'offset à retourner)</br>
+            Retourne :</br>
+            Si index est égal à 0, <a href="#textTopOffset">textTopOffset</a>.</br>
+            Si index est égal à 1, <a href="#textLeftOffset">textLeftOffset</a>.</br>
+            Si index est égal à 2, <a href="#textBottomOffset">textBottomOffset</a>.</br>
+            Si index est égal à 3, <a href="#textRightOffset">textRightOffset</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="getTextVerticalAlignment">getTextVerticalAlignment()</h3>
         <div>
@@ -170,6 +180,17 @@
             Change l'<a href="#textHorizontalAlignment">alignement</a> horizontal du texte à "textHorizontalAlignment".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="getTextOffset">getTextOffset()</h3>
+        <div>
+            Paramètres : textOffset (nouveau décalage du texte), index (numéro de l'offset à retourner, basiquement à 1)</br>
+            Change en "textOffset" la valeur de :</br>
+            Si index est égal à 0, <a href="#textTopOffset">textTopOffset</a>.</br>
+            Si index est égal à 1, <a href="#textLeftOffset">textLeftOffset</a>.</br>
+            Si index est égal à 2, <a href="#textBottomOffset">textBottomOffset</a>.</br>
+            Si index est égal à 3, <a href="#textRightOffset">textRightOffset</a>.</br>
+            Si index est égal à -1, les 5 décalages mentionnés plus haut.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
+        </div>
         <h3 id="setTextVerticalAlignment">setTextVerticalAlignment()</h3>
         <div>
             Paramètres : textVerticalAlignment (nouvel <a href="#textVerticalAlignment">alignement</a> vertical du texte)</br>
@@ -199,19 +220,19 @@
         <div>
             Paramètres : generator (générateur de texte), pos (position à vérifier)</br>
             Retourne la position du curseur à une certaine position sur la partie graphique du texte.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="_getCursorX">_getCursorX()</h3>
         <div>
             Paramètres : generator (générateur de texte)</br>
             Retourne la valeur de la coordonnée x du curseur.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="_getCursorY">_getCursorY()</h3>
         <div>
             Paramètres : generator (générateur de texte)</br>
             Retourne la valeur de la coordonnée y du curseur.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="_getTextHeight">_getTextHeight()</h3>
         <div>
@@ -284,7 +305,7 @@
             -Découpe des lignes à afficher (avec ou sans <a href="#dynamicTextCut">dynamicTextCut</a>)</br>
             -Rendu du texte</br>
             Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="_setCursorIsVisible">_setCursorIsVisible()</h3>
         <div>
@@ -351,10 +372,25 @@
             Texte affiché par le widget.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="textBottomOffset">textBottomOffset</h3>
+        <div>
+            Décalage du texte en bas (avec la bordure basse de <a href="./mframe.html#frameBottomWidth">MFrame</a>).
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
+        </div>
         <h3 id="textColor">textColor</h3>
         <div>
             Couleur du texte à afficher.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="textLeftOffset">textLeftOffset</h3>
+        <div>
+            Décalage du texte à gauche (avec la bordure gauche de <a href="./mframe.html#frameLeftWidth">MFrame</a>).
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
+        </div>
+        <h3 id="textLeftOffset">textRightOffset</h3>
+        <div>
+            Décalage du texte à droite (avec la bordure droite de <a href="./mframe.html#frameRightWidth">MFrame</a>).
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="textHorizontalAlignment">textHorizontalAlignment</h3>
         <div>
@@ -363,6 +399,11 @@
             Si il est égal à 1, le texte est aligné vers le milieu.</br>
             Si il est égal à 2, le texte est aligné vers la droite.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="textTopOffset">textTopOffset</h3>
+        <div>
+            Décalage du texte en haut (avec la bordure haute de <a href="./mframe.html#frameTopWidth">MFrame</a>).
+            Ajouté à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="textVerticalAlignment">textVerticalAlignment</h3>
         <div>

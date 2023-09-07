@@ -642,8 +642,12 @@ class MText(MFrame):
         self.fontSize = 12
         self.input = False
         self.text = text
+        self.textBottomOffset = 0
         self.textColor = (0, 0, 0)
         self.textHorizontalAlignment = 0
+        self.textLeftOffset = 0
+        self.textRightOffset = 0
+        self.textTopOffset = 0
         self.textVerticalAlignment = 0
         self._backspacePressed = False
         self._backspacePressedTime = 0
@@ -694,10 +698,12 @@ class MText(MFrame):
         addLineToCursor = [] #Boolean list to see if the line is natural or not to the cursor
         pieces = []
         spaceWidth = generator.size(" ")[0]
-        textWidth = self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3))
+        textWidth = self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3) + self.getTextOffset(1) + self.getTextOffset(3))
 
         if not self.getDynamicTextCut(): #Cut lines into pieces
             pieces = self.text.split("\n")
+            for i in pieces:
+                addLineToCursor.append(2)
         else:
             lines = self.text.split("\n")
             for line in lines:
@@ -717,9 +723,9 @@ class MText(MFrame):
                             if self.dynamicTextCutType == 1 and i != lastI - 1:
                                 toAdd += " "
                         if self.getDynamicTextCutType() == 0:
-                            addLineToCursor.append(0)
+                            addLineToCursor.append(0) #Cut by a caracter
                         else:
-                            addLineToCursor.append(1)
+                            addLineToCursor.append(1) #Cut by a space
                         pieces.append(toAdd)
                         firstI = lastI
                         lineWidth = 0
@@ -739,7 +745,7 @@ class MText(MFrame):
                 if len(toAnalyze) == 0:
                     pieces.append("")
 
-                addLineToCursor.append(2)
+                addLineToCursor.append(2) #Cut by a line breaker
 
         return pieces.copy(), addLineToCursor.copy()
 
@@ -766,6 +772,16 @@ class MText(MFrame):
     
     def getTextHorizontalAlignment(self): #Return textHorizontalAlignment
         return self.textHorizontalAlignment
+    
+    def getTextOffset(self, index): #Return textTopOffset if index = 0, textLeftOffset if index = 1, textBottomOffset if index = 2, textRightOffset if index = 3
+        if index == 0:
+            return self.textTopOffset
+        elif index == 1:
+            return self.textLeftOffset
+        elif index == 2:
+            return self.textBottomOffset
+        else:
+            return self.textRightOffset
     
     def getTextVerticalAlignment(self): #Return textVerticalAlignment
         return self.textVerticalAlignment
@@ -824,6 +840,26 @@ class MText(MFrame):
     def setTextHorizontalAlignment(self, textHorizonAlignment): #Change the value of textAlignment
         if self.textHorizontalAlignment != textHorizonAlignment:
             self.textHorizontalAlignment = textHorizonAlignment
+            self.setShouldModify(True)
+
+    def setTextOffset(self, textOffset, index = -1): #Change the value of textTopOffset if index = 0, textLeftOffset if index = 1, textBottomOffset if index = 2, textRightOffset if index = 3
+        if index == 0 and self.textTopOffset != textOffset:
+            self.textTopOffset = textOffset
+            self.setShouldModify(True)
+        elif index == 1 and self.textLeftOffset != textOffset:
+            self.textLeftOffset = textOffset
+            self.setShouldModify(True)
+        elif index == 2 and self.textBottomOffset != textOffset:
+            self.textBottomOffset = textOffset
+            self.setShouldModify(True)
+        elif index == 3 and self.textRightOffset != textOffset:
+            self.textRightOffset = textOffset
+            self.setShouldModify(True)
+        elif not (self.textTopOffset != textOffset and self.textLeftOffset == textOffset and self.textBottomOffset == textOffset and self.textRightOffset == textOffset):
+            self.textTopOffset = textOffset
+            self.textLeftOffset = textOffset
+            self.textBottomOffset = textOffset
+            self.textRightOffset = textOffset
             self.setShouldModify(True)
 
     def setTextVerticalAlignment(self, textVerticalAlignment): #Change the value of textAlignment
@@ -891,13 +927,14 @@ class MText(MFrame):
         i = 0
         lineLength = 0
         textLength = 0
-        x = self.getFrameWidth(1)
-        y = self.getFrameWidth(0)
+        x = self.getFrameWidth(1) + self.getTextOffset(1)
+        y = self.getFrameWidth(0) + self.getTextOffset(0)
 
         if self.getTextVerticalAlignment() == 1:
-            y = self.getHeight()/2 - self._getTextHeight(generator)/2
+            y = self.getFrameWidth(0) + self.getTextOffset(0)
+            y += (((self.getHeight()-(self.getFrameWidth(0)+self.getFrameWidth(2)+self.getTextOffset(0)+self.getTextOffset(2)))/2) - self._getTextHeight(generator)/2)
         elif self.getTextVerticalAlignment() == 2:
-            y = self.getHeight() - (self.getFrameWidth(0) + self._getTextHeight(generator))
+            y = self.getHeight() - (self.getFrameWidth(2) + self._getTextHeight(generator) + self.getTextOffset(2))
 
         if pos[1] < y:
             return 0
@@ -921,9 +958,9 @@ class MText(MFrame):
             i -= 1
 
         if self.getTextHorizontalAlignment() == 1:
-            x = self.getWidth()/2 - lineLength/2
+            x = self.getTextOffset(1) + ((self.getWidth()-(self.getTextOffset(1)+self.getTextOffset(3)))/2) - lineLength/2
         elif self.getTextHorizontalAlignment() == 2:
-            x = self.getWidth() - (self.getFrameWidth(3) + lineLength)
+            x = self.getWidth() - (self.getFrameWidth(3) + lineLength + self.getTextOffset(3))
 
         for piece in pieces[0][i]: #Search for x
             textLength += 1
@@ -961,11 +998,11 @@ class MText(MFrame):
 
         #return textSize
         if self.getTextHorizontalAlignment() == 0: #Apply alignment modification
-            return textSize + self.getFrameWidth(1)
+            return textSize + self.getFrameWidth(1) + self.getTextOffset(1)
         elif self.getTextHorizontalAlignment() == 1:
-            return (self.getWidth()/2-lineSize/2) + textSize
+            return self.getTextOffset(1) + ((self.getWidth()-(self.getTextOffset(1)+self.getTextOffset(3)))/2-lineSize/2) + textSize
         else:
-            return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize))
+            return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize) + self.getTextOffset(3))
     
     def _getCursorY(self, generator): #Return the y pos of the cursor
         surfaces = self._getTextRendered(generator)
@@ -988,11 +1025,11 @@ class MText(MFrame):
             yCursor = textHeight - surfaces[-1].get_height()
 
         if self.getTextVerticalAlignment() == 0: #Apply alignment modification
-            yCursor += self.getFrameWidth(0)
+            yCursor += self.getFrameWidth(0) + self.getTextOffset(0)
         elif self.getTextVerticalAlignment() == 1:
-            yCursor += (self.getHeight()/2-textHeight/2)
+            yCursor += self.getFrameWidth(0) + self.getTextOffset(0) + ((self.getHeight()-(self.getFrameWidth(0)+self.getFrameWidth(2)+self.getTextOffset(0)+self.getTextOffset(2)))/2-textHeight/2)
         else:
-            yCursor += (self.getHeight()-(self.getFrameWidth(2)+textHeight))
+            yCursor = (self.getHeight()-((textHeight-yCursor)+self.getFrameWidth(2)+self.getTextOffset(2)))
 
         return yCursor
     
@@ -1124,11 +1161,11 @@ class MText(MFrame):
 
         generator = pygame.font.SysFont(self.font, self.fontSize)
         heightCursor = generator.size(" ")[1]
-        x = self.getFrameWidth(1)
-        y = self.getFrameWidth(0)
+        x = self.getFrameWidth(1) + self.getTextOffset(1)
+        y = self.getFrameWidth(0) + self.getTextOffset(0)
 
         if self.getTextVerticalAlignment() == 2:
-            y = self.getHeight() - (self.getFrameWidth(0))
+            y = self.getHeight() - (self.getFrameWidth(2) + self.getTextOffset(2))
 
         surfaces = self._getTextRendered(generator) #Get the text rendered into surface
         textHeight = 0
@@ -1136,16 +1173,16 @@ class MText(MFrame):
             textHeight += textSurface.get_height()
 
         if self.getTextVerticalAlignment() == 1: #Calculate y including vertical alignment particularity
-            y = self.getHeight()/2 - textHeight/2
+            y = self.getFrameWidth(0) + self.getTextOffset(0) + ((self.getHeight()-(self.getFrameWidth(0)+self.getFrameWidth(2)+self.getTextOffset(0)+self.getTextOffset(2)))/2 - textHeight/2)
 
         if self.getTextVerticalAlignment() == 2:
             surfaces = surfaces[::-1]
 
         for textSurface in surfaces: #Place text
             if self.getTextHorizontalAlignment() == 1:
-                x = self.getWidth()/2 - textSurface.get_width()/2
+                x = self.getTextOffset(1) + ((self.getWidth()-(self.getFrameWidth(1)+self.getFrameWidth(3)+self.getTextOffset(1)+self.getTextOffset(3)))/2) - textSurface.get_width()/2
             elif self.getTextHorizontalAlignment() == 2:
-                x = self.getWidth() - (self.getFrameWidth(3) + textSurface.get_width())
+                x = self.getWidth() - (self.getFrameWidth(3) + textSurface.get_width() + self.getTextOffset(3))
 
             if self.getTextVerticalAlignment() == 2:
                 y -= textSurface.get_height()
