@@ -18,7 +18,8 @@ temps = 0
 texte = MText("", 300, 0, 600, 900, mapp)
 texte.setCursorVisible(True)
 texte.setDynamicTextCut(True)
-texte.setFontSize(19)
+texte.setFont("Consolas")
+texte.setFontSize(17)
 texte.setInput(True)
 
 while True:

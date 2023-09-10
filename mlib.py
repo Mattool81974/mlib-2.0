@@ -642,6 +642,9 @@ class MText(MFrame):
         self.font = "arial"
         self.fontSize = 12
         self.input = False
+        self.selection = False
+        self.selectionStart = 0
+        self.selectionStop = 0
         self.text = text
         self.textBottomOffset = 0
         self.textColor = (0, 0, 0)
@@ -676,6 +679,13 @@ class MText(MFrame):
         self._topArrowNumber = 0
 
     def appendText(self, text, appendAtCursor = True, moveCursor = True): #Append "text" to text
+        i = 0
+        while i < len(text): #Delete ord(13) weird caracter
+            if(ord(text[i])) == 13:
+               text = text[:i] + text[i+1:len(text)]
+               i -= 1
+            i += 1
+        
         newText = self.getText()
         if appendAtCursor:
             newText = newText[0:self.getCursorPosition()] + text + newText[self.getCursorPosition():]
@@ -766,6 +776,9 @@ class MText(MFrame):
     def getInput(self): #Return input
         return self.input
 
+    def getSelection(self): #Return selection
+        return self.selection
+
     def getText(self): #Return text
         return self.text
     
@@ -827,6 +840,12 @@ class MText(MFrame):
     def setInput(self, input): #Change the value of input
         self.input = input
     
+    def setSelection(self, selection): #Change the value of selection
+        if selection != self.getSelection():
+            self.selection = selection
+            if self.selectionStart != self.selectionStop:
+                self.setShouldModify(True)
+
     def setText(self, text): #Change the value of text
         if self.text != text:
             self.text = text
@@ -875,10 +894,10 @@ class MText(MFrame):
         generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
         heightCursor = generator.size(" ")[1]
 
-        x = self._getCursorX(generator)
-        y = self._getCursorY(generator) + heightCursor + heightCursor/2
+        x = self._getPositionX(generator, self.getCursorPosition())
+        y = self._getPositionY(generator, self.getCursorPosition()) + heightCursor + heightCursor/2
 
-        pos = self._getCursorPositionAtPos(generator, (x, y))
+        pos = self._getPositionAtPos(generator, (x, y))
 
         self.setCursorPosition(pos)
 
@@ -888,10 +907,10 @@ class MText(MFrame):
         generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
         heightCursor = generator.size(" ")[1]
 
-        x = self._getCursorX(generator)
-        y = self._getCursorY(generator) - heightCursor/2
+        x = self._getPositionX(generator, self.getCursorPosition())
+        y = self._getPositionY(generator, self.getCursorPosition()) - heightCursor/2
 
-        pos = self._getCursorPositionAtPos(generator, (x, y))
+        pos = self._getPositionAtPos(generator, (x, y))
         if y < 0:
             pos = 0
 
@@ -900,7 +919,7 @@ class MText(MFrame):
     def _getCursorIsVisible(self): #Return the value of _cursorIsVisible
         return self._cursorIsVisible
     
-    def _getCursorLine(self, generator): #Return the line of the cursor
+    def _getPositionLine(self, generator, position): #Return the line of the cursor
         pieces, piecesLineReturn = self.getCuttedText(generator)
 
         i = 0
@@ -915,7 +934,7 @@ class MText(MFrame):
             else:
                 offset = 1
 
-            if textLength <= self.getCursorPosition() - offset:
+            if textLength <= position - offset:
                 yCursor += 1
             else:
                 return yCursor
@@ -923,7 +942,7 @@ class MText(MFrame):
             i += 1
         return yCursor
 
-    def _getCursorPositionAtPos(self, generator, pos): #Return the position of the cursor at one pos
+    def _getPositionAtPos(self, generator, pos): #Return the position of the cursor at one pos
         pieces = self.getCuttedText(generator)
         
         i = 0
@@ -975,7 +994,7 @@ class MText(MFrame):
 
         return textLength
 
-    def _getCursorX(self, generator): #Return the x pos of the cursor
+    def _getPositionX(self, generator, position): #Return the x pos of the cursor
         pieces, piecesLineReturn = self.getCuttedText(generator)
 
         i = -1
@@ -986,9 +1005,9 @@ class MText(MFrame):
             i += 1
 
             textLength += len(piece)
-            if textLength >= self.getCursorPosition():
+            if textLength >= position:
                 lineSize = generator.size(piece)[0]
-                textSize = generator.size(piece[0:(self.getCursorPosition()-(textLength-len(piece)))])[0]
+                textSize = generator.size(piece[0:(position-(textLength-len(piece)))])[0]
                 break
 
             if piecesLineReturn[i] != 0:
@@ -1006,11 +1025,11 @@ class MText(MFrame):
         else:
             return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize) + self.getTextOffset(3))
     
-    def _getCursorY(self, generator): #Return the y pos of the cursor
+    def _getPositionY(self, generator, position): #Return the y pos of the cursor
         surfaces = self._getTextRendered(generator)
 
         i = 0
-        line = self._getCursorLine(generator)
+        line = self._getPositionLine(generator, position)
         textHeight = 0
         yAssignee = True
         yCursor = -1
@@ -1058,7 +1077,7 @@ class MText(MFrame):
             if self.getCursorVisible():
                 self._cursorIsVisible = True
                 self._cursorVisibleTime = 0
-                self.setCursorPosition(self._getCursorPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos))
+                self.setCursorPosition(self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos))
                 self.setShouldModify(True)
 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
@@ -1213,8 +1232,8 @@ class MText(MFrame):
                 y += textSurface.get_height()
 
         if self.getCursorVisible() and self._getCursorIsVisible() and self.getFocused(): #Draw cursor
-            xCursor = self._getCursorX(generator)
-            yCursor = self._getCursorY(generator)
+            xCursor = self._getPositionX(generator, self.getCursorPosition())
+            yCursor = self._getPositionY(generator, self.getCursorPosition())
             pygame.draw.rect(surface, (0, 0, 0), (xCursor, yCursor, self.getCursorWidth(), heightCursor))
 
         return surface

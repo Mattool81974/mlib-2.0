@@ -24,7 +24,7 @@
         <div>
             Paramètres : text (text à ajouter), appendAtCursor (booléen qui indique si le texte est ajouté au niveau du curseur ou pas, basiquement à True), moveCursor (booléen qui indique si le curseur doit bouger avec le texte, basiquement à True)</br>
             Ajoute le "text" à <a href="#text">text</a>, soit à la fin si appendAtCursor est False, soit au niveau du curseur si appendAtCursor est False, et bouge le curseur si moveCursor est True.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="getCursorPosition">getCursorPosition()</h3>
         <div>
@@ -79,6 +79,12 @@
             Paramètres : aucun</br>
             Retourne si le widget est utilisé comme <a href="#input">entré</a> ou non.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="getSelection">getSelection()</h3>
+        <div>
+            Paramètres : aucun()</h3>
+            Retourne si la <a href="#selection">sélection</a> est possible ou non.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="getText">getText()</h3>
         <div>
@@ -159,8 +165,14 @@
         <h3 id="setInput">setInput()</h3>
         <div>
             Paramètres : input (nouvelle valeur de si le widget est utilisé comme <a href="#input">entré</a>)</br>
-            Change si le widget est utilisé comme <a href="#input">entré</a> ou non à "input".</br>
+            Change si le widget est utilisé comme <a href="#input">entré</a> ou non par "input".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="setSelection">setSelection()</h3>
+        <div>
+            Paramètres : selection (nouvelle valeur de si la <a href="#selection">sélection</a> est possible ou non)</br>
+            Change si la <a href="#selection">sélection</a> est possible ou non par "selection".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="setText">setText()</h3>
         <div>
@@ -209,29 +221,33 @@
             Retourne la valeur de <a href="#_cursorIsVisible">_cursorIsVisible</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
-        <h3 id="_getCursorLine">_getCursorLine()</h3>
+        <h3 id="_getPositionLine">_getPositionLine()</h3>
         <div>
-            Paramètres : generator (générateur de texte)</br>
-            Analyse le texte dans "pieces" et retourne la ligne du curseur.</br>
+            Paramètres : generator (générateur de texte), position (position dans le texte où l'on veut connaître la ligne)</br>
+            Analyse le texte dans "pieces" et retourne la ligne de "position".</br>
             Si pieces est à 0, pieces sera égal à <a href="#getCuttedPiece">getCuttedPiece</a>.</br>
+            Avant la version 1.3.0, cette fonction s'appelée "_getCursorLine".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
-        <h3 id="_getCursorPositionAtPos">_getCursorPositionAtPos()</h3>
+        <h3 id="_getPositionAtPos">_getPositionAtPos()</h3>
         <div>
             Paramètres : generator (générateur de texte), pos (position à vérifier)</br>
             Retourne la position du curseur à une certaine position sur la partie graphique du texte.</br>
-            Modifié à la <a href="../versions.html">version</a> 1.2.0.
+            Avant la version 1.3.0, cette fonction s'appelée "_getCursorPositionAtPos".</br>
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
-        <h3 id="_getCursorX">_getCursorX()</h3>
+        <h3 id="_getPositionX">_getPositionX()</h3>
         <div>
-            Paramètres : generator (générateur de texte)</br>
-            Retourne la valeur de la coordonnée x du curseur.</br>
-            Modifié à la <a href="../versions.html">version</a> 1.2.0.
+            Paramètres : generator (générateur de texte), position (position à laquelle obtenir le X)</br>
+            Retourne la valeur de la coordonnée x de la position "position" dans le texte.</br>
+            Avant la version 1.3.0, cette fonction s'appelée "_getCursorX".</br>
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
-        <h3 id="_getCursorY">_getCursorY()</h3>
+        <h3 id="_getPositionY">_getPositionY()</h3>
         <div>
-            Paramètres : generator (générateur de texte)</br>
-            Retourne la valeur de la coordonnée y du curseur.</br>
+            Paramètres : generator (générateur de texte), position (position à laquelle obtenir le Y)</br>
+            Retourne la valeur de la coordonnée y de la position "position" dans le texte.</br>
+            Avant la version 1.3.0, cette fonction s'appelée "_getCursorY".</br>
             Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
         <h3 id="_getTextHeight">_getTextHeight()</h3>
@@ -366,6 +382,23 @@
             Booléen qui indique si le MText est utilisé comme une entrée ou non.</br>
             Si il est égal à True, alors le MText réagira aux entrées du clavier si il est focus grâce à <a href="./mwidget.html#_isKeyGettingPressed">_isKeyGettingPressed()</a> de MWidget.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="selection">selection</h3>
+        <div>
+            Indique si la sélection dans le texte est possible ou non.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="selectionStart">selectionStart</h3>
+        <div>
+            Position dans le texte où la sélection commence.</br>
+            Elle utilise le même système de numérotation de la position que <a href="cursorPosition">cursorPosition</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="selectionStop">selectionStop</h3>
+        <div>
+            Position dans le texte où la sélection s'arrête.</br>
+            Elle utilise le même système de numérotation de la position que <a href="cursorPosition">cursorPosition</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="text">text</h3>
         <div>
