@@ -1,6 +1,7 @@
 from math import *
 from pygame import *
 import pygame
+from pyperclip import *
 from os import *
 from time import time_ns
 
@@ -656,6 +657,7 @@ class MText(MFrame):
         self._bottomArrowPressedAtThisFrame = False
         self._bottomArrowPressedTime = 0
         self._bottomArrowNumber = 0
+        self._controlPressed = False
         self._cursorFlashingTime = 0.5
         self._cursorIsVisible = True
         self._cursorVisibleTime = 0
@@ -1077,15 +1079,16 @@ class MText(MFrame):
             self._topArrowPressedTime = 0
             self._topArrowNumber = 0
         
-        if self.getInput():
-            if key == pygame.K_BACKSPACE:
-                self._backspacePressed = False
-                self._backspacePressedTime = 0
-                self._backspaceNumber = 0
-            elif key == pygame.K_RETURN:
-                self._returnPressed = False
-                self._returnPressedTime = 0
-                self._returnNumber = 0
+        if key == pygame.K_BACKSPACE:
+            self._backspacePressed = False
+            self._backspacePressedTime = 0
+            self._backspaceNumber = 0
+        elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
+            self._controlPressed = False
+        elif key == pygame.K_RETURN:
+            self._returnPressed = False
+            self._returnPressedTime = 0
+            self._returnNumber = 0
 
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         if self.getCursorVisible(): #Cursor navigation
@@ -1128,19 +1131,36 @@ class MText(MFrame):
                 self._backspacePressed = True
                 self._backspacePressedTime = 0
                 self._backspaceNumber = 0
+            elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
+                self._controlPressed = True
             elif key == pygame.K_RETURN:
                 self.appendText("\n")
                 self._returnPressed = True
                 self._returnPressedTime = 0
                 self._returnNumber = 0
+            elif key == pygame.K_v and self._controlPressed:
+                self.appendText(paste())
 
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        self._bottomArrowPressed = False
+        self._bottomArrowPressedTime = 0
+        self._bottomArrowNumber = 0
         self._backspacePressed = False
         self._backspacePressedTime = 0
         self._backspaceNumber = 0
+        self._controlPressed = False
+        self._leftArrowPressed = False
+        self._leftArrowPressedTime = 0
+        self._leftArrowNumber = 0
         self._returnPressed = False
         self._returnPressedTime = 0
         self._returnNumber = 0
+        self._rightArrowPressed = False
+        self._rightArrowPressedTime = 0
+        self._rightArrowNumber = 0
+        self._topArrowPressed = False
+        self._topArrowPressedTime = 0
+        self._topArrowNumber = 0
 
         if self.getCursorVisible():
             self.setShouldModify(True)

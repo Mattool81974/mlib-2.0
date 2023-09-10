@@ -263,7 +263,7 @@
             Fonction appelé lorsque le widget est focus est qu'une touche est pressée.</br>
             Reset <a href="#_backspacePressed">_backspacePressed</a> et <a href="#_returnPressed">_returnPressed</a>.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isKeyGettingDropped">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isKeyGettingPressed">_isKeyGettingPressed()</h3>
         <div>
@@ -273,15 +273,15 @@
             Cette fonction est utilisé à la place de <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3> pour certains caractères spéciaux (comme le retour à la ligne).</br>
             Elle permet aussi de faire naviguer le curseur avec les flèches.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isKeyGettingPressed">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isNotFocusedAnymore">_isNotFocusedAnymore()</h3>
         <div>
             Paramètres : aucun</br>
             Fonction appelé lorsque le widget n'est plus focus.</br>
-            Permet de savoir quand le widget n'est plus focus pour reset <a href="#_backspacePressed">backspacePressed</a> et <a href="#_returnPressed">returnPressed</a>.</br>
+            Permet de savoir quand le widget n'est plus focus pour reset <a href="#_backspacePressed">backspacePressed</a>, <a href="#_returnPressed">returnPressed</a>, les flèches et la touche contrôle.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isNotFocusedAnymore">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3>
         <div>
@@ -449,6 +449,11 @@
         <div>
             Nombre de "bottomArrow" appliqués au texte.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="_controlPressed">_controlPressed</h3>
+        <div>
+            Booléen qui indique si la touche contrôle (droite ou gauche) est pressée.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="_cursorFlashingTime">_cursorFlashingTime</h3>
         <div>
