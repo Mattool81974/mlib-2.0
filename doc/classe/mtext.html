@@ -82,8 +82,32 @@
         </div>
         <h3 id="getSelection">getSelection()</h3>
         <div>
-            Paramètres : aucun()</h3>
+            Paramètres : aucun</br>
             Retourne si la <a href="#selection">sélection</a> est possible ou non.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="getSelectionBackgroundColor">getSelectionBackgroundColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#selectionBackgroundColor">couleur</a> d'arrière plan de la sélection du texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="getSelectionStart">getSelectionStart()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#selectionStart">position</a> dans le texte où la sélection commence.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="getSelectionStop">getSelectionStop()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#selectionStop">position</a> dans le texte où la sélection s'arrête.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="getSelectionTextColor">getSelectionTextColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#selectionTextColor">couleur</a> du texte dans la sélection.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="getText">getText()</h3>
@@ -164,14 +188,45 @@
         </div>
         <h3 id="setInput">setInput()</h3>
         <div>
-            Paramètres : input (nouvelle valeur de si le widget est utilisé comme <a href="#input">entré</a>)</br>
+            Paramètres : input (nouvelle valeur de si le widget est utilisé comme <a href="#input">entré</a>), changeAll (indique si la fonction change l'apparence du <a href="#setCursorVisible">curseur</a> et de la <a href="#setSelection">sélection</a>, basiquement à True)</br>
             Change si le widget est utilisé comme <a href="#input">entré</a> ou non par "input".</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Elle change aussi l'apparence du <a href="#setCursorVisible">curseur</a> et de la <a href="#setSelection">sélection</a> si "changeAll" est True.</br>
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="setSelection">setSelection()</h3>
         <div>
             Paramètres : selection (nouvelle valeur de si la <a href="#selection">sélection</a> est possible ou non)</br>
             Change si la <a href="#selection">sélection</a> est possible ou non par "selection".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="setSelectionBackgroundColor">setSelectionBackgroundColor()</h3>
+        <div>
+            Paramètres : selectionBackgroundColor (nouvelle <a href="#selectionBackgroundColor">couleur</a> d'arrière plan de la sélection du texte)</br>
+            Change la <a href="#selectionBackgroundColor">couleur</a> d'arrière plan de la sélection du texte par "selectionBackgroundColor".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="setSelectionPos">setSelectionPos()</h3>
+        <div>
+            Paramètres : selectionStart (nouvelle <a href="#selectionStart">position</a> dans le texte où la sélection commence), selectionStop (nouvelle <a href="#selectionStop">position</a> dans le texte où la sélection s'arrête)</br>
+            Change la <a href="#selectionStart">position</a> dans le texte où la sélection commence et la valeur de la <a href="#selectionStop">position</a> dans le texte où la sélection s'arrête en même temps plus efficacement qu'avec <a href="setSelectionStart">setSelectionStart</a> et <a href="#setSelectionStop">setSelectionStop</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="setSelectionStart">setSelectionStart()</h3>
+        <div>
+            Paramètres : selectionStart (nouvelle <a href="#selectionStart">position</a> dans le texte où la sélection commence)</br>
+            Change la <a href="#selectionStart">position</a> dans le texte où la sélection commence par "selectionStart".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="setSelectionStop">setSelectionStop()</h3>
+        <div>
+            Paramètres : selectionStop (nouvelle <a href="#selectionStop">position</a> dans le texte où la sélection s'arrête)</br>
+            Change la <a href="#selectionStop">position</a> dans le texte où la sélection s'arrête par "selectionStop".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="setSelectionTextColor">setSelectionTextColor()</h3>
+        <div>
+            Paramètres : selectionTextColor (nouvelle <a href="#selectionTextColor">couleur</a> du texte dans la sélection)</br>
+            Change la <a href="#selectionTextColor">couleur</a> du texte dans la sélection par "selectionTextColor".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="setText">setText()</h3>
@@ -209,7 +264,19 @@
             Change l'<a href="#textVerticalAlignment">alignement</a> vertical du texte à "textVerticalAlignment".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="_checkSelection">_checkSelection()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Vérifie si la sélection est cohérente avec le texte, sinon, la modifie pour qu'elle le devienne.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
         <h3 id="_cursorBottom">_cursorBottom()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Descend le curseur à la ligne d'au dessous.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="_cursorTop">_cursorBottom()</h3>
         <div>
             Paramètres : aucun</br>
             Monte le curseur à la ligne d'au dessus.</br>
@@ -260,8 +327,9 @@
         <div>
             Paramètres : generator (générateur de texte), pieces (texte à générer, basiquement à 0)</br>
             Retourne une liste qui contient les surfaces du texte à générer.</br>
+            Elle s'occupe aussi d'appliquer les modifications graphiques dû à la <a href="#selection">selection</a>.</br>
             Si pieces est à 0, pieces sera égal à <a href="#getCuttedPiece">getCuttedPiece</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
         <div>
@@ -269,9 +337,9 @@
             Fonction appelé lorsque le widget est clické.</br>
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
             Ordonne une modification du widget lors d'un click pour commencer à animer le curseur si nécessaire et si la touche pressée est le click gauche.</br>
-            Permet aussi de déplacer le curseur au niveau du click.</br>
+            Permet aussi de déplacer le curseur au niveau du click et d'annuler la valeur de <a href="#selectionStart">selectionStart</a> et <a href="#selectionStart">selectionStop</a> en leur attribuant la même valeur.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isGettingMouseDown">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isKeyGettingDropped">_isKeyGettingDropped()</h3>
         <div>
@@ -321,7 +389,7 @@
             -Découpe des lignes à afficher (avec ou sans <a href="#dynamicTextCut">dynamicTextCut</a>)</br>
             -Rendu du texte</br>
             Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.</br>
-            Modifié à la <a href="../versions.html">version</a> 1.2.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="_setCursorIsVisible">_setCursorIsVisible()</h3>
         <div>
@@ -388,16 +456,28 @@
             Indique si la sélection dans le texte est possible ou non.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
+        <h3 id="selectionBackgroundColor">selectionBackgroundColor</h3>
+        <div>
+            Couleur derrière la partie sélectionnée du texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
         <h3 id="selectionStart">selectionStart</h3>
         <div>
             Position dans le texte où la sélection commence.</br>
             Elle utilise le même système de numérotation de la position que <a href="cursorPosition">cursorPosition</a>.</br>
+            Si elle est égal à <a href="#selectionStop">selectionStop</a>, il n'y a pas de sélection.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="selectionStop">selectionStop</h3>
         <div>
             Position dans le texte où la sélection s'arrête.</br>
             Elle utilise le même système de numérotation de la position que <a href="cursorPosition">cursorPosition</a>.</br>
+            Si elle est égal à <a href="#selectionStart">selectionStart</a>, il n'y a pas de sélection.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="selectionTextColor">selectionTextColor</h3>
+        <div>
+            Couleur du texte de la partie sélectionnée.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="text">text</h3>
