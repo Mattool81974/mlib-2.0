@@ -220,6 +220,9 @@ class MWidget:
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
+    def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
+        pass
+
     def _removeChild(self, child): #Remove a child to the widget
         id = self.containsChild(child.getId())
         if id != -1:
@@ -337,6 +340,8 @@ class MApp(MWidget):
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
+            elif event.type == pygame.MOUSEMOTION: #If hte mouse is moving
+                self.focusedWidget._mouseMove(event.buttons, event.pos, event.rel)
             elif event.type == pygame.KEYDOWN: #If a key is pressed on the keyboard
                 self.focusedWidget._isKeyGettingPressed(event.key)
                 self.pressedKey.append(event.key)
@@ -1140,19 +1145,20 @@ class MText(MFrame):
         i = 0
         isSelected = False
         selectionStarted = False
+        selectionStartOffset = -1
         surfaces = []
         textLength = 0
         for piece in pieces: #Render text into pieces
             textLength += len(piece)
             if addLineToReturn[i] != 0:
                 textLength += 1
-            if self.getSelection() and self.getSelectionStart() != self.getSelectionStop() and textLength > self.getSelectionStart() and (not selectionStarted or isSelected): #If the selection start at this line
+            if self.getSelection() and self.getSelectionStart() != self.getSelectionStop() and textLength > self.getSelectionStart() + selectionStartOffset and (not selectionStarted or isSelected): #If the selection start at this line
                 if not selectionStarted: #Start selection
                     isSelected = True
                     selectionStarted = True
-                    if textLength >= self.getSelectionStop(): #And end at this line too
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart())], False, self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
+                    if textLength >= self.getSelectionStop() + selectionStartOffset: #And end at this line too
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], False, self.getTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
                         textSurface3 = generator.render(piece[self.getSelectionStop():len(piece)], False, self.getTextColor())
                         surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
@@ -1164,8 +1170,8 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
                     else:
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart())], False, self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], False, self.getTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1174,7 +1180,7 @@ class MText(MFrame):
                         textSurface.blit(textSurface2, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
                         surfaces.append(textSurface)
                 elif isSelected: #Line in the middle of the selection
-                    if textLength < self.getSelectionStop(): #And end at this line too
+                    if textLength < self.getSelectionStop() + selectionStartOffset: #And end at this line too
                         textSurface1 = generator.render(piece, False, self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
@@ -1183,8 +1189,8 @@ class MText(MFrame):
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
                     else: #End selection in a another line than the first selection position
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()):], False, self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], False, self.getSelectionTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], False, self.getTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1202,10 +1208,10 @@ class MText(MFrame):
     
     def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked by the mouse
         if button == 1:
+            cursorPos = self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos)
             if self.getCursorVisible():
                 self._cursorIsVisible = True
                 self._cursorVisibleTime = 0
-                cursorPos = self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos)
                 self.setCursorPosition(cursorPos)
                 self.setShouldModify(True)
             self.setSelectionPos(cursorPos, cursorPos)
@@ -1213,6 +1219,8 @@ class MText(MFrame):
     def _isGettingMouseUp(self, button, relativePos): ##Function usefull for heritage, call by MApp when the widget isn't clicked by the mouse anymore
         if button == 1:
             cursorPos = self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos)
+            if self.getCursorVisible():
+                self.setCursorPosition(cursorPos)
             self.setSelectionStop(cursorPos)
                 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
