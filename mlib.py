@@ -341,7 +341,7 @@ class MApp(MWidget):
                 overflightedWidget.mouseUp = event.button
                 overflightedWidget._isGettingMouseUp(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
             elif event.type == pygame.MOUSEMOTION: #If hte mouse is moving
-                self.focusedWidget._mouseMove(event.buttons, event.pos, event.rel)
+                self.focusedWidget._mouseMove(event.buttons, (event.pos[0] - self.focusedWidget.getX(), event.pos[1] - self.focusedWidget.getY()), event.rel)
             elif event.type == pygame.KEYDOWN: #If a key is pressed on the keyboard
                 self.focusedWidget._isKeyGettingPressed(event.key)
                 self.pressedKey.append(event.key)
@@ -663,6 +663,7 @@ class MText(MFrame):
         self._backspacePressed = False
         self._backspacePressedTime = 0
         self._backspaceNumber = 0
+        self._baseSelection = 0
         self._bottomArrowPressed = False
         self._bottomArrowPressedAtThisFrame = False
         self._bottomArrowPressedTime = 0
@@ -1215,13 +1216,13 @@ class MText(MFrame):
                 self.setCursorPosition(cursorPos)
                 self.setShouldModify(True)
             self.setSelectionPos(cursorPos, cursorPos)
+            self._baseSelection = cursorPos
 
     def _isGettingMouseUp(self, button, relativePos): ##Function usefull for heritage, call by MApp when the widget isn't clicked by the mouse anymore
         if button == 1:
             cursorPos = self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), relativePos)
             if self.getCursorVisible():
                 self.setCursorPosition(cursorPos)
-            self.setSelectionStop(cursorPos)
                 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
         if key == pygame.K_DOWN:
@@ -1332,6 +1333,18 @@ class MText(MFrame):
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is entering a text (applicated for only one frame)
         if self.getInput():
             self.appendText(text)
+
+    def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moving
+        if buttons.count(1) > 0:
+            if self.getCursorVisible() or self.getSelection():
+                cursorPos = self._getPositionAtPos(pygame.font.SysFont(self.font, self.fontSize), pos)
+                if self.getCursorVisible():
+                    self.setCursorPosition(cursorPos)
+                if self.getSelection():
+                    if cursorPos >= self.getSelectionStop():
+                        self.setSelectionPos(self._baseSelection, cursorPos)
+                    else:
+                        self.setSelectionPos(cursorPos, self._baseSelection)
 
     def _removeTextAtCursor(self, length): #Remove a length-sized piece of text at the cursor
         firstI = self.getCursorPosition() - length
