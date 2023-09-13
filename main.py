@@ -5,7 +5,7 @@ from random import randint
 from time import sleep
 
 #TAILLE = (700, 394)
-TAILLE = (900, 400)
+TAILLE = (900, 900)
 
 fenetre = display.set_mode(TAILLE)
 mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
@@ -19,13 +19,13 @@ phrase = phrase[:-1]
 nb = 0
 temps = 0
 
-texte = MText(phrase, 300, 0, 600, 400, mapp)
+texte = MText(phrase, 300, 0, 600, 900, mapp)
 texte.setSelectionBackgroundColor((25, 102, 255))
 texte.setDynamicTextCut(True)
 texte.setFont("Consolas")
 texte.setFontSize(17)
 texte.setInput(True)
-texte.setSelectionPos(0, 72)
+texte.setSelectionPos(0, 51)
 texte.setSelectionTextColor((255, 255, 255))
 
 while True:

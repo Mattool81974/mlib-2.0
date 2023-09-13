@@ -978,6 +978,8 @@ class MText(MFrame):
         pos = self._getPositionAtPos(generator, (x, y))
 
         self.setCursorPosition(pos)
+        self.setSelectionPos(0, 0)
+        self._baseSelection = 0
 
     def _cursorTop(self): #Put down the cursor into the line at the top
         self._setCursorIsVisible(True)
@@ -993,6 +995,8 @@ class MText(MFrame):
             pos = 0
 
         self.setCursorPosition(pos)
+        self.setSelectionPos(0, 0)
+        self._baseSelection = 0
     
     def _getCursorIsVisible(self): #Return the value of _cursorIsVisible
         return self._cursorIsVisible
@@ -1157,10 +1161,10 @@ class MText(MFrame):
                 if not selectionStarted: #Start selection
                     isSelected = True
                     selectionStarted = True
-                    if textLength >= self.getSelectionStop() + selectionStartOffset: #And end at this line too
+                    if textLength > self.getSelectionStop() + selectionStartOffset: #And end at this line too
                         textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], False, self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
-                        textSurface3 = generator.render(piece[self.getSelectionStop():len(piece)], False, self.getTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], False, self.getSelectionTextColor())
+                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], False, self.getTextColor())
                         surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1181,7 +1185,7 @@ class MText(MFrame):
                         textSurface.blit(textSurface2, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
                         surfaces.append(textSurface)
                 elif isSelected: #Line in the middle of the selection
-                    if textLength < self.getSelectionStop() + selectionStartOffset: #And end at this line too
+                    if textLength <= self.getSelectionStop() + selectionStartOffset: #And end at this line too
                         textSurface1 = generator.render(piece, False, self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
@@ -1265,6 +1269,8 @@ class MText(MFrame):
                 self._bottomArrowNumber = 0
             elif key == pygame.K_LEFT and len(self.getText()) > 0:
                 self.setCursorPosition(self.getCursorPosition() - 1)
+                self.setSelectionPos(0, 0)
+                self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
 
@@ -1273,6 +1279,8 @@ class MText(MFrame):
                 self._leftArrowNumber = 0
             elif key == pygame.K_RIGHT and len(self.getText()) > 0:
                 self.setCursorPosition(self.getCursorPosition() + 1)
+                self.setSelectionPos(0, 0)
+                self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
 
