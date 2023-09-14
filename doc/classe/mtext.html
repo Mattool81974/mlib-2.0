@@ -80,6 +80,13 @@
             Retourne si le widget est utilisé comme <a href="#input">entré</a> ou non.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="getSelectedText">getSelectedText()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le texte sélectionné (entre <a href="selectionStart">selectionStart</a> et <a href="selectionStop">selectionStop</a>).</br>
+            Si le texte n'est pas sélectionné ou <a href="getSelection">getSelection</a> est faux, renvoie -1.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
         <h3 id="getSelection">getSelection()</h3>
         <div>
             Paramètres : aucun</br>
@@ -282,6 +289,12 @@
             Monte le curseur à la ligne d'au dessus.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="_doBackspaceEffet">_doBackspaceEffet()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Produit sur le texte l'effet de l'appuie sur la touche <a href="_backspacePressed">backspace"</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
         <h3 id="_getCursorIsVisible">_getCursorIsVisible()</h3>
         <div>
             Paramètres : aucun</br>
@@ -356,17 +369,17 @@
             Fonction appelé lorsque le widget est focus est qu'une touche est pressée.</br>
             Reset <a href="#_backspacePressed">_backspacePressed</a> et <a href="#_returnPressed">_returnPressed</a>.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isKeyGettingDropped">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isKeyGettingPressed">_isKeyGettingPressed()</h3>
         <div>
             Paramètres : key (touche pressée)</br>
             Fonction appelé lorsque le widget est focus est qu'une touche est pressée.</br>
             Ajoute la touche key dans le <a href="#text">texte</a> si <a href="#input">input</a> est True.</br>
-            Cette fonction est utilisé à la place de <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3> pour certains caractères spéciaux (comme le retour à la ligne).</br>
-            Elle permet aussi de faire naviguer le curseur avec les flèches.</br>
+            Cette fonction est utilisé à la place de <h3 id = "#_isTextGettingEntered">_isTextGettingEntered()</h3> pour certains caractères spéciaux (comme le retour à la ligne).</br>
+            Elle permet aussi de faire naviguer le curseur avec les flèches et de copier/coller du texte.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isKeyGettingPressed">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isNotFocusedAnymore">_isNotFocusedAnymore()</h3>
         <div>
@@ -374,21 +387,23 @@
             Fonction appelé lorsque le widget n'est plus focus.</br>
             Permet de savoir quand le widget n'est plus focus pour reset <a href="#_backspacePressed">backspacePressed</a>, <a href="#_returnPressed">returnPressed</a>, les flèches et la touche contrôle.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isNotFocusedAnymore">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3>
         <div>
             Paramètres : text (texte entrée)</br>
             Fonction appelé lorsque le widget est focus est que l'utilisateur rentre du texte.</br>
             Ajoute le texte dans le <a href="#text">texte</a> si <a href="#input">input</a> est True.</br>
+            Si du texte est <a href="#selection">sélectionné</a>, le texte sélectionné est supprimé et remplacé par "text".</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isTextGettingEntered">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
-        <h3 id="_removeTextAtCursor">_removeTextAtCursor()</h3>
+        <h3 id="_removeTextAtPos">_removeTextAtPos()</h3>
         <div>
-            Paramètres : length (taille du texte à supprimer)</br>
-            Supprime un texte de longeur "length" derrière le curseur.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Paramètres : length (taille du texte à supprimer), pos (position dans le texte où supprimer le texte)</br>
+            Supprime un texte de longeur "length" derrière la position "pos".</br>
+            Avant la version 1.3.0, cette fonction s'appelée "_removeTextAtCursor".</br>
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>

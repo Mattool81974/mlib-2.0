@@ -784,6 +784,12 @@ class MText(MFrame):
     def getInput(self): #Return input
         return self.input
 
+    def getSelectedText(self): #Return the selected text into the mtext
+        if self.getSelection() and self.getSelectionStart() != self.getSelectionStop():
+            return self.getText()[self.getSelectionStart():self.getSelectionStop()]
+        else:
+            return -1
+
     def getSelection(self): #Return selection
         return self.selection
 
@@ -998,6 +1004,14 @@ class MText(MFrame):
         self.setSelectionPos(0, 0)
         self._baseSelection = 0
     
+    def _doBackspaceEffet(self): #Do the effect of the pression fo the backspace touch
+        if self.getInput():
+            if self.getSelection() and self.getSelectedText() != -1:
+                self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                self.setSelectionPos(0, 0)
+            else:
+                self._removeTextAtPos(1, self.getCursorPosition())
+
     def _getCursorIsVisible(self): #Return the value of _cursorIsVisible
         return self._cursorIsVisible
     
@@ -1298,7 +1312,7 @@ class MText(MFrame):
         
         if self.getInput(): #Special touch handle
             if key == pygame.K_BACKSPACE:
-                self._removeTextAtCursor(1)
+                self._doBackspaceEffet()
                 self._backspacePressed = True
                 self._backspacePressedTime = 0
                 self._backspaceNumber = 0
@@ -1309,7 +1323,12 @@ class MText(MFrame):
                 self._returnPressed = True
                 self._returnPressedTime = 0
                 self._returnNumber = 0
+            elif key == pygame.K_c and self._controlPressed:
+                copy(self.getSelectedText())
             elif key == pygame.K_v and self._controlPressed:
+                if self.getSelection() and self.getSelectedText() != -1:
+                    self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                    self.setSelectionPos(0, 0)
                 self.appendText(paste())
 
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
@@ -1340,6 +1359,9 @@ class MText(MFrame):
 
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is entering a text (applicated for only one frame)
         if self.getInput():
+            if self.getSelection() and self.getSelectedText() != -1:
+                self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                self.setSelectionPos(0, 0)
             self.appendText(text)
 
     def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moving
@@ -1354,12 +1376,15 @@ class MText(MFrame):
                     else:
                         self.setSelectionPos(cursorPos, self._baseSelection)
 
-    def _removeTextAtCursor(self, length): #Remove a length-sized piece of text at the cursor
-        firstI = self.getCursorPosition() - length
+    def _removeTextAtPos(self, length, pos): #Remove a length-sized piece of text at the cursor
+        firstI = pos - length
         if firstI <= -1:
             firstI = 0
-        self.setText(self.getText()[:firstI] + self.getText()[self.getCursorPosition():])
-        self.setCursorPosition(self.getCursorPosition() - length)
+        if self.getCursorPosition() >= pos:
+            self.setCursorPosition(self.getCursorPosition() - length)
+        elif self.getCursorPosition() >= pos - length:
+            self.setCursorPosition(pos - length)
+        self.setText(self.getText()[:firstI] + self.getText()[pos:])
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
@@ -1416,7 +1441,7 @@ class MText(MFrame):
             if self._backspacePressedTime > 0.5:
                 n = (self._backspacePressedTime - 0.5)*10
                 if ceil(n) >= self._backspaceNumber:
-                    self._removeTextAtCursor(1)
+                    self._doBackspaceEffet()
                     self._backspaceNumber += 0.5
 
         if self._bottomArrowPressed:
