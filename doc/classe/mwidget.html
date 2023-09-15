@@ -235,11 +235,11 @@
         </div>
         <h3 id = "_isGettingMouseUp">_isGettingMouseUp()</h3>
         <div>
-            Paramètres : button (nombre entier du bouton de souris clické)</br>
+            Paramètres : button (nombre entier du bouton de souris clické), relativePos (position relative au widget du curseur de la souris)</br>
             Fonction appelé lorsque le widget n'est plus clické (après <a href="#_isGettingMouseDown">_isGettingMouseDown</a>).</br>
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_isGettingOverflighted">_isGettingOverflighted()</h3>
         <div>
@@ -281,6 +281,13 @@
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id = "_mouseMove">_mouseMove()</h3>
+        <div>
+            Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
+            Fonction appelé lorsque le widget est focus est que l'utilisateur bouge la souris.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id = "_removeChild">_removeChild()</h3>
         <div>
