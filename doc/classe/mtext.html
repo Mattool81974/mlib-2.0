@@ -9,8 +9,25 @@
         <h1>MText</h1>
         <div>
             MText est une classe permettant de d'afficher du texte.</br>
+            Elle offre tout ce qui est nécessaire pour :</br>
+            -Afficher du texte</br>
+            -Permettre à l'utilisateur de modifier et d'entrer le texte</br></br>
             Elle hérite de <a href="./mframe.html">MFrame</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3>Entrée et modification du texte</h3>
+        <div>
+            La modification du texte par l'utilisateur est possible lorsque <a href="#input">input</a> est True.
+            MText se rapproche des entrée textes dans des logiciels comme Word ou Libre Office. Pour cela, elle dispose d'un système de curseur et de sélection. 
+            Le système de curseur est actif si <a href="cursorVisible">cursorVisible</a> est True. 
+            Il est possible qu'il ne soit pas actif et que la modification de texte le soit, mais cette situation est fortement déconseillé. 
+            Il permet de savoir où les modifications de texte de l'utilisateur seront apportées. 
+            Le système de sélection est lui actif si <a href="#selection">selection</a> est True. 
+            Il est possible qu'il ne soit pas actif et que la modification de texte le soit, sans que cela pose de gros problème d'utilisations. 
+            Or, il est fortement recommandé d'activer le curseur si la selection est active, sauf si vous savez exactement que faire. 
+            Il permet de sélectionner une partie de texte et de modifier cette partie. 
+            Le raccourci clavier Ctrl+A permet de sélectionner tout le texte.</br>
+            De plus, MText permet le copie/collage d'élément dans le texte, avec Ctrl+C, Ctrl+V et Ctrl+X.
         </div>
 
         <h2>Fonctions</h2>

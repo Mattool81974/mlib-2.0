@@ -1319,17 +1319,29 @@ class MText(MFrame):
             elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
                 self._controlPressed = True
             elif key == pygame.K_RETURN:
+                if self.getSelection() and self.getSelectedText() != -1:
+                    self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                    self.setSelectionPos(0, 0)
                 self.appendText("\n")
                 self._returnPressed = True
                 self._returnPressedTime = 0
                 self._returnNumber = 0
+            elif key == pygame.K_a and self._controlPressed:
+                self.setCursorPosition(len(self.getText()))
+                self.setSelectionPos(0, len(self.getText()))
             elif key == pygame.K_c and self._controlPressed:
-                copy(self.getSelectedText())
+                if self.getSelection() and self.getSelectedText() != -1:
+                    copy(self.getSelectedText())
             elif key == pygame.K_v and self._controlPressed:
                 if self.getSelection() and self.getSelectedText() != -1:
                     self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                     self.setSelectionPos(0, 0)
                 self.appendText(paste())
+            elif key == pygame.K_x and self._controlPressed:
+                if self.getSelection() and self.getSelectedText() != -1:
+                    copy(self.getSelectedText())
+                    self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                    self.setSelectionPos(0, 0)
 
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
         self._bottomArrowPressed = False
@@ -1468,6 +1480,9 @@ class MText(MFrame):
             if self._returnPressedTime > 0.5:
                 n = (self._returnPressedTime - 0.5)*10
                 if ceil(n) >= self._returnNumber:
+                    if self.getSelection() and self.getSelectedText() != -1:
+                        self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
+                        self.setSelectionPos(0, 0)
                     self.appendText("\n")
                     self._returnNumber += 0.5
 
