@@ -262,13 +262,15 @@ class MWidget:
 
 ###################### Main application class
 class MApp(MWidget):
-    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, printFps = False): #MApp's constructor
+    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, printFps = False, windowIcon = ""): #MApp's constructor
         MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, "MApp") #Parent class constructor call
         self.deltaTime = 0
         self.focusedWidget = self
         self.fps = 0
         self.pressedKey = []
         self.printFps = printFps
+        self.windowIcon = ""
+        self.setWindowIcon(windowIcon)
         self.setWindowTitle(windowTitle)
         self._deltaTimeCache = time_ns()
         self._fpsCount = 0
@@ -368,6 +370,12 @@ class MApp(MWidget):
     def getWidgets(self): #Return _widget
         return self._widgets
     
+    def getWindowIcon(self): #Return windowIcon
+        return self.windowIcon
+
+    def getWindowTitle(self): #Return windowTitle
+        return self.windowTitle
+
     def isKeyPressed(self, key): #Return if the key is pressed
         for i in self.pressedKey:
             if key == i:
@@ -376,6 +384,11 @@ class MApp(MWidget):
     
     def setPrintFps(self, printFps): #Change the value of printFps
         self.printFps = printFps
+
+    def setWindowIcon(self, windowIcon): #Change the value of windowIcon
+        if windowIcon != "" and windowIcon != self.getWindowIcon() and path.exists(windowIcon):
+            self.windowIcon = windowIcon
+            display.set_icon(image.load(windowIcon))
 
     def setWindowTitle(self, windowTitle): #Change the title of the window
         self.windowTitle = windowTitle

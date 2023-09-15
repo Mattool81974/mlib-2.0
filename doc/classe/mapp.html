@@ -8,14 +8,15 @@
     <body>
         <h1>MApp</h1>
         <div>
-            MApp est la classe permettant de définir la fenêtre principale de l'interface graphique. Elle hérite de <a href="mwidget.html">mwidget</a>.</br>
+            MApp est la classe permettant de définir la fenêtre principale de l'interface graphique.</br>
+            Elle hérite de <a href="mwidget.html">mwidget</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
 
         <h2>Fonctions</h2>
-        <h3>__init__()</h3>
+        <h3 id="__init__">__init__()</h3>
         <div>
-            Paramètres : pygameWindow (assignée à la variable <a href="#_pygameWindow">pygameWindow</a>), windowTitle (assignée à la variable <a href="#windowTitle">windowTitle</a>), windowWidth (défini la largeur de la fenêtre), windowHeight (défini la hauteur de la fenêtre), printFps (assignée à la variable <a href="#printFps">printFps</a>)</br>
+            Paramètres : pygameWindow (assignée à la variable <a href="#_pygameWindow">pygameWindow</a>), windowTitle (assignée à la variable <a href="#windowTitle">windowTitle</a>), windowWidth (défini la largeur de la fenêtre), windowHeight (défini la hauteur de la fenêtre), printFps (assignée à la variable <a href="#printFps">printFps</a>), windowIcon (chemin d'accés vers l'icône de l'application)</br>
             Crée la fenêtre sur lequel effectuer les modifications graphiques.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
@@ -70,6 +71,18 @@
             Retourne <a href="#_widgets">_widgets</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="getWindowIcon">getWindowIcon()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la valeur du chemin d'accés vers l'<a href="#windowIcon">icône</a> de la fenêtre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
+        </div>
+        <h3 id="getWindowTitle">getWindowTitle()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#windowTitle">titre</a> de la fenêtre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
+        </div>
         <h3 id="isKeyPressed">isKeyPressed()</h3>
         <div>
             Paramètres : key (touche à vérifier)</br>
@@ -81,6 +94,12 @@
             Paramètres : printFps (nouvelle valeur de <a href="#printFps">printFps</a>)</br>
             Change la valeur de <a href="#printFps">printFps</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="setWindowIcon">setWindowIcon()</h3>
+        <div>
+            Paramètres : windowIcon (nouveau chemin d'accés vers l'<a href="#windowIcon">icône</a> de la fenêtre)</br>
+            Change la valeur du chemin d'accés vers l'<a href="#windowIcon">icône</a> de la fenêtre par "windowIcon".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="setWindowTitle">setWindowTitle()</h3>
         <div>
@@ -132,6 +151,11 @@
         <div>
             Booléen qui détermine si le MApp print le nombre de FPS à chaque updates de <a href="#fps">fps</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id = "windowIcon">windowIcon</h3>
+        <div>
+            Chemin d'accés vers l'icône de la fenêtre (en haut à gauche de la fenêtre).</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id = "windowTitle">windowTitle</h3>
         <div>
