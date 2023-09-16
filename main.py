@@ -25,7 +25,6 @@ texte.setDynamicTextCut(True)
 texte.setFont("Consolas")
 texte.setFontSize(17)
 texte.setInput(True)
-texte.setSelectionPos(0, 51)
 texte.setSelectionTextColor((255, 255, 255))
 
 while True:

@@ -694,6 +694,7 @@ class MText(MFrame):
         self._rightArrowPressed = False
         self._rightArrowPressedTime = 0
         self._rightArrowNumber = 0
+        self._shiftPressed = False
         self._topArrowPressed = False
         self._topArrowPressedAtThisFrame = False
         self._topArrowPressedTime = 0
@@ -1000,6 +1001,34 @@ class MText(MFrame):
         self.setSelectionPos(0, 0)
         self._baseSelection = 0
 
+    def _cursorLeft(self): #Put the cursor at the left
+        leftOffset = 1
+        if self.getSelection() and self._shiftPressed:
+            if self.getSelectedText() == -1:
+                self.setSelectionPos(self.getCursorPosition() - leftOffset, self.getCursorPosition())
+            else:
+                if self.getSelectionStart() <= self.getCursorPosition() - leftOffset:
+                    self.setSelectionStop(self.getCursorPosition() - leftOffset)
+                else:
+                    self.setSelectionStart(self.getCursorPosition() - leftOffset)
+        else:
+            self.setSelectionPos(0, 0)
+        self.setCursorPosition(self.getCursorPosition() - leftOffset)
+
+    def _cursorRight(self): #Put the cursor at the right
+        rightOffset = 1
+        if self.getSelection() and self._shiftPressed:
+            if self.getSelectedText() == -1:
+                self.setSelectionPos(self.getCursorPosition(), self.getCursorPosition() + rightOffset)
+            else:
+                if self.getSelectionStop() < self.getCursorPosition() + rightOffset:
+                    self.setSelectionStop(self.getCursorPosition() + rightOffset)
+                else:
+                    self.setSelectionStart(self.getCursorPosition() + rightOffset)
+        else:
+            self.setSelectionPos(0, 0)
+        self.setCursorPosition(self.getCursorPosition() + rightOffset)
+
     def _cursorTop(self): #Put down the cursor into the line at the top
         self._setCursorIsVisible(True)
 
@@ -1272,8 +1301,7 @@ class MText(MFrame):
             self._topArrowPressed = False
             self._topArrowPressedTime = 0
             self._topArrowNumber = 0
-        
-        if key == pygame.K_BACKSPACE:
+        elif key == pygame.K_BACKSPACE:
             self._backspacePressed = False
             self._backspacePressedTime = 0
             self._backspaceNumber = 0
@@ -1283,6 +1311,10 @@ class MText(MFrame):
             self._returnPressed = False
             self._returnPressedTime = 0
             self._returnNumber = 0
+        elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
+            self._controlPressed = False
+        elif key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = False
 
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         if self.getCursorVisible(): #Cursor navigation
@@ -1295,8 +1327,7 @@ class MText(MFrame):
                 self._bottomArrowPressedTime = 0
                 self._bottomArrowNumber = 0
             elif key == pygame.K_LEFT and len(self.getText()) > 0:
-                self.setCursorPosition(self.getCursorPosition() - 1)
-                self.setSelectionPos(0, 0)
+                self._cursorLeft()
                 self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
@@ -1305,8 +1336,7 @@ class MText(MFrame):
                 self._leftArrowPressedTime = 0
                 self._leftArrowNumber = 0
             elif key == pygame.K_RIGHT and len(self.getText()) > 0:
-                self.setCursorPosition(self.getCursorPosition() + 1)
-                self.setSelectionPos(0, 0)
+                self._cursorRight()
                 self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
@@ -1329,8 +1359,6 @@ class MText(MFrame):
                 self._backspacePressed = True
                 self._backspacePressedTime = 0
                 self._backspaceNumber = 0
-            elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
-                self._controlPressed = True
             elif key == pygame.K_RETURN:
                 if self.getSelection() and self.getSelectedText() != -1:
                     self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
@@ -1356,6 +1384,11 @@ class MText(MFrame):
                     self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                     self.setSelectionPos(0, 0)
 
+        if key == pygame.K_RCTRL or key == pygame.K_LCTRL:
+            self._controlPressed = True
+        elif key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = True
+
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
         self._bottomArrowPressed = False
         self._bottomArrowPressedTime = 0
@@ -1373,6 +1406,7 @@ class MText(MFrame):
         self._rightArrowPressed = False
         self._rightArrowPressedTime = 0
         self._rightArrowNumber = 0
+        self._shiftPressed = False
         self._topArrowPressed = False
         self._topArrowPressedTime = 0
         self._topArrowNumber = 0
@@ -1483,7 +1517,7 @@ class MText(MFrame):
             if self._leftArrowPressedTime > 0.5:
                 n = (self._leftArrowPressedTime - 0.5)*10
                 if ceil(n) >= self._leftArrowNumber:
-                    self.setCursorPosition(self.getCursorPosition() - 1)
+                    self._cursorLeft()
                     self._cursorVisibleTime = 0
                     self._setCursorIsVisible(True)
                     self._leftArrowNumber += 0.5
@@ -1504,7 +1538,7 @@ class MText(MFrame):
             if self._rightArrowPressedTime > 0.5:
                 n = (self._rightArrowPressedTime - 0.5)*10
                 if ceil(n) >= self._rightArrowNumber:
-                    self.setCursorPosition(self.getCursorPosition() + 1)
+                    self._cursorRight()
                     self._cursorVisibleTime = 0
                     self._setCursorIsVisible(True)
                     self._rightArrowNumber += 0.5
