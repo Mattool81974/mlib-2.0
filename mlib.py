@@ -1011,6 +1011,31 @@ class MText(MFrame):
 
     def _cursorLeft(self): #Put the cursor at the left
         leftOffset = 1
+        if self._controlPressed:
+            firstCar = ""
+            firstToPass = False
+            leftOffset = 0
+            textToAnalyse = self.getText()[:self.getCursorPosition()]
+            toVerify = " .-'"
+            if toVerify.count(textToAnalyse[-1]):
+                if textToAnalyse[-1] == textToAnalyse[-2]:
+                    firstCar = textToAnalyse[-1]
+                    firstToPass = True
+                leftOffset = 1
+                textToAnalyse = textToAnalyse[:-1]
+
+            for j in range(len(textToAnalyse)):
+                i = textToAnalyse[::-1][j]
+                if toVerify.count(i):
+                    j2 = j + 1
+                    if firstToPass:
+                        while toVerify.count(textToAnalyse[::-1][j2]) and textToAnalyse[::-1][j2] == firstCar and j2 < len(textToAnalyse):
+                            leftOffset += 1
+                            textToAnalyse = textToAnalyse[:-1]
+                        leftOffset += 1
+                    break
+                leftOffset += 1
+        
         if self.getSelection() and self._shiftPressed:
             if self.getSelectedText() == -1:
                 self.setSelectionPos(self.getCursorPosition() - leftOffset, self.getCursorPosition())
@@ -1025,6 +1050,31 @@ class MText(MFrame):
 
     def _cursorRight(self): #Put the cursor at the right
         rightOffset = 1
+        if self._controlPressed:
+            firstCar = ""
+            firstToPass = False
+            rightOffset = 0
+            textToAnalyse = self.getText()[self.getCursorPosition():]
+            toVerify = " .-'"
+            if toVerify.count(textToAnalyse[0]):
+                if textToAnalyse[0] == textToAnalyse[1]:
+                    firstCar = textToAnalyse[0]
+                    firstToPass = True
+                rightOffset = 1
+                textToAnalyse = textToAnalyse[1:]
+
+            for j in range(len(textToAnalyse)):
+                i = textToAnalyse[j]
+                if toVerify.count(i):
+                    j2 = j + 1
+                    if firstToPass:
+                        while toVerify.count(textToAnalyse[j2]) and textToAnalyse[j2] == firstCar and j2 < len(textToAnalyse):
+                            rightOffset += 1
+                            textToAnalyse = textToAnalyse[:-1]
+                        rightOffset += 1
+                    break
+                rightOffset += 1
+        
         if self.getSelection() and self._shiftPressed:
             if self.getSelectedText() == -1:
                 self.setSelectionPos(self.getCursorPosition(), self.getCursorPosition() + rightOffset)

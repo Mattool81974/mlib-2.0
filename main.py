@@ -12,10 +12,6 @@ mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
 mapp.setBackgroundColor((0, 0, 0))
 
 phrase = "Le T-90 est un char de combat russe associant le char T-72B et certains sous-systèmes du T-80U.\nEntré en service dans l'armée russe en novembre 1992, le T-90 est actuellement utilisé par dix pays."
-phrase = ""
-for i in range(10):
-    phrase += "123456789\n"
-phrase = phrase[:-1]
 nb = 0
 temps = 0
 
