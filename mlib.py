@@ -997,9 +997,17 @@ class MText(MFrame):
 
         pos = self._getPositionAtPos(generator, (x, y))
 
+        if self.getSelection() and self._shiftPressed:
+            if self.getSelectedText() == -1:
+                self.setSelectionPos(self.getCursorPosition(), pos)
+            else:
+                if self._baseSelection < pos:
+                    self.setSelectionPos(self._baseSelection, pos)
+                else:
+                    self.setSelectionPos(pos, self._baseSelection)
+        else:
+            self.setSelectionPos(0, 0)
         self.setCursorPosition(pos)
-        self.setSelectionPos(0, 0)
-        self._baseSelection = 0
 
     def _cursorLeft(self): #Put the cursor at the left
         leftOffset = 1
@@ -1007,10 +1015,10 @@ class MText(MFrame):
             if self.getSelectedText() == -1:
                 self.setSelectionPos(self.getCursorPosition() - leftOffset, self.getCursorPosition())
             else:
-                if self.getSelectionStart() <= self.getCursorPosition() - leftOffset:
-                    self.setSelectionStop(self.getCursorPosition() - leftOffset)
+                if self._baseSelection < self.getCursorPosition() - leftOffset:
+                    self.setSelectionPos(self._baseSelection, self.getCursorPosition() - leftOffset)
                 else:
-                    self.setSelectionStart(self.getCursorPosition() - leftOffset)
+                    self.setSelectionPos(self.getCursorPosition() - leftOffset, self._baseSelection)
         else:
             self.setSelectionPos(0, 0)
         self.setCursorPosition(self.getCursorPosition() - leftOffset)
@@ -1021,10 +1029,10 @@ class MText(MFrame):
             if self.getSelectedText() == -1:
                 self.setSelectionPos(self.getCursorPosition(), self.getCursorPosition() + rightOffset)
             else:
-                if self.getSelectionStop() < self.getCursorPosition() + rightOffset:
-                    self.setSelectionStop(self.getCursorPosition() + rightOffset)
+                if self._baseSelection < self.getCursorPosition() + rightOffset:
+                    self.setSelectionPos(self._baseSelection, self.getCursorPosition() + rightOffset)
                 else:
-                    self.setSelectionStart(self.getCursorPosition() + rightOffset)
+                    self.setSelectionPos(self.getCursorPosition() + rightOffset, self._baseSelection)
         else:
             self.setSelectionPos(0, 0)
         self.setCursorPosition(self.getCursorPosition() + rightOffset)
@@ -1042,9 +1050,17 @@ class MText(MFrame):
         if y < 0:
             pos = 0
 
+        if self.getSelection() and self._shiftPressed:
+            if self.getSelectedText() == -1:
+                self.setSelectionPos(pos, self.getCursorPosition())
+            else:
+                if self._baseSelection <= pos:
+                    self.setSelectionPos(pos, self._baseSelection)
+                else:
+                    self.setSelectionPos(pos, self._baseSelection)
+        else:
+            self.setSelectionPos(0, 0)
         self.setCursorPosition(pos)
-        self.setSelectionPos(0, 0)
-        self._baseSelection = 0
     
     def _doBackspaceEffet(self): #Do the effect of the pression fo the backspace touch
         if self.getInput():
@@ -1314,6 +1330,7 @@ class MText(MFrame):
         elif key == pygame.K_RCTRL or key == pygame.K_LCTRL:
             self._controlPressed = False
         elif key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._baseSelection = 0
             self._shiftPressed = False
 
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
@@ -1328,7 +1345,6 @@ class MText(MFrame):
                 self._bottomArrowNumber = 0
             elif key == pygame.K_LEFT and len(self.getText()) > 0:
                 self._cursorLeft()
-                self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
 
@@ -1337,7 +1353,6 @@ class MText(MFrame):
                 self._leftArrowNumber = 0
             elif key == pygame.K_RIGHT and len(self.getText()) > 0:
                 self._cursorRight()
-                self._baseSelection = 0
                 self._cursorVisibleTime = 0
                 self._setCursorIsVisible(True)
 
@@ -1387,6 +1402,7 @@ class MText(MFrame):
         if key == pygame.K_RCTRL or key == pygame.K_LCTRL:
             self._controlPressed = True
         elif key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._baseSelection = self.getCursorPosition()
             self._shiftPressed = True
 
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
