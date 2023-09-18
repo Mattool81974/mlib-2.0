@@ -15,6 +15,10 @@
             Elle hérite de <a href="./mframe.html">MFrame</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="display">Affichage du texte</h3>
+        <div>
+            Le texte est affiché entre les <a href="./mframe.html">bordure</a> et l'offset.
+        </div>
         <h3>Entrée et modification du texte</h3>
         <div>
             La modification du texte par l'utilisateur est possible lorsque <a href="#input">input</a> est True.
@@ -63,9 +67,11 @@
         </div>
         <h3 id="getCuttedText">getCuttedText()</h3>
         <div>
-            Paramètres : generator (générateur de texte)</br>
-            Retourne le texte coupé pour le <a href="#_renderBeforeHierarchy">render</a> et la liste de booléen qui indique si tel ou tel ligne est une découpe du texte ou effectuée par la fonction.</br>
-            Modifié à la <a href="../versions.html">version</a> 1.2.0.
+            Paramètres : all (booléen qui indique si tout le texte est traité, basiquement à True), generator (générateur de texte, basiquement à 0)</br>
+            Retourne le texte coupé pour le <a href="#_renderBeforeHierarchy">render</a>, la liste de booléen qui indique si tel ou tel ligne est une découpe du texte ou effectuée par la fonction et un tuple. Ce tupel contient les coordonnée du texte Y où commence et s'arrête le coupage (utilise si all est False) et la longueur du texte au début du coupage.</br>
+            Si all est égal à True, tout le texte est traité. Sinon, seule la partie présente dans l'<a href="#display">affichage</a> du MText.</br>
+            Si generator est égal à 0, le générateur devient celui de <a href="#getGenerator">getGenerator</a>.</br>
+            Modifié à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="getDynamicTextCut">getDynamicTextCut()</h3>
         <div>
@@ -90,6 +96,12 @@
             Paramètres : aucun</br>
             Retourne la <a href="fontSize">taille de police</a> du texte à afficher.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="getGenerator">getGenerator()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le générateur pygame du MText.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="getInput">getInput()</h3>
         <div>
@@ -167,6 +179,18 @@
             Paramètres : aucun</br>
             Retourne l'<a href="#textVerticalAlignment">alignement</a> vertical du texte.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="getTextX">getTextX()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la position <a href="#textX">X</a> du texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
+        </div>
+        <h3 id="getTextY">getTextY()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la position <a href="#textY">Y</a> du texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="setCursorPosition">setCursorPosition()</h3>
         <div>
@@ -271,7 +295,7 @@
             Change l'<a href="#textHorizontalAlignment">alignement</a> horizontal du texte à "textHorizontalAlignment".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
-        <h3 id="getTextOffset">getTextOffset()</h3>
+        <h3 id="setTextOffset">setTextOffset()</h3>
         <div>
             Paramètres : textOffset (nouveau décalage du texte), index (numéro de l'offset à retourner, basiquement à 1)</br>
             Change en "textOffset" la valeur de :</br>
@@ -287,6 +311,18 @@
             Paramètres : textVerticalAlignment (nouvel <a href="#textVerticalAlignment">alignement</a> vertical du texte)</br>
             Change l'<a href="#textVerticalAlignment">alignement</a> vertical du texte à "textVerticalAlignment".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="setTextX">setTextX()</h3>
+        <div>
+            Paramètres : textX (nouvelle position <a href="#textX">X</a> du texte)</br>
+            Change la position <a href="#textX">X</a> du texte par "textX".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
+        </div>
+        <h3 id="setTextY">setTextY()</h3>
+        <div>
+            Paramètres : textX (nouvelle position <a href="#textY">Y</a> du texte)</br>
+            Change la position <a href="#textY">Y</a> du texte par "textY".</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="_checkSelection">_checkSelection()</h3>
         <div>
@@ -363,6 +399,12 @@
             Avant la version 1.3.0, cette fonction s'appelée "_getCursorY".</br>
             Modifié à la <a href="../versions.html">version</a> 1.2.0.
         </div>
+        <h3 id="_getTextDisplaySize">_getTextDisplaySize()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la taille de l'endroit d'<a href="#display">affichage</a> du texte dans le MText.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
+        </div>
         <h3 id="_getTextHeight">_getTextHeight()</h3>
         <div>
             Paramètres : generator (générateur de texte)</br>
@@ -371,9 +413,11 @@
         </div>
         <h3 id="_getTextRendered">getTextRendered()</h3>
         <div>
-            Paramètres : generator (générateur de texte), pieces (texte à générer, basiquement à 0)</br>
-            Retourne une liste qui contient les surfaces du texte à générer.</br>
+            Paramètres : generator (générateur de texte, basiquement à 0), pieces (texte à générer, basiquement à 0)</br>
+            Retourne une liste qui contient les surfaces du texte à générer et la coordonnée du texte Y où commence le coupage (utilise si all est False).</br>
             Elle s'occupe aussi d'appliquer les modifications graphiques dû à la <a href="#selection">selection</a>.</br>
+            Cependant, si le texte est hors du MText (trop haut, trop bas ou trop décalé), le rendu n'est pas fait.</br>
+            Si generator est à 0, generator sera égal à <a href="#getGenerator">getGenerator</a>.</br>
             Si pieces est à 0, pieces sera égal à <a href="#getCuttedPiece">getCuttedPiece</a>.</br>
             Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
@@ -430,6 +474,14 @@
             Si du texte est <a href="#selection">sélectionné</a>, le texte sélectionné est supprimé et remplacé par "text".</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isTextGettingEntered">MWidget</a>.</br>
             Modifié à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="_mouseWheel">_mouseWheel()</h3>
+        <div>
+            Paramètres : rotation (valeur de la rotation de la molette)</br>
+            Fonction appelé lorsque le widget est focus est que l'utilisateur tourne la molette.</br>
+            Permet de faire défiler le texte grâce à <a href="#textY">textY</a>.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_mouseWheel">MWidget</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.1.
         </div>
         <h3 id="_removeTextAtPos">_removeTextAtPos()</h3>
         <div>
@@ -582,6 +634,16 @@
             Si il est égal à 1, le texte est aligné vers le milieu.</br>
             Si il est égal à 2, le texte est aligné vers le bas.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="textX">textX</h3>
+        <div>
+            Coordonnées X du texte dans le MText (donc entre la <a href="./mframe.html">bordure</a> et l'<a href="#display">offset</a>).</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
+        </div>
+        <h3 id="textY">textY</h3>
+        <div>
+            Coordonnées Y du texte dans le MText (donc entre la <a href="./mframe.html">bordure</a> et l'<a href="#display">offset</a>).</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.3.0.
         </div>
         <h3 id="_backspacePressed">_backspacePressed</h3>
         <div>
