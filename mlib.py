@@ -741,6 +741,7 @@ class MText(MFrame):
         addLineToCursor = [] #Boolean list to see if the line is natural or not to the cursor
         length = 0
         lengthAtStart = 0
+        lineAtStart = 0
         pieces = []
         spaceWidth = generator.size(" ")[0]
         textWidth = self._getTextDisplaySize()[0]
@@ -751,6 +752,7 @@ class MText(MFrame):
 
         if not self.getDynamicTextCut(): #Cut lines into pieces
             cutted = self.getText().split("\n")
+            j = 0
             for i in cutted:
                 if not all:
                     lineHeight = generator.size(i)[1]
@@ -760,6 +762,7 @@ class MText(MFrame):
                             pieces.append(i)
                             if not textYStartAssigned:
                                 lengthAtStart = length
+                                lineAtStart = j
                                 textYStart = textY
                                 textYStartAssigned = True
                     else:
@@ -769,6 +772,7 @@ class MText(MFrame):
                 else:
                     addLineToCursor.append(2)
                     pieces.append(i)
+                j += 1
                 length += len(i) + 1
         else:
             lines = self.getText().split("\n")
@@ -800,6 +804,7 @@ class MText(MFrame):
                                     pieces.append(toAdd)
                                     if not textYStartAssigned:
                                         lengthAtStart = length
+                                        lineAtStart = len(pieces)
                                         textYStart = textY
                                         textYStartAssigned = True
                             else:
@@ -834,6 +839,7 @@ class MText(MFrame):
                                 pieces.append(toAdd)
                                 if not textYStartAssigned:
                                     lengthAtStart = length
+                                    lineAtStart = len(pieces)
                                     textYStart = textY
                                     textYStartAssigned = True
                         else:
@@ -852,6 +858,7 @@ class MText(MFrame):
                                 pieces.append(toAdd)
                                 if not textYStartAssigned:
                                     lengthAtStart = length
+                                    lineAtStart = len(pieces)
                                     textYStart = textY
                                     textYStartAssigned = True
                         else:
@@ -866,7 +873,7 @@ class MText(MFrame):
 
                 length += len(line) + 1
 
-        return pieces.copy(), addLineToCursor.copy(), (textYStart, textYStop, lengthAtStart)
+        return pieces.copy(), addLineToCursor.copy(), (textYStart, textYStop, lengthAtStart, lineAtStart)
 
     def getDynamicTextCut(self): #Return dynamicTextCut
         return self.dynamicTextCut
@@ -1071,6 +1078,8 @@ class MText(MFrame):
 
     def setTextX(self, textX): #Change the value of textX
         if self.textX != textX:
+            if textX > 0:
+                textX = 0
             self.textX = textX
             self.setShouldModify(True)
     
@@ -1078,6 +1087,8 @@ class MText(MFrame):
         if self.textY != textY:
             if textY > 0:
                 textY = 0
+            elif textY < -(self._getTextHeight() - self._getTextDisplaySize()[1]):
+                textY = -(self._getTextHeight() - self._getTextDisplaySize()[1])
             self.textY = textY
             self.setShouldModify(True)
 
@@ -1338,15 +1349,21 @@ class MText(MFrame):
             return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize) + self.getTextOffset(3))
     
     def _getPositionY(self, generator, position): #Return the y pos of the cursor           OPTIMIZABLE
-        pieces, addLineToCursor, textY = self.getCuttedText(all=True,generator=generator)
+        pieces, addLineToCursor, textY = self.getCuttedText(all=False,generator=generator)
 
-        i = 0
+        i = textY[3]
         line = self._getPositionLine(generator, position)
+        spaceHeight = generator.size(" ")[1]
+        if i > line or i + len(pieces) < line:
+            return -spaceHeight
+        
         textHeight = 0
+        textLengt = 0
         yAssignee = True
         yCursor = -1
         for piece in pieces: #Analyze each lines
             textHeight += generator.size(piece)[1]
+            textLengt += len(piece)
 
             if i >= line and yAssignee:
                 yAssignee = False
@@ -1357,7 +1374,7 @@ class MText(MFrame):
         if yCursor == -1:
             yCursor = textHeight - generator.size(pieces[-1])[1]
 
-        yCursor += self.getTextY()
+        yCursor += textY[0]
 
         if self.getTextVerticalAlignment() == 0: #Apply alignment modification
             yCursor += self.getFrameWidth(0) + self.getTextOffset(0)
@@ -1372,7 +1389,10 @@ class MText(MFrame):
         return (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3) + self.getTextOffset(1) + self.getTextOffset(3)), #Width
                 self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2) + self.getTextOffset(0) + self.getTextOffset(2))) #Height
 
-    def _getTextHeight(self, generator): #Return the height of the text
+    def _getTextHeight(self, generator=0): #Return the height of the text
+        if generator == 0:
+            generator = self.getGenerator()
+        
         pieces = self.getCuttedText(all=True, generator=generator)[0]
         textHeight = 0
 
@@ -1469,7 +1489,6 @@ class MText(MFrame):
                 self._cursorVisibleTime = 0
                 self.setCursorPosition(cursorPos)
                 self.setShouldModify(True)
-            print(cursorPos)
             self.setSelectionPos(cursorPos, cursorPos)
             self._baseSelection = cursorPos
 

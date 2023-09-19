@@ -24,7 +24,7 @@ texte.setSelectionBackgroundColor((25, 102, 255))
 #texte.setDynamicTextCut(True)
 texte.setFont("Consolas")
 texte.setFontSize(17)
-texte.setInput(True)
+#texte.setInput(True)
 texte.setSelectionTextColor((255, 255, 255))
 texte.setTextY(0)
 
