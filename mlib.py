@@ -2,8 +2,8 @@ from math import *
 from pygame import *
 import pygame
 from pyperclip import *
-from os import *
-from time import time_ns
+import os as os
+from time import localtime, time_ns
 
 pygame.init()
 
@@ -40,6 +40,9 @@ class MWidget:
 
         if self._type != "MApp": #Register the widget into the MApp object
             self.parent._declaringWidget(self)
+        
+            if self._mapp.getConsole():
+                self._mapp.writeConsole("New MWidget object", indentation=0, writer=self)
 
     def absolutePos(self): #Return the pos according to the MApp object
         return self.absoluteX(), self.absoluteY()
@@ -265,9 +268,13 @@ class MWidget:
 
 ###################### Main application class
 class MApp(MWidget):
-    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, printFps = False, windowIcon = ""): #MApp's constructor
+    def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, console = False, printFps = False, windowIcon = ""): #MApp's constructor
         MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, "MApp") #Parent class constructor call
+        self.console = console
+        self.consoleContent = ""
+        self.consoleFile = ""
         self.deltaTime = 0
+        self.frameCount = 0
         self.focusedWidget = self
         self.fps = 0
         self.pressedKey = []
@@ -281,6 +288,12 @@ class MApp(MWidget):
         self._modifiedWidget = []
         self._pygameWindow = pygameWindow
         self._widgets = []
+
+        self.setConsoleFile("console.txt")
+
+        if self.getConsole():
+            self.writeConsole("New MWidget object", indentation=0, writer=self)
+            self.writeConsole("New MApp object", indentation=1, writer=self)
 
     def frame(self): #Do a frame in the application
         self.frameEvent()
@@ -298,6 +311,16 @@ class MApp(MWidget):
 
             if self.printFps:
                 print(self.fps)
+
+            if self.getConsole():
+                self.writeConsole("New fps count : " + str(self.fps) + " fps", 0, self)
+
+            if self.getConsole():
+                consoleFile = open(self.getConsoleFile(), "a")
+                consoleFile.write(self.getConsoleContent())
+                consoleFile.close()
+
+                self.setConsoleContent("")
 
         self._fpsCount += 1
 
@@ -337,10 +360,15 @@ class MApp(MWidget):
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
                 overflightedWidget.mouseDown = event.button
-                self.focusedWidget.focused = False
-                self.focusedWidget._isNotFocusedAnymore()
-                self.focusedWidget = overflightedWidget
-                self.focusedWidget.focused = True
+                if self.focusedWidget.getID() != overflightedWidget.getID():
+                    self.focusedWidget.focused = False
+                    if self.getConsole():
+                        self.writeConsole("Widget not focused anymore", indentation = 0, writer = self.focusedWidget)
+                    self.focusedWidget._isNotFocusedAnymore()
+                    self.focusedWidget = overflightedWidget
+                    self.focusedWidget.focused = True
+                if self.getConsole():
+                    self.writeConsole("Mouse clicked", indentation = 0, writer = self.focusedWidget)
                 overflightedWidget._isGettingMouseDown(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 overflightedWidget.mouseUp = event.button
@@ -348,17 +376,36 @@ class MApp(MWidget):
             elif event.type == pygame.MOUSEMOTION: #If hte mouse is moving
                 self.focusedWidget._mouseMove(event.buttons, (event.pos[0] - self.focusedWidget.getX(), event.pos[1] - self.focusedWidget.getY()), event.rel)
             elif event.type == pygame.MOUSEWHEEL: #If the wheel is rotating
+                if self.getConsole():
+                    self.writeConsole("Wheel turned", indentation = 0, writer = self.focusedWidget)
                 self.focusedWidget._mouseWheel(event.precise_y)
             elif event.type == pygame.KEYDOWN: #If a key is pressed on the keyboard
+                if self.getConsole():
+                    self.writeConsole("Key " + str(event.key) + " pressed", indentation = 0, writer = self.focusedWidget)
                 self.focusedWidget._isKeyGettingPressed(event.key)
                 self.pressedKey.append(event.key)
             elif event.type == pygame.KEYUP: #If a key is dropped on the keyboard
+                if self.getConsole():
+                    self.writeConsole("Key " + str(event.key) + " not pressed anymore", indentation = 0, writer = self.focusedWidget)
                 self.focusedWidget._isKeyGettingDropped(event.key)
             elif event.type == pygame.TEXTINPUT: #If the user is enterring text
+                if self.getConsole():
+                    self.writeConsole("New text \"" + event.text + "\" entered", indentation = 0, writer = self.focusedWidget)
                 self.focusedWidget._isTextGettingEntered(event.text)
+
+        self.frameCount += 1
 
     def frameGraphics(self): #Do all graphics updates in the application
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
+
+    def getConsole(self): #Return console
+        return self.console
+
+    def getConsoleContent(self): #Return consoleContent
+        return self.consoleContent
+
+    def getConsoleFile(self): #Return consoleFile
+        return self.consoleFile
 
     def getDeltaTime(self): #Return deltaTime
         return self.deltaTime
@@ -387,6 +434,22 @@ class MApp(MWidget):
                 return True
         return False
     
+    def setConsole(self, console): #Change the value of console
+        self.console = console
+
+    def setConsoleContent(self, consoleContent): #Change the value of consoleContent
+        self.consoleContent = consoleContent
+
+    def setConsoleFile(self, consoleFile): #Change the value of consoleFile
+        if self.consoleFile != "":
+            os.remove(self.consoleFile)
+
+        self.consoleFile = consoleFile
+        if os.path.exists(self.consoleFile):
+            f = open(self.consoleFile, "w")
+            f.write("")
+            f.close()
+
     def setPrintFps(self, printFps): #Change the value of printFps
         self.printFps = printFps
 
@@ -399,6 +462,17 @@ class MApp(MWidget):
         self.windowTitle = windowTitle
 
         pygame.display.set_caption(windowTitle)
+
+    def writeConsole(self, toWrite, indentation = 0, writer = 0): #Write something into the console
+        tns = time_ns()/(10**9)
+        
+        date = localtime(tns)
+        dateStr = str(date.tm_mday) + "/" + str(date.tm_mon) + "/" + str(date.tm_year) + "-" + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
+        indent = (" " * (indentation * 2))
+        toAdd = dateStr + " | frame : " + str(self.frameCount) + "\n" #French system pattern
+        if writer != 0:
+            toAdd = " type : " + writer._type + " | id : " + str(writer.getID()) + " | " + toAdd
+        self.setConsoleContent(self.getConsoleContent() + indent + toWrite + " - " + toAdd)
 
     def _addWidgetToReset(self, widget): #Add a widget _modifiedWidget
         self._modifiedWidget.append(widget)
@@ -429,6 +503,9 @@ class MFrame(MWidget):
         self.leftTopCornerRadius = 0
         self.rightBottomCornerRadius = 0
         self.rightTopCornerRadius = 0
+
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("New MFrame object", indentation = 1, writer = self)
 
     def getCornerRadius(self, index = 0): #Return the value of leftTopCornerRadius if 0, leftBottomCornerRadius if 1, rightBottomCornerRadius if 2, rightTopCornerRadius if 3
         if index == 0:
@@ -539,6 +616,9 @@ class MImage(MFrame):
         self.imageSize = (0, 0)
         self.imageVerticalAlignment = 0
         self._image = 0
+
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("New MImage object", indentation = 2, writer = self)
 
         self.setImageLink(imageLink)
 
@@ -706,6 +786,9 @@ class MText(MFrame):
         self._topArrowPressedTime = 0
         self._topArrowNumber = 0
 
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("New MText object", indentation = 2, writer=self)
+
     def appendText(self, text, appendAtCursor = True, moveCursor = True): #Append "text" to text
         i = 0
         while i < len(text): #Delete ord(13) weird caracter
@@ -775,6 +858,7 @@ class MText(MFrame):
                 j += 1
                 length += len(i) + 1
         else:
+            j = 0
             lines = self.getText().split("\n")
             for line in lines:
                 firstI = 0
@@ -804,12 +888,13 @@ class MText(MFrame):
                                     pieces.append(toAdd)
                                     if not textYStartAssigned:
                                         lengthAtStart = length
-                                        lineAtStart = len(pieces)
+                                        lineAtStart = j
                                         textYStart = textY
                                         textYStartAssigned = True
                             else:
                                 textYStop = textY
                                 break
+                            j += 1
                             textY += lineHeight
                         else:
                             if self.getDynamicTextCutType() == 0:
@@ -817,6 +902,7 @@ class MText(MFrame):
                             else:
                                 addLineToCursor.append(1) #Cut by a space
                                 length += 1
+                            j += 1
                             pieces.append(toAdd)
                         firstI = lastI
                         lineWidth = 0
@@ -839,7 +925,7 @@ class MText(MFrame):
                                 pieces.append(toAdd)
                                 if not textYStartAssigned:
                                     lengthAtStart = length
-                                    lineAtStart = len(pieces)
+                                    lineAtStart = j
                                     textYStart = textY
                                     textYStartAssigned = True
                         else:
@@ -858,7 +944,7 @@ class MText(MFrame):
                                 pieces.append(toAdd)
                                 if not textYStartAssigned:
                                     lengthAtStart = length
-                                    lineAtStart = len(pieces)
+                                    lineAtStart = j
                                     textYStart = textY
                                     textYStartAssigned = True
                         else:
@@ -871,6 +957,7 @@ class MText(MFrame):
                 if len(addLineToCursor) <= len(pieces) - 1:
                     addLineToCursor.append(2) #Cut by a line breaker
 
+                j += 1
                 length += len(line) + 1
 
         return pieces.copy(), addLineToCursor.copy(), (textYStart, textYStop, lengthAtStart, lineAtStart)
@@ -996,6 +1083,9 @@ class MText(MFrame):
                 self.setShouldModify(True)
 
     def setSelectionPos(self, selectionStart, selectionStop): #Change the value of selectionStart and selectionStop more easily
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("New selection pos from " + str(selectionStart) + " to " + str(selectionStop), indentation = 0, writer=self)
+        
         self.setSelectionStop(len(self.getText()) + 1) #Neutralize _checkSelection effect
         self.setSelectionStart(0)
         self.setSelectionStop(selectionStop) #Apply modifications
@@ -1003,6 +1093,8 @@ class MText(MFrame):
 
     def setSelectionStart(self, selectionStart): #Change the value of selectionStart
         if selectionStart != self.getSelectionStart():
+            if self._mapp.getConsole():
+                self._mapp.writeConsole("New selection start at " + str(selectionStart), indentation = 1, writer=self)
             self.selectionStart = selectionStart
             if self.selectionStart < 0:
                 self.selectionStart = 0
@@ -1016,6 +1108,8 @@ class MText(MFrame):
 
     def setSelectionStop(self, selectionStop): #Change the value of selectionStop
         if selectionStop != self.getSelectionStop():
+            if self._mapp.getConsole():
+                self._mapp.writeConsole("New selection stop at " + str(selectionStop), indentation = 1, writer=self)
             self.selectionStop = selectionStop
             if self.getSelectionStop() > len(self.getText()) + 1:
                 self.setSelectionStop(len(self.getText()) + 1)
@@ -1104,6 +1198,9 @@ class MText(MFrame):
                 self.setSelectionStop(s)
 
     def _cursorBottom(self): #Put up the cursor into the line at the top
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("Cursor move to the bottom", indentation = 0, writer=self)
+        
         self._setCursorIsVisible(True)
 
         generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
@@ -1127,6 +1224,9 @@ class MText(MFrame):
         self.setCursorPosition(pos)
 
     def _cursorLeft(self): #Put the cursor at the left
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("Cursor move to the left", indentation = 0, writer=self)
+
         leftOffset = 1
         if self._controlPressed:
             firstCar = ""
@@ -1166,6 +1266,9 @@ class MText(MFrame):
         self.setCursorPosition(self.getCursorPosition() - leftOffset)
 
     def _cursorRight(self): #Put the cursor at the right
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("Cursor move to the right", indentation = 0, writer=self)
+
         rightOffset = 1
         if self._controlPressed:
             firstCar = ""
@@ -1205,6 +1308,9 @@ class MText(MFrame):
         self.setCursorPosition(self.getCursorPosition() + rightOffset)
 
     def _cursorTop(self): #Put down the cursor into the line at the top
+        if self._mapp.getConsole():
+            self._mapp.writeConsole("Cursor move to the top", indentation = 0, writer=self)
+
         self._setCursorIsVisible(True)
 
         generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
@@ -1231,6 +1337,9 @@ class MText(MFrame):
     
     def _doBackspaceEffet(self): #Do the effect of the pression fo the backspace touch
         if self.getInput():
+            if self._mapp.getConsole():
+                self._mapp.writeConsole("Do backspace effect", indentation = 0, writer=self)
+
             if self.getSelection() and self.getSelectedText() != -1:
                 self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                 self.setSelectionPos(0, 0)
@@ -1348,7 +1457,7 @@ class MText(MFrame):
         else:
             return self.getWidth() - (self.getFrameWidth(3) + (lineSize - textSize) + self.getTextOffset(3))
     
-    def _getPositionY(self, generator, position): #Return the y pos of the cursor           OPTIMIZABLE
+    def _getPositionY(self, generator, position): #Return the y pos of the cursor
         pieces, addLineToCursor, textY = self.getCuttedText(all=False,generator=generator)
 
         i = textY[3]
@@ -1671,25 +1780,44 @@ class MText(MFrame):
         x = self.getFrameWidth(1) + self.getTextOffset(1)
         y = self.getFrameWidth(0) + self.getTextOffset(0)
 
+        textSurface = self._renderTextImage(generator)
+        surface.blit(textSurface, (x, y, textSurface.get_width(), textSurface.get_height()))
+
+        if self.getCursorVisible() and self._getCursorIsVisible() and self.getFocused(): #Draw cursor
+            xCursor = self._getPositionX(generator, self.getCursorPosition())
+            yCursor = self._getPositionY(generator, self.getCursorPosition())
+            pygame.draw.rect(surface, (0, 0, 0), (xCursor, yCursor, self.getCursorWidth(), heightCursor))
+
+        return surface
+    
+    def _renderTextImage(self, generator=0):
+        if generator == 0:
+            generator = self.getGenerator()
+
+        x = 0
+        y = 0
+        
         if self.getTextVerticalAlignment() == 2:
-            y = self.getHeight() - (self.getFrameWidth(2) + self.getTextOffset(2))
+            y = self.getHeight()
 
         surfaces, textYStart = self._getTextRendered(all=False, generator=generator) #Get the text rendered into surface
         textHeight = 0
         for textSurface in surfaces:
             textHeight += textSurface.get_height()
 
+        surface = Surface(self._getTextDisplaySize(), pygame.SRCALPHA)
+
         if self.getTextVerticalAlignment() == 1: #Calculate y including vertical alignment particularity
-            y = self.getFrameWidth(0) + self.getTextOffset(0) + ((self.getHeight()-(self.getFrameWidth(0)+self.getFrameWidth(2)+self.getTextOffset(0)+self.getTextOffset(2)))/2 - textHeight/2)
+            y = (surface.get_height()/2 - textHeight/2)
 
         if self.getTextVerticalAlignment() == 2:
             surfaces = surfaces[::-1]
 
         for textSurface in surfaces: #Place text
             if self.getTextHorizontalAlignment() == 1:
-                x = self.getTextOffset(1) + ((self.getWidth()-(self.getFrameWidth(1)+self.getFrameWidth(3)+self.getTextOffset(1)+self.getTextOffset(3)))/2) - textSurface.get_width()/2
+                x = ((surface.get_width())/2) - textSurface.get_width()/2
             elif self.getTextHorizontalAlignment() == 2:
-                x = self.getWidth() - (self.getFrameWidth(3) + textSurface.get_width() + self.getTextOffset(3))
+                x = surface.get_width() - textSurface.get_width()
 
             if self.getTextVerticalAlignment() == 2:
                 y -= textSurface.get_height()
@@ -1699,13 +1827,8 @@ class MText(MFrame):
             if self.getTextVerticalAlignment() != 2:
                 y += textSurface.get_height()
 
-        if self.getCursorVisible() and self._getCursorIsVisible() and self.getFocused(): #Draw cursor
-            xCursor = self._getPositionX(generator, self.getCursorPosition())
-            yCursor = self._getPositionY(generator, self.getCursorPosition())
-            pygame.draw.rect(surface, (0, 0, 0), (xCursor, yCursor, self.getCursorWidth(), heightCursor))
-
         return surface
-    
+
     def _setCursorIsVisible(self, _cursorIsVisible): #Change the value of _cursorIsVisible
         if self._cursorIsVisible != _cursorIsVisible:
             self._cursorIsVisible = _cursorIsVisible
