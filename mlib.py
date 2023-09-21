@@ -1372,13 +1372,13 @@ class MText(MFrame):
             i += 1
         return yCursor
 
-    def _getPositionAtPos(self, generator, pos): #Return the position of the cursor at one pos
+    def _getPositionAtPos(self, generator, pos): #Return the position in the text at one pos
         pieces = self.getCuttedText(all=True, generator=generator)
         
         i = 0
         lineLength = 0
         textLength = 0
-        x = self.getFrameWidth(1) + self.getTextOffset(1)
+        x = self.getFrameWidth(1) + self.getTextOffset(1) + self.getTextX()
         y = self.getFrameWidth(0) + self.getTextOffset(0)
 
         if self.getTextVerticalAlignment() == 1:
@@ -1439,7 +1439,7 @@ class MText(MFrame):
             textLength += len(piece)
             if textLength >= position:
                 lineSize = generator.size(piece)[0]
-                textSize = generator.size(piece[0:(position-(textLength-len(piece)))])[0]
+                textSize = generator.size(piece[0:(position-(textLength-len(piece)))])[0] + self.getTextX()
                 break
 
             if piecesLineReturn[i] != 0:
@@ -1582,12 +1582,6 @@ class MText(MFrame):
             i += 1
             textY += textHeight
         
-        if textYStart <= 0 and len(surfaces) > 0:
-            surfaces[0] = surfaces[0].subsurface((0, -textYStart, surfaces[0].get_width(), surfaces[0].get_height() + textYStart))
-
-        if textYStop > self._getTextDisplaySize()[1]:
-            surfaces[-1] = surfaces[-1].subsurface((0, 0, surfaces[-1].get_width(), surfaces[-1].get_height() - (textYStop - self._getTextDisplaySize()[1])))
-
         return surfaces, textYStart
     
     def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked by the mouse
@@ -1826,6 +1820,9 @@ class MText(MFrame):
             
             if self.getTextVerticalAlignment() != 2:
                 y += textSurface.get_height()
+
+        surface = surface.subsurface((-self.getTextX(), 0, surface.get_width() + self.getTextX(), surface.get_height()))
+        surface = surface.subsurface((0, -textYStart, surface.get_width(), surface.get_height() + (textYStart)))
 
         return surface
 

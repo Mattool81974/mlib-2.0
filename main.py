@@ -16,6 +16,7 @@ phrase = ""
 for i in range(100):
     phrase += str(i) + "-" + "123456789\n"[len(str(i))+1:]
 phrase = phrase[:-1]
+phrase = ""
 nb = 0
 temps = 0
 
@@ -29,12 +30,16 @@ texte.setFrameWidth(5)
 texte.setInput(True)
 texte.setSelectionTextColor((255, 255, 255))
 texte.setTextOffset(5)
+texte.setTextX(0)
 texte.setTextY(0)
 
 #CuttedText : 0.0013
 
 while True:
     mapp.frameEvent()
+
+    if len(texte.getText()):
+        texte.setTextX(-50)
 
     mapp.frameGraphics()
     pygame.display.flip()
