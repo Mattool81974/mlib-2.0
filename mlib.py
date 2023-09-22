@@ -774,6 +774,7 @@ class MText(MFrame):
         self._leftArrowPressed = False
         self._leftArrowPressedTime = 0
         self._leftArrowNumber = 0
+        self._longestLineSize = 0
         self._returnPressed = False
         self._returnPressedTime = 0
         self._returnNumber = 0
@@ -1083,9 +1084,6 @@ class MText(MFrame):
                 self.setShouldModify(True)
 
     def setSelectionPos(self, selectionStart, selectionStop): #Change the value of selectionStart and selectionStop more easily
-        if self._mapp.getConsole():
-            self._mapp.writeConsole("New selection pos from " + str(selectionStart) + " to " + str(selectionStop), indentation = 0, writer=self)
-        
         self.setSelectionStop(len(self.getText()) + 1) #Neutralize _checkSelection effect
         self.setSelectionStart(0)
         self.setSelectionStop(selectionStop) #Apply modifications
@@ -1093,8 +1091,6 @@ class MText(MFrame):
 
     def setSelectionStart(self, selectionStart): #Change the value of selectionStart
         if selectionStart != self.getSelectionStart():
-            if self._mapp.getConsole():
-                self._mapp.writeConsole("New selection start at " + str(selectionStart), indentation = 1, writer=self)
             self.selectionStart = selectionStart
             if self.selectionStart < 0:
                 self.selectionStart = 0
@@ -1108,8 +1104,6 @@ class MText(MFrame):
 
     def setSelectionStop(self, selectionStop): #Change the value of selectionStop
         if selectionStop != self.getSelectionStop():
-            if self._mapp.getConsole():
-                self._mapp.writeConsole("New selection stop at " + str(selectionStop), indentation = 1, writer=self)
             self.selectionStop = selectionStop
             if self.getSelectionStop() > len(self.getText()) + 1:
                 self.setSelectionStop(len(self.getText()) + 1)
@@ -1172,14 +1166,16 @@ class MText(MFrame):
 
     def setTextX(self, textX): #Change the value of textX
         if self.textX != textX:
-            if textX > 0:
+            if textX > 0 or self._longestLineSize <= self._getTextDisplaySize()[0]:
                 textX = 0
+            elif -textX > self._longestLineSize - self._getTextDisplaySize()[0]:
+                textX = -self._longestLineSize + self._getTextDisplaySize()[0]
             self.textX = textX
             self.setShouldModify(True)
     
     def setTextY(self, textY): #Change the value of textY
         if self.textY != textY:
-            if textY > 0:
+            if textY > 0 or self._getTextHeight() <= self._getTextDisplaySize()[1]:
                 textY = 0
             elif textY < -(self._getTextHeight() - self._getTextDisplaySize()[1]):
                 textY = -(self._getTextHeight() - self._getTextDisplaySize()[1])
@@ -1198,35 +1194,32 @@ class MText(MFrame):
                 self.setSelectionStop(s)
 
     def _cursorBottom(self): #Put up the cursor into the line at the top
-        if self._mapp.getConsole():
-            self._mapp.writeConsole("Cursor move to the bottom", indentation = 0, writer=self)
-        
         self._setCursorIsVisible(True)
 
-        generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
-        heightCursor = generator.size(" ")[1]
-
-        x = self._getPositionX(generator, self.getCursorPosition())
-        y = self._getPositionY(generator, self.getCursorPosition()) + heightCursor + heightCursor/2
-
-        pos = self._getPositionAtPos(generator, (x, y))
-
-        if self.getSelection() and self._shiftPressed:
-            if self.getSelectedText() == -1:
-                self.setSelectionPos(self.getCursorPosition(), pos)
-            else:
-                if self._baseSelection < pos:
-                    self.setSelectionPos(self._baseSelection, pos)
-                else:
-                    self.setSelectionPos(pos, self._baseSelection)
+        if self._controlPressed:
+            self.setTextY(self.getTextY() - 30)
         else:
-            self.setSelectionPos(0, 0)
-        self.setCursorPosition(pos)
+            generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
+            heightCursor = generator.size(" ")[1]
+
+            x = self._getPositionX(generator, self.getCursorPosition())
+            y = self._getPositionY(generator, self.getCursorPosition()) + heightCursor + heightCursor/2
+
+            pos = self._getPositionAtPos(generator, (x, y))
+
+            if self.getSelection() and self._shiftPressed:
+                if self.getSelectedText() == -1:
+                    self.setSelectionPos(self.getCursorPosition(), pos)
+                else:
+                    if self._baseSelection < pos:
+                        self.setSelectionPos(self._baseSelection, pos)
+                    else:
+                        self.setSelectionPos(pos, self._baseSelection)
+            else:
+                self.setSelectionPos(0, 0)
+            self.setCursorPosition(pos)
 
     def _cursorLeft(self): #Put the cursor at the left
-        if self._mapp.getConsole():
-            self._mapp.writeConsole("Cursor move to the left", indentation = 0, writer=self)
-
         leftOffset = 1
         if self._controlPressed:
             firstCar = ""
@@ -1266,9 +1259,6 @@ class MText(MFrame):
         self.setCursorPosition(self.getCursorPosition() - leftOffset)
 
     def _cursorRight(self): #Put the cursor at the right
-        if self._mapp.getConsole():
-            self._mapp.writeConsole("Cursor move to the right", indentation = 0, writer=self)
-
         rightOffset = 1
         if self._controlPressed:
             firstCar = ""
@@ -1308,38 +1298,35 @@ class MText(MFrame):
         self.setCursorPosition(self.getCursorPosition() + rightOffset)
 
     def _cursorTop(self): #Put down the cursor into the line at the top
-        if self._mapp.getConsole():
-            self._mapp.writeConsole("Cursor move to the top", indentation = 0, writer=self)
-
-        self._setCursorIsVisible(True)
-
-        generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
-        heightCursor = generator.size(" ")[1]
-
-        x = self._getPositionX(generator, self.getCursorPosition())
-        y = self._getPositionY(generator, self.getCursorPosition()) - heightCursor/2
-
-        pos = self._getPositionAtPos(generator, (x, y))
-        if y < 0:
-            pos = 0
-
-        if self.getSelection() and self._shiftPressed:
-            if self.getSelectedText() == -1:
-                self.setSelectionPos(pos, self.getCursorPosition())
-            else:
-                if self._baseSelection <= pos:
-                    self.setSelectionPos(pos, self._baseSelection)
-                else:
-                    self.setSelectionPos(pos, self._baseSelection)
+        if self._controlPressed:
+            self.setTextY(self.getTextY() - 30)
         else:
-            self.setSelectionPos(0, 0)
-        self.setCursorPosition(pos)
+            self._setCursorIsVisible(True)
+
+            generator = pygame.font.SysFont(self.getFont(), self.getFontSize())
+            heightCursor = generator.size(" ")[1]
+
+            x = self._getPositionX(generator, self.getCursorPosition())
+            y = self._getPositionY(generator, self.getCursorPosition()) - heightCursor/2
+
+            pos = self._getPositionAtPos(generator, (x, y))
+            if y < 0:
+                pos = 0
+
+            if self.getSelection() and self._shiftPressed:
+                if self.getSelectedText() == -1:
+                    self.setSelectionPos(pos, self.getCursorPosition())
+                else:
+                    if self._baseSelection <= pos:
+                        self.setSelectionPos(pos, self._baseSelection)
+                    else:
+                        self.setSelectionPos(pos, self._baseSelection)
+            else:
+                self.setSelectionPos(0, 0)
+            self.setCursorPosition(pos)
     
     def _doBackspaceEffet(self): #Do the effect of the pression fo the backspace touch
         if self.getInput():
-            if self._mapp.getConsole():
-                self._mapp.writeConsole("Do backspace effect", indentation = 0, writer=self)
-
             if self.getSelection() and self.getSelectedText() != -1:
                 self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                 self.setSelectionPos(0, 0)
@@ -1524,6 +1511,7 @@ class MText(MFrame):
         surfaces = []
         textLength = textY[2]
         textY = self.getTextY()
+        self._longestLineSize = 0
         for piece in pieces: #Render text into pieces
             textHeight = generator.size(piece)[1]
             textLength += len(piece)
@@ -1561,7 +1549,7 @@ class MText(MFrame):
                         textSurface1 = generator.render(piece, False, self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
-                        textSurface = Surface((textSurface1.get_width() + textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
+                        textSurface = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         textSurface.blit(surfaceSelectionBackground, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
@@ -1581,6 +1569,9 @@ class MText(MFrame):
                 surfaces.append(textSurface)
             i += 1
             textY += textHeight
+
+            if surfaces[-1].get_width() > self._longestLineSize:
+                self._longestLineSize = surfaces[-1].get_width()
         
         return surfaces, textYStart
     
@@ -1754,7 +1745,10 @@ class MText(MFrame):
 
     def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused and the wheel is rotating
         multiplicator = 30
-        self.setTextY(self.getTextY() + rotation * multiplicator)
+        if self._controlPressed:
+            self.setTextX(self.getTextX() + rotation * multiplicator)
+        else:
+            self.setTextY(self.getTextY() + rotation * multiplicator)
 
     def _removeTextAtPos(self, length, pos): #Remove a length-sized piece of text at the cursor
         firstI = pos - length
@@ -1816,12 +1810,18 @@ class MText(MFrame):
             if self.getTextVerticalAlignment() == 2:
                 y -= textSurface.get_height()
 
-            surface.blit(textSurface, (x, y, textSurface.get_width(), textSurface.get_height()))
+            surface.blit(textSurface, (x + self.getTextX(), y, textSurface.get_width(), textSurface.get_height()))
             
             if self.getTextVerticalAlignment() != 2:
                 y += textSurface.get_height()
 
-        surface = surface.subsurface((-self.getTextX(), 0, surface.get_width() + self.getTextX(), surface.get_height()))
+        x = 0
+        w = surface.get_width()
+        if w < 0:
+            w = 0
+            x = 0
+
+        surface = surface.subsurface((x, 0, w, surface.get_height()))
         surface = surface.subsurface((0, -textYStart, surface.get_width(), surface.get_height() + (textYStart)))
 
         return surface

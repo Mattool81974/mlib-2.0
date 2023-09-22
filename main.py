@@ -21,25 +21,17 @@ nb = 0
 temps = 0
 
 texte = MText(phrase, 300, 0, 600, 900, mapp)
-texte.setSelectionBackgroundColor((25, 102, 255))
-texte.setDynamicTextCut(True)
 texte.setFont("Consolas")
 texte.setFontSize(17)
 texte.setFrameColor((0, 0, 255))
 texte.setFrameWidth(5)
 texte.setInput(True)
 texte.setSelectionTextColor((255, 255, 255))
-texte.setTextOffset(5)
-texte.setTextX(0)
-texte.setTextY(0)
 
 #CuttedText : 0.0013
 
 while True:
     mapp.frameEvent()
-
-    if len(texte.getText()):
-        texte.setTextX(-50)
 
     mapp.frameGraphics()
     pygame.display.flip()

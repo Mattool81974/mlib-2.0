@@ -17,7 +17,9 @@
         </div>
         <h3 id="display">Affichage du texte</h3>
         <div>
-            Le texte est affiché entre les <a href="./mframe.html">bordure</a> et l'offset.
+            Le texte est affiché entre les <a href="./mframe.html">bordure</a> et l'offset. Un système de scroll est possible grâce à <a href="#textX">textX</a> et <a href="textY">textY</a>.
+            On peut scroller sur l'angle vertical avec Ctrl+flèche ou avec la roulette de la souris et sur l'angle horizontal avec Ctrl+roulette de la souris.
+            Il est pour l'instant très déconseillé d'utiliser un alignement et le scrolling en même temps.
         </div>
         <h3>Entrée et modification du texte</h3>
         <div>
@@ -730,6 +732,12 @@
         <div>
             Nombre de "leftArrow" appliqués au texte.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="_longestLineSize">_longestLineSize</h3>
+        <div>
+            Taille de la ligne la plus grande rendu dans <a href="#_getTextRendered">_getTextRendered()</a>.</br>
+            Elle sert à définir la valeur la plsu élevé de <a href="#textX">textX</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.4.0.
         </div>
         <h3 id="_returnPressed">_returnPressed</h3>
         <div>
