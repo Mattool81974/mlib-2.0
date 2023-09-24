@@ -18,8 +18,8 @@ class MWidget:
         self.cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW
         self.focused = False
         self.height = height
-        self.mouseDown = -1
-        self.mouseUp = -1
+        self.mouseDown = []
+        self.mouseUp = []
         self.overflighted = False
         self.parent = 0
         self.setShouldModify(True)
@@ -191,8 +191,8 @@ class MWidget:
         self.setShouldModify(True)
 
     def softResetWidget(self): #Reset without graphics modification
-        self.mouseDown = -1
-        self.mouseUp = -1
+        self.mouseDown = []
+        self.mouseUp = []
         self.overflighted = False
 
     def _addChild(self, child): #Add a child to the widget
@@ -218,6 +218,9 @@ class MWidget:
         pass
 
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        pass
+
+    def _isNotOverflightedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not overflighted anymore
         pass
 
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
@@ -285,6 +288,7 @@ class MApp(MWidget):
         self._deltaTimeCache = time_ns()
         self._fpsCount = 0
         self._fpsDuration = 0
+        self._lastOverflightedWidget = 0
         self._modifiedWidget = []
         self._pygameWindow = pygameWindow
         self._widgets = []
@@ -351,6 +355,9 @@ class MApp(MWidget):
         cursor = overflightedWidget.getCursorOnOverflight()
         overflightedWidget.overflighted = True
         pygame.mouse.set_cursor(cursor)
+        if self._lastOverflightedWidget != overflightedWidget:
+            if self._lastOverflightedWidget != 0: self._lastOverflightedWidget._isNotOverflightedAnymore()
+            self._lastOverflightedWidget = overflightedWidget
         overflightedWidget._isGettingOverflighted()
 
         events = pygame.event.get()
@@ -359,7 +366,7 @@ class MApp(MWidget):
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
-                overflightedWidget.mouseDown = event.button
+                if overflightedWidget.mouseDown.count(event.button) == 0: overflightedWidget.mouseDown.append(event.button)
                 if self.focusedWidget.getID() != overflightedWidget.getID():
                     self.focusedWidget.focused = False
                     if self.getConsole():
@@ -371,8 +378,8 @@ class MApp(MWidget):
                     self.writeConsole("Mouse clicked", indentation = 0, writer = self.focusedWidget)
                 overflightedWidget._isGettingMouseDown(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
-                overflightedWidget.mouseUp = event.button
-                overflightedWidget._isGettingMouseUp(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
+                if overflightedWidget.mouseUp.count(event.button) == 0: overflightedWidget.mouseUp.append(event.button)
+                self.focusedWidget._isGettingMouseUp(event.button, (event.pos[0] - overflightedWidget.getX(), event.pos[1] - overflightedWidget.getY()))
             elif event.type == pygame.MOUSEMOTION: #If hte mouse is moving
                 self.focusedWidget._mouseMove(event.buttons, (event.pos[0] - self.focusedWidget.getX(), event.pos[1] - self.focusedWidget.getY()), event.rel)
             elif event.type == pygame.MOUSEWHEEL: #If the wheel is rotating
@@ -1895,3 +1902,151 @@ class MText(MFrame):
             if self._cursorVisibleTime >= self._cursorFlashingTime:
                 self._cursorVisibleTime -= self._cursorFlashingTime
                 self._setCursorIsVisible(not self._cursorIsVisible)
+
+###################### Secondary class to create a simple button
+class MButton(MText):
+    def __init__(self, text, x, y, width, height, parent, widgetType="MButton"):
+        super().__init__(text, x, y, width, height, parent, widgetType)
+
+        self.backgroundColorOnOverflight = (210, 207, 200)
+        self.changeBackgroundColorOnOnOverflight = False
+        self.changeTextColorOnOnOverflight = False
+        self.changeFontSizeOnOnOverflight = False
+        self.leftClicked = False
+        self.rightClicked = False
+        self.fontSizeOnOverflight = 24
+        self.textColorOnOverflight = (50, 47, 40)
+        self._baseBackgroundColor = (0, 0, 0)
+        self._baseFontSize = 0
+        self._baseTextColor = (0, 0, 0)
+
+        self.setBackgroundColor((180, 177, 170), True)
+        self.setCursorOnOverflight(pygame.SYSTEM_CURSOR_HAND)
+        self.setFontSize(22)
+        self.setFrameWidth(1)
+        self.setTextColor((0, 0, 0))
+        self.setTextHorizontalAlignment(1)
+        self.setTextVerticalAlignment(1)
+
+    def getBackgroundColorOnOverflight(self):
+        return self.backgroundColorOnOverflight
+
+    def getChangeBackgroundColorOnOnOverflight(self):
+        return self.changeBackgroundColorOnOnOverflight
+    
+    def getChangeFontSizeOnOnOverflight(self):
+        return self.changeFontSizeOnOnOverflight
+    
+    def getChangeTextColorOnOnOverflight(self):
+        return self.changeTextColorOnOnOverflight
+    
+    def getFontSizeOnOverflight(self):
+        return self.fontSizeOnOverflight
+    
+    def getTextColorOnOverflight(self):
+        return self.textColorOnOverflight
+
+    def isGettingLeftClicked(self):
+        return self.leftClicked
+    
+    def isGettingRightClicked(self):
+        return self.rightClicked
+    
+    def setBackgroundColor(self, backgroundColor, notButton = True):
+        if notButton:
+            self._baseBackgroundColor = backgroundColor
+            self.setBackgroundColor(backgroundColor, False)
+        else:
+            super().setBackgroundColor(backgroundColor, constant=True)
+
+    def setBackgroundColorOnOverflight(self, backgroundColorOnOverflight):
+        if self.backgroundColorOnOverflight != backgroundColorOnOverflight:
+            self.backgroundColorOnOverflight = backgroundColorOnOverflight
+            if self.getChangeBackgroundColorOnOnOverflight() and self.getOverflighted():
+                self.setShouldModify(True)
+    
+    def setChangeBackgroundColorOnOnOverflight(self, changeBackgroundColorOnOnOverflight):
+        if self.changeBackgroundColorOnOnOverflight != changeBackgroundColorOnOnOverflight:
+            self.changeBackgroundColorOnOnOverflight = changeBackgroundColorOnOnOverflight
+            if self.getOverflighted():
+                self.setShouldModify(True)
+
+    def setChangeFontSizeOnOnOverflight(self, changeFontSizeOnOnOverflight):
+        if self.changeFontSizeOnOnOverflight != changeFontSizeOnOnOverflight:
+            self.changeFontSizeOnOnOverflight = changeFontSizeOnOnOverflight
+            if self.getOverflighted():
+                self.setShouldModify(True)
+
+    def setChangeTextColorOnOnOverflight(self, changeTextColorOnOnOverflight):
+        if self.changeTextColorOnOnOverflight != changeTextColorOnOnOverflight:
+            self.changeTextColorOnOnOverflight = changeTextColorOnOnOverflight
+            if self.getOverflighted():
+                self.setShouldModify(True)
+
+    def setFontSize(self, fontSize, notButton = True):
+        if notButton:
+            self._baseFontSize = fontSize
+            self.setFontSize(fontSize, False)
+        else:
+            super().setFontSize(fontSize)
+
+    def setFontSizeOnOverflight(self, fontSizeOnOverflight):
+        if self.fontSizeOnOverflight != fontSizeOnOverflight:
+            self.fontSizeOnOverflight = fontSizeOnOverflight
+            if self.getChangeFontSizeOnOnOverflight() and self.getOverflighted():
+                self.setShouldModify(True)
+
+    def setTextColor(self, textColor, notButton = True):
+        if notButton:
+            self._baseTextColor = textColor
+            self.setTextColor(textColor, False)
+        else:
+            super().setTextColor(textColor)
+
+    def setTextColorOnOverflight(self, textColorOnOverflight):
+        if self.textColorOnOverflight != textColorOnOverflight:
+            self.textColorOnOverflight = textColorOnOverflight
+            if self.getChangeTextColorOnOnOverflight() and self.getOverflighted():
+                self.setShouldModify(True)
+
+    def _doNotOverflightedEffect(self):
+        self.setBackgroundColor(self._baseBackgroundColor)
+        self.setFontSize(self._baseFontSize)
+        self.setTextColor(self._baseTextColor)
+
+    def _doOverflightedEffect(self):
+        if self.getChangeBackgroundColorOnOnOverflight():
+            self.setBackgroundColor(self.getBackgroundColorOnOverflight(), False)
+
+        if self.getChangeFontSizeOnOnOverflight():
+            self.setFontSize(self.getFontSizeOnOverflight(), False)
+
+        if self.getChangeTextColorOnOnOverflight():
+            self.setTextColor(self.getTextColorOnOverflight(), False)
+    
+    def _isGettingMouseDown(self, button, relativePos):
+        if button == 1:
+            self.leftClicked = True
+        elif button == 3:
+            self.rightClicked = True
+
+    def _isGettingMouseUp(self, button, relativePos):
+        if button == 1:
+            self.leftClicked = False
+        elif button == 3:
+            self.rightClicked = False
+
+    def _isGettingOverflighted(self):
+        self._doOverflightedEffect()
+
+    def _isNotFocusedAnymore(self):
+        self.leftClicked = False
+        self.rightClicked = False
+
+    def _isNotOverflightedAnymore(self):
+        self._doNotOverflightedEffect()
+
+###################### Secondary class which represents bar/slider
+class MBar(MFrame):
+    def __init__(self, x, y, width, height, parent, widgetType="MBar"):
+        super().__init__(x, y, width, height, parent, widgetType)

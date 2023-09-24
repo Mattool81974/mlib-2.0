@@ -8,7 +8,7 @@
     <body>
         <h1>MApp</h1>
         <div>
-            MApp est la classe permettant de définir la fenêtre principale de l'interface graphique.</br>
+            MApp est la classe primaire permettant de définir la fenêtre principale de l'interface graphique.</br>
             Elle hérite de <a href="mwidget.html">mwidget</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
@@ -37,7 +37,7 @@
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux <a href="../base.html#event">évènements</a>.</br>
             Cette fonction s'occupe aussi d'actualiser le <a href="#deltaTime">deltaTime</a>, puis <a href="#fps">fps</a>, puis de stocker la <a href="#consoleSystem">console</a> sous format ".txt".</br>
             Il est FORTEMENT conseillé d'appeler cette fonction au début d'une frame.</br>
-            Modifié à la <a href="../versions.html">version</a> 1.4.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="frameGraphics">frameGraphics()</h3>
         <div>
@@ -244,6 +244,11 @@
         <div>
             Nombre de secondes depuis la dernière update de <a href="#fps">fps</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id = "_lastOverflightedWidget">_lastOverflightedWidget</h3>
+        <div>
+            Widget survolé pendant la dernière frame.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id = "_modifiedWidget">_modifiedWidget</h3>
         <div>

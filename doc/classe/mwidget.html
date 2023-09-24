@@ -8,16 +8,16 @@
     <body>
         <h1>MWidget</h1>
         <div>
-            MWidget est la classe principale pour définir un <a href="base.html">widget</a>.</br>
+            MWidget est la classe principale primaire pour définir un <a href="../base.html">widget</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
 
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : x (assignée à la variabe <a href="#x">x</a>), y (assignée à la variabe <a href="#y">y</a>), width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MWidget")</br>
+            Paramètres : x (assignée à la variabe <a href="#x">x</a>), y (assignée à la variabe <a href="#y">y</a>), width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), widgetType (assignée à la variable <a href="#_type">_type</a>, basiquememnt mit à "MWidget")</br>
             Construit un objet widget.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="absolutePos">absolutePos()</h3>
         <div>
@@ -274,6 +274,14 @@
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id = "_isNotOverflightedAnymore">_isNotOverflightedAnymore()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Fonction appelé lorsque le widget n'est plus survolé par le curseur.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
         <h3 id = "_isTextGettingEntered">_isTextGettingEntered()</h3>
         <div>
             Paramètres : text (texte entrée)</br>
@@ -365,17 +373,17 @@
         </div>
         <h3 id = "mouseDown">mouseDown</h3>
         <div>
-            Nombre qui représente , soit le bouton de la souris par lequel il est clické, soit -1.</br>
+            Liste qui contient tous les boutons de la souris pressés par l'utilisateur sur le widget pendant cette frame.</br>
             Si bouton est "1", la touche clické est la touche gauche, si bouton est "2", la touche clické est la molette, si bouton est "3", la touche clické est la touche droite.</br>
             Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseDown">_isGettingMouseDown</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id = "mouseUp">mouseUp</h3>
         <div>
-            Nombre qui représente , soit le bouton de la souris par lequel il n'est plus clické, soit -1.</br>
+            Liste qui contient tous les boutons de la souris plus pressés par l'utilisateur sur le widget pendant cette frame.</br>
             Si bouton est "1", la touche clické est la touche gauche, si bouton est "2", la touche clické est la molette, si bouton est "3", la touche clické est la touche droite.</br>
             Si possible, il est conseillé d'utiliser <a href="#_isGettingMouseUp">_isGettingMouseUp</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id = "overflighted">overflighted</h3>
         <div>
