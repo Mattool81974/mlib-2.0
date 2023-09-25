@@ -208,7 +208,7 @@ class MWidget:
     def _isGettingMouseUp(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is stopping of being clicked (called for only one frame) with button = left button (1) and right button (2)
         pass
 
-    def _isGettingOverflighted(self): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
+    def _isGettingOverflighted(self, relativePos): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         pass
 
     def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
@@ -358,7 +358,7 @@ class MApp(MWidget):
         if self._lastOverflightedWidget != overflightedWidget:
             if self._lastOverflightedWidget != 0: self._lastOverflightedWidget._isNotOverflightedAnymore()
             self._lastOverflightedWidget = overflightedWidget
-        overflightedWidget._isGettingOverflighted()
+        overflightedWidget._isGettingOverflighted((mousePos[0] - overflightedWidget.getX(), mousePos[1] - overflightedWidget.getY()))
 
         events = pygame.event.get()
         for event in events: #Event handler
@@ -2036,7 +2036,7 @@ class MButton(MText):
         elif button == 3:
             self.rightClicked = False
 
-    def _isGettingOverflighted(self):
+    def _isGettingOverflighted(self, relativePos):
         self._doOverflightedEffect()
 
     def _isNotFocusedAnymore(self):
@@ -2048,5 +2048,208 @@ class MButton(MText):
 
 ###################### Secondary class which represents bar/slider
 class MBar(MFrame):
-    def __init__(self, x, y, width, height, parent, widgetType="MBar"):
+    def __init__(self, orientation, minValue, maxValue, step, x, y, width, height, parent, widgetType="MBar"): #Construct an MBar object
         super().__init__(x, y, width, height, parent, widgetType)
+
+        self.buttonBackgroundColor = (130, 127, 120)
+        self.buttonBackgroundColorOnOverflight = (180, 177, 170)
+        self.buttonOrientationLength = (self.getHeight() - 2) / 10
+        if orientation == 0:
+            self.buttonOrientationLength = (self.getWidth() - 2) / 10
+        self.changeButtonBackgroundColorOnOverflight = False
+        self.maxValue = maxValue
+        self.minValue = minValue
+        self.step = step
+        self.value = minValue
+        self.ORIENTATION = orientation
+        self._buttonClicked = False
+        self._buttonOverflighted = False
+
+        self.setChangeButtonBackgroundColorOnOverflight(True)
+        self.setFrameWidth(1)
+
+    def getButtonBackgroundColor(self): #Return buttonBackgroundColor
+        return self.buttonBackgroundColor
+    
+    def getButtonBackgroundColorOnOverflight(self): #Return buttonBackgroundColorOnOverflight
+        return self.buttonBackgroundColorOnOverflight
+    
+    def getButtonOrientationLength(self): #Return buttonOrientationLength
+        return self.buttonOrientationLength
+    
+    def getChangeButtonBackgroundColorOnOverflight(self): #Return changeButtonBackgroundColorOnOnOverflight
+        return self.changeButtonBackgroundColorOnOverflight
+    
+    def getMaxValue(self): #Return maxValue
+        return self.maxValue
+    
+    def getMinValue(self): #Return maxValue
+        return self.minValue
+    
+    def getOrientation(self): #Return ORIENTATION
+        return self.ORIENTATION
+    
+    def getStep(self): #Return step
+        return self.step
+    
+    def getValue(self): #Return maxValue
+        return self.value
+    
+    def getButtonOrientationPos(self): #Return the orientation pos of the button
+        if self.getValue() <= self.getMinValue():
+            return 0
+        
+        frame1 = self.getFrameWidth(1)
+        if self.getOrientation() == 1:
+            frame1 = self.getFrameWidth(0)
+
+        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
+        if self.getOrientation() == 1:
+            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
+
+        if self.getValue() >= self.getMaxValue():
+            return realButtonNavigationLength + frame1
+
+        valuePercentage = (self.getValue() - self.getMinValue()) / (self.getMaxValue() - self.getMinValue())
+
+        pos = realButtonNavigationLength * valuePercentage
+
+        return pos
+    
+    def isValueIn(self, value): #Return if value is between minValue and maxValue
+        return value >= self.getMinValue() and value <= self.getMaxValue()
+    
+    def setChangeButtonBackgroundColorOnOverflight(self, changeButtonBackgroundColorOnOverflight): #Return buttonBackgroundColorOnOverflight
+        if self.getChangeButtonBackgroundColorOnOverflight() != changeButtonBackgroundColorOnOverflight:
+            self.changeButtonBackgroundColorOnOverflight = changeButtonBackgroundColorOnOverflight
+            if self._buttonOverflighted:
+                self.setShouldModify(True)
+    
+    def setButtonBackgroundColor(self, buttonBackgroundColor): #Change the value of buttonBackground
+        if self.getButtonBackgroundColor() != buttonBackgroundColor:
+            self.buttonBackgroundColor = buttonBackgroundColor
+            self.setShouldModify(True)
+
+    def setButtonBackgroundColorOnOverflight(self, buttonBackgroundColorOnOverflight): #Change the value of buttonBackgroundOnOverflight
+        if self.getButtonBackgroundColorOnOverflight() != buttonBackgroundColorOnOverflight:
+            self.buttonBackgroundColorOnOverflight = buttonBackgroundColorOnOverflight
+            self.setShouldModify(True)
+    
+    def setMaxValue(self, maxValue): #Change the value of maxValue
+        if self.getMaxValue() != maxValue and maxValue >= self.getMinValue() and self.getValue() <= maxValue():
+            self.maxValue = maxValue
+            self.setShouldModify(True)
+    
+    def setMinValue(self, minValue): #Change the value of maxValue
+        if self.getMinValue() != minValue and minValue <= self.getMaxValue() and self.getValue() >= minValue:
+            self.minValue = minValue
+            self.setShouldModify(True)
+    
+    def setStep(self, step): #Change the value of step
+        if self.getStep() != step:
+            self.step = step
+            self.setShouldModify(True)
+    
+    def setValue(self, value): #Change the value of value
+        if self.getValue() != value and self.isValueIn(value):
+            self.value = value
+            self.setShouldModify(True)
+
+    def _doNotOverflightEffect(self): #Apply effect on the MBar when not overflighted by the cursor
+        if self._buttonOverflighted:
+            self._buttonOverflighted = False
+            self.setShouldModify(True)
+
+    def _doOverflightEffect(self, relativePos): #Apply effect on the MBar when overflighted by the cursor
+        if self._isPosOverButton(relativePos):
+            if not self._buttonOverflighted:
+                self._buttonOverflighted = True
+                self.setShouldModify(True)
+        else:
+            if self._buttonOverflighted:
+                self._buttonOverflighted = False
+                self.setShouldModify(True)
+
+    def _getValueAtPos(self, relativePos): #Return the value at a relative pos
+        frame1 = self.getFrameWidth(1)
+        if self.getOrientation() == 1:
+            frame1 = self.getFrameWidth(0)
+
+        if relativePos <= frame1 + self.getButtonOrientationLength() / 2:
+            return self.getMinValue()
+
+        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
+        if self.getOrientation() == 1:
+            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
+
+        if relativePos >= buttonNavigationLength - frame1:
+            return self.getMaxValue()
+
+        if self.getOrientation() == 0:
+            relativePos -= self.getFrameWidth(1) + self.getButtonOrientationLength()/2
+        else:
+            relativePos -= self.getFrameWidth(0) + self.getButtonOrientationLength()/2
+
+        toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
+
+        return round(toReturn)
+
+    def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+        if button == 1:
+            if self._isPosOverButton(relativePos):
+                self._buttonClicked = True
+            else:
+                toAdd = relativePos[0]
+                if self.getOrientation() == 1:
+                    toAdd = relativePos[1]
+                toAdd = self._getValueAtPos(toAdd)
+                if toAdd > self.getMaxValue(): toAdd = self.getMaxValue()
+                if toAdd < self.getMinValue(): toAdd = self.getMinValue(())
+                self.setValue(toAdd)
+
+    def _isGettingMouseUp(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is not clicked anymore (called for only one frame) with button = left button (1) and right button (2)
+        if button == 1:
+            self._buttonClicked = False
+
+    def _isGettingOverflighted(self, relativePos): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
+        self._doOverflightEffect(relativePos)
+
+    def _isNotOverflightedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not overflighted anymore
+        self._doNotOverflightEffect()
+
+    def _isPosOverButton(self, relativePos): #Return if pos overflight the button or not
+        good = True #Check if the cursor is overflighting the button
+        if self.getOrientation() == 1: #Vertical
+            good = relativePos[0] >= self.getFrameWidth(1) and relativePos[0] <= self.getWidth() - self.getFrameWidth(3)
+            good = good and relativePos[1] >= self.getButtonOrientationPos() and relativePos[1] <= self.getButtonOrientationPos() + self.getButtonOrientationLength()
+        else: #Horizontal
+            good = relativePos[1] >= self.getFrameWidth(0) and relativePos[1] <= self.getHeight() - self.getFrameWidth(2)
+            good = good and relativePos[0] >= self.getButtonOrientationPos() and relativePos[0] <= self.getButtonOrientationPos() + self.getButtonOrientationLength()
+        
+        return good
+    
+    def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
+        if self._buttonClicked:
+            toAdd = pos[0]
+            if self.getOrientation() == 1:
+                toAdd = pos[1]
+            self.setValue(round(self._getValueAtPos(toAdd)))
+
+    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+        surface = super()._renderBeforeHierarchy(surface)
+
+        #Calculate button position
+        finalRect = (self.getFrameWidth(1), self.getFrameWidth(0) + self.getButtonOrientationPos(), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getButtonOrientationLength())
+        if self.getOrientation() == 0:
+            finalRect = (self.getFrameWidth(1) + self.getButtonOrientationPos(), self.getFrameWidth(0), self.getButtonOrientationLength(), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))
+
+        #Choose button color
+        buttonBackgroundColor = self.getButtonBackgroundColor()
+        if self._buttonOverflighted and self.getChangeButtonBackgroundColorOnOverflight():
+            buttonBackgroundColor = self.getButtonBackgroundColorOnOverflight()
+
+        draw.rect(surface, buttonBackgroundColor, finalRect)
+
+        return surface
