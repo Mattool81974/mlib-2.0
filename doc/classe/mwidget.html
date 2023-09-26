@@ -139,6 +139,19 @@
             Retourne si les coordonnées "pos" se situent dans le widget grâce à <a href="#absolutePos">"absolutePos"</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="promoveChild">promoveChild()</h3>
+        <div>
+            Paramètres : child (enfant à privilégier)</br>
+            Place child en haut de la liste de widget à render pour le render sur tous les autres.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
+        <h3 id = "resetWidget">resetWidget()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Reset le widget à son état initial (si aucun <a href="../base.html#event">évènements</a> ne le modifie).</br>
+            Pour cela, la fonction utiliser toutes les variables (constantes) qui s'appellent "_NOMDUNEVARIABLE", comme <a href="#_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
         <h3 id="resize">resize()</h3>
         <div>
             Paramètres : newWidth (nouvelle largeur du widget), newHeight (nouvelle hauteur du widget)</br>
@@ -156,13 +169,6 @@
         <div>
             Paramètres : cursorOnOverflight (nouveau curseur de survol)</br>
             Change le curseur de survol <a href="cursorOnOverflight">"cursorOnOverflight"</a> en cursorOnOverflight.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
-        </div>
-        <h3 id = "resetWidget">resetWidget()</h3>
-        <div>
-            Paramètres : aucun</br>
-            Reset le widget à son état initial (si aucun <a href="../base.html#event">évènements</a> ne le modifie).</br>
-            Pour cela, la fonction utiliser toutes les variables (constantes) qui s'appellent "_NOMDUNEVARIABLE", comme <a href="#_BACKGROUNDCOLOR">_BACKGROUNDCOLOR</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
         <h3 id="setHeight">setHeight()</h3>
@@ -290,6 +296,13 @@
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="_lateUpdate">_lateUpdate()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame après le contrôle des éléments.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
         <h3 id = "_mouseMove">_mouseMove()</h3>
         <div>
             Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
@@ -308,7 +321,7 @@
         <div>
             Paramètres : enfant (widget à supprimer en enfant)</br>
             Supprime l'enfant "enfant" de la liste  d'enfant <a href="#_children">_children</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id = "_render">_render()</h3>
         <div>
@@ -344,7 +357,7 @@
         <h3 id = "_update">_update()</h3>
         <div>
             Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
-            Fonction appelée à chaque frame.</br>
+            Fonction appelée à chaque frame avant le contrôel des évènements.</br>
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
