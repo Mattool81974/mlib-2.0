@@ -9,26 +9,14 @@ TAILLE = (900, 900)
 
 fenetre = display.set_mode(TAILLE)
 mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], console=False, printFps=True)
-mapp.setBackgroundColor((0, 0, 0))
+mapp.setBackgroundColor((255, 255, 255))
 
 phrase = "Le T-90 est un char de combat russe associant le char T-72B et certains sous-systèmes du T-80U.\nEntré en service dans l'armée russe en novembre 1992, le T-90 est actuellement utilisé par dix pays."
-phrase = ""
-for i in range(100):
-    phrase += str(i) + "-" + "123456789\n"[len(str(i))+1:]
-phrase = phrase[:-1]
-phrase = ""
-nb = 0
-temps = 0
 
-texte = MText(phrase, 300, 0, 600, 900, mapp)
-texte.setFont("Consolas")
-texte.setFontSize(17)
-texte.setFrameColor((0, 0, 255))
-texte.setFrameWidth(5)
-texte.setInput(True)
-texte.setSelectionTextColor((255, 255, 255))
+img = MFrame(0, 0, 300, 1200, mapp)
 
-#CuttedText : 0.0013
+scrolleur = MScrollArea(img, 150, 150, 600, 600, mapp)
+scrolleur.setBackgroundColor((0, 0, 0))
 
 while True:
     mapp.frameEvent()
