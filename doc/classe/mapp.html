@@ -37,14 +37,15 @@
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux <a href="../base.html#event">évènements</a>.</br>
             Cette fonction s'occupe aussi d'actualiser le <a href="#deltaTime">deltaTime</a>, puis <a href="#fps">fps</a>, puis de stocker la <a href="#consoleSystem">console</a> sous format ".txt".</br>
             Il est FORTEMENT conseillé d'appeler cette fonction au début d'une frame.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.1.
         </div>
         <h3 id="frameGraphics">frameGraphics()</h3>
         <div>
             Paramètres : Aucun</br>
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux graphismes.</br>
+            Juste avant, elle appelle <a href="./mwidget.html#_lastUpdate">_lastUpdate</a> de tous les widgets.</br>
             Il est FORTEMENT conseillé d'appeler cette fonction à la fin d'une frame.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.0.1.
         </div>
         <h3 id="getConsole">getConsole()</h3>
         <div>
@@ -166,6 +167,12 @@
             Paramètres : widget (widget à enregistrer)</br>
             Fonction permettant d'enregistrer un widget nouvellement crée dans <a href="#_widgets">_widgets</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="_undeclaringWidget">_undeclaringWidget()</h3>
+        <div>
+            Paramètres : widget (widget à désenregistrer)</br>
+            Fonction permettant de supprimer tout liens avec un widget dans le MApp.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.1.
         </div>
 
         <h2>Variables</h2>

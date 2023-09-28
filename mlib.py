@@ -30,6 +30,8 @@ class MWidget:
         self._BACKGROUNDCOLOR = self.backgroundColor
         self._children = []
         self._id = _nbWidget
+        self._isMovingAtThisFrame = False
+        self._isResizedAtThisFrame = False
         self._lastSurface = 0
         self._type = widgetType
 
@@ -69,6 +71,10 @@ class MWidget:
                 return i1
         return -1
     
+    def delete(self): #Delete a widget from the mlib ecosystem
+        self._mapp._undeclaringWidget(self)
+        self.getParent()._removeChild(self)
+
     def getBackgroundColor(self): #Return the value of backgroundColor
         return self.backgroundColor
     
@@ -120,6 +126,12 @@ class MWidget:
     def getY(self): #Return the value of Y
         return self.y
     
+    def isMoving(self): #Return _isMovingAtThisFrame
+        return self._isMovingAtThisFrame
+
+    def isResized(self): #Return _isResizeAtThisFrame
+        return self._isResizedAtThisFrame
+
     def move(self, newX, newY): #Change the value of X and Y in one function
         self.setX(newX)
         self.setY(newY)
@@ -157,8 +169,10 @@ class MWidget:
         self.cursorOnOverflight = cursorOnOverflight
     
     def setHeight(self, newHeight): #Change the value of height
-        self.height = newHeight
-        self.setShouldModify(True)
+        if self.getHeight() != newHeight:
+            self.height = newHeight
+            self._isResizedAtThisFrame = True
+            self.setShouldModify(True)
     
     def setParent(self, newParent): #Change the value of parent
         if self.parent != 0:
@@ -183,21 +197,31 @@ class MWidget:
             self.setShouldModify(True)
 
     def setWidth(self, newWidth): #Change the value of width
-        self.width = newWidth
-        self.setShouldModify(True)
+        if self.getWidth() != newWidth:
+            self.width = newWidth
+            self._isResizedAtThisFrame = True
+            self.setShouldModify(True)
 
     def setX(self, newX): #Change the value of X
+        relativeMove = newX - self.getX()
         self.x = newX
-        self.setShouldModify(True)
+        self._isMoving(0, relativeMove)
+        self._isMovingAtThisFrame = True
+        self.getParent().setShouldModify(True)
 
     def setY(self, newY): #Change the value of Y
+        relativeMove = newY - self.getY()
         self.y = newY
-        self.setShouldModify(True)
+        self._isMoving(1, relativeMove)
+        self._isMovingAtThisFrame = True
+        self.getParent().setShouldModify(True)
 
     def softResetWidget(self): #Reset without graphics modification
         self.mouseDown = []
         self.mouseUp = []
         self.overflighted = False
+        self._isMovingAtThisFrame = False
+        self._isResizedAtThisFrame = False
 
     def _addChild(self, child): #Add a child to the widget
         if self.containsChild(child.getID()) == -1:
@@ -221,6 +245,9 @@ class MWidget:
     def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
         pass
 
+    def _isMoving(self, axis, relativeMove): #Function usefull for heritage, call by setX and setY when the widget is moving
+        pass
+
     def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
         pass
 
@@ -230,6 +257,9 @@ class MWidget:
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
+    def _lastUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle and user program
+        pass
+
     def _lateUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle
         pass
     
@@ -336,7 +366,7 @@ class MApp(MWidget):
         self.pressedKey.clear()
 
         for i in self._widgets: #Soft reset all widget
-            i.softResetWidget()
+            if self.frameCount > 0:i.softResetWidget()
             i._update(self.getDeltaTime())
 
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
@@ -411,6 +441,9 @@ class MApp(MWidget):
         self.frameCount += 1
 
     def frameGraphics(self): #Do all graphics updates in the application
+        for i in self._widgets: #Late update every widgets
+            i._lastUpdate(self.getDeltaTime())
+
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
 
     def getConsole(self): #Return console
@@ -502,6 +535,10 @@ class MApp(MWidget):
         if not self._containsWidget(widget):
             self._widgets.append(widget)
             widget._mapp = self
+
+    def _undeclaringWidget(self, widget): #Undeclare widget and cut all links with it
+        if self._containsWidget(widget):
+            self._widgets.remove(widget)
 
 ###################### Usefull class to do widget with frame
 class MFrame(MWidget):
@@ -751,6 +788,7 @@ class MText(MFrame):
     def __init__(self, text, x, y, width, height, parent, widgetType = "MText"):
         super().__init__(x, y, width, height, parent, widgetType)
 
+        self.antiAnaliasing = False
         self.cursorPosition = 0
         self.cursorVisible = False
         self.cursorWidth = 2
@@ -823,6 +861,9 @@ class MText(MFrame):
 
         if moveCursor:
             self.setCursorPosition(self.getCursorPosition() + len(text))
+
+    def getAntiAnaliasing(self): #Return antiAnaliasing
+        return self.antiAnaliasing
 
     def getCursorPosition(self): #Return cursorPosition
         return self.cursorPosition
@@ -1044,6 +1085,11 @@ class MText(MFrame):
     
     def getTextY(self): #Return textY
         return self.textY
+    
+    def setAntiAnaliasing(self, antiAnaliasing): #Change the value of antiAnaliasing
+        if self.getAntiAnaliasing() != antiAnaliasing:
+            self.antiAnaliasing = antiAnaliasing
+            self.setShouldModify(True)
 
     def setCursorPosition(self, cursorPosition): #Change the value of cursorPosition
         if self.cursorPosition != cursorPosition and cursorPosition >= 0 and cursorPosition <= len(self.getText()):
@@ -1537,9 +1583,9 @@ class MText(MFrame):
                     isSelected = True
                     selectionStarted = True
                     if textLength > self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], False, self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], False, self.getSelectionTextColor())
-                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], False, self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
                         surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1550,8 +1596,8 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
                     else:
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], False, self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], False, self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1561,7 +1607,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                 elif isSelected: #Line in the middle of the selection
                     if textLength <= self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece, False, self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
@@ -1569,8 +1615,8 @@ class MText(MFrame):
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
                     else: #End selection in a another line than the first selection position
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], False, self.getSelectionTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], False, self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
                         surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1580,7 +1626,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
             else:
-                textSurface = generator.render(piece, False, self.textColor)
+                textSurface = generator.render(piece, self.getAntiAnaliasing(), self.textColor)
                 surfaces.append(textSurface)
             i += 1
             textY += textHeight
@@ -2169,7 +2215,11 @@ class MBar(MFrame):
             self.setShouldModify(True)
     
     def setValue(self, value): #Change the value of value
-        if self.getValue() != value and self.isValueIn(value):
+        if self.getValue() != value:
+            if value > self.getMaxValue():
+                value = self.getMaxValue()
+            elif value < self.getMinValue():
+                value = self.getMinValue()
             self.value = value
             self._valueChanged = True
             self.setShouldModify(True)
@@ -2277,14 +2327,14 @@ class MBar(MFrame):
         return surface
     
 ###################### Secondary class which represents an area where we can make a widget scroll in it
-class MScrollArea(MFrame):
+class MScrollArea(MWidget):
     def __init__(self, widgetToScroll, x, y, width, height, parent, widgetType="MScrollArea"): #Construct an MScrollArea object
         super().__init__(x, y, width, height, parent, widgetType)
         self.barOrientationLength = 15
-        self.horizontalBar = MBar(0, 0, 10, self.getFrameWidth(1) + self.barOrientationLength, self.getHeight() - (self.getFrameWidth(2) + self.barOrientationLength), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3) + self.barOrientationLength), self.barOrientationLength, self)
-        self.verticalBar = MBar(1, 0, 10, self.getFrameWidth(1), self.getFrameWidth(0), self.barOrientationLength, self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2) + self.barOrientationLength), self)
+        self.horizontalBar = MBar(0, 0, 10, self.barOrientationLength, self.getHeight() - self.barOrientationLength, self.getWidth() - (self.barOrientationLength), self.barOrientationLength, self)
+        self.verticalBar = MBar(1, 0, 10, 0, 0, self.barOrientationLength, self.getHeight() - (self.barOrientationLength), self)
         self.widgetToScroll = 0
-        self._widgetToScrollOffset = (15, 15)
+        self._widgetToScrollOffset = (self.barOrientationLength, self.barOrientationLength)
 
         self.horizontalBar.setChangeButtonBackgroundColorOnOverflight(True)
         self.horizontalBar.setVisible(False)
@@ -2309,70 +2359,96 @@ class MScrollArea(MFrame):
         horizontalBarNecessary = False
         verticalBarNecessary = False
 
-        if self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)) < self.getWidgetToScroll().getWidth():
-            horizontalBarNecessary = True
+        if self.getWidgetToScroll() != 0:
+            if self.getWidth() < self.getWidgetToScroll().getWidth():
+                horizontalBarNecessary = True
 
-        if self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2) + self.getBarOrientationLength() * horizontalBarNecessary) < self.getWidgetToScroll().getHeight():
-            verticalBarNecessary = True
+            if self.getHeight() - (self.getBarOrientationLength() * horizontalBarNecessary) < self.getWidgetToScroll().getHeight():
+                verticalBarNecessary = True
 
-        if self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3) + self.getBarOrientationLength() * verticalBarNecessary) < self.getWidgetToScroll().getWidth():
-            horizontalBarNecessary = True
+            if self.getWidth() - (self.getBarOrientationLength() * verticalBarNecessary) < self.getWidgetToScroll().getWidth():
+                horizontalBarNecessary = True
 
         if horizontalBarNecessary:
-            self._widgetToScrollOffset = (0, 15)
+            self._widgetToScrollOffset = (0, self.barOrientationLength)
         else:
             self._widgetToScrollOffset = (0, 0)
 
         if verticalBarNecessary:
-            self._widgetToScrollOffset = (15, self._widgetToScrollOffset[1])
+            self._widgetToScrollOffset = (self.barOrientationLength, self._widgetToScrollOffset[1])
         else:
             self._widgetToScrollOffset = (0, self._widgetToScrollOffset[1])
 
         if horizontalBarNecessary:
             if not self.getHorizontalBar().getVisible():
-                maxValue = self.getWidgetToScroll().getWidth() - (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3) + self._widgetToScrollOffset[0]))
+                maxValue = self.getWidgetToScroll().getWidth() - (self.getWidth() - (self._widgetToScrollOffset[0]))
 
                 self.getHorizontalBar().setVisible(True)
 
-                bolRatio = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3))) / self.getWidgetToScroll().getWidth()
-                self.getHorizontalBar().setButtonOrientationLength((self.getHorizontalBar().getWidth() - (self.getHorizontalBar().getFrameWidth(1) + self.getHorizontalBar().getFrameWidth(3))) * bolRatio)
+                bolRatio = (self.getWidth()) / self.getWidgetToScroll().getWidth()
+                self.getHorizontalBar().setButtonOrientationLength((self.getHorizontalBar().getWidth()) * bolRatio)
                 self.getHorizontalBar().setMinValue(0)
                 self.getHorizontalBar().setMaxValue(maxValue)
+
+            if verticalBarNecessary:
+                self.getHorizontalBar().setX(self.barOrientationLength)
+                self.getHorizontalBar().setWidth(self.getWidth() - self.barOrientationLength)
+            else:
+                self.getHorizontalBar().setX(0)
+                self.getHorizontalBar().setWidth(self.getWidth())
         else:
             if self.getHorizontalBar().getVisible():
                 self.getHorizontalBar().setVisible(False)
 
         if verticalBarNecessary:
             if not self.getVerticalBar().getVisible():
-                maxValue = self.getWidgetToScroll().getHeight() - (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2) + self._widgetToScrollOffset[1]))
+                maxValue = self.getWidgetToScroll().getHeight() - (self.getHeight() - (self._widgetToScrollOffset[1]))
 
                 self.getVerticalBar().setVisible(True)
 
-                bolRatio = (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))) / self.getWidgetToScroll().getHeight()
-                self.getVerticalBar().setButtonOrientationLength((self.getVerticalBar().getHeight() - (self.getHorizontalBar().getFrameWidth(0) + self.getHorizontalBar().getFrameWidth(2))) * bolRatio)
+                bolRatio = (self.getHeight()) / self.getWidgetToScroll().getHeight()
+                self.getVerticalBar().setButtonOrientationLength((self.getVerticalBar().getHeight()) * bolRatio)
                 self.getVerticalBar().setMinValue(0)
                 self.getVerticalBar().setMaxValue(maxValue)
+
+            if horizontalBarNecessary:
+                self.getVerticalBar().setHeight(self.getHeight() - self.barOrientationLength)
+            else:
+                self.getVerticalBar().setHeight(self.getHeight())
         else:
             if self.getVerticalBar().getVisible():
                 self.getVerticalBar().setVisible(False)
 
+        if self.getWidgetToScroll() != 0:
+            self.getWidgetToScroll().move(self._widgetToScrollOffset[0], 0)
+
+    def reload(self): #Reload the MScrollArea after widgetToScroll edit
+        temp = self.getWidgetToScroll()
+        self.setWidgetToScroll(0)
+        self.setWidgetToScroll(temp)
+
     def setWidgetToScroll(self, widgetToScroll): #Change widgetToScroll
         if self.getWidgetToScroll() != widgetToScroll:
             self.widgetToScroll = widgetToScroll
-            if widgetToScroll.getParent() != self:
-                widgetToScroll.setParent(self)
-                self.promoveChild(self.horizontalBar)
-                self.promoveChild(self.verticalBar)
-            widgetToScroll.move(0, 0)
+            if widgetToScroll != 0:
+                if widgetToScroll.getParent() != self:
+                    widgetToScroll.setParent(self)
+                    self.promoveChild(self.horizontalBar)
+                    self.promoveChild(self.verticalBar)
+                widgetToScroll.move(self._widgetToScrollOffset[0], 0)
             self.placeBar()
+
+    def _lastUpdate(self, deltaTime): #Function called every frame after event handle and user actions
+        if self.widgetToScroll.isResized():
+            self.reload()
 
     def _lateUpdate(self, deltaTime): #Function called every frame after event handle
         if self.getHorizontalBar().getValueChanded():
-            oldPos = (0, self.getWidgetToScroll().getY() - (self.getFrameWidth(0) + self._widgetToScrollOffset[1]))
-            newPos = (oldPos[0] + self.getFrameWidth(1) + self._widgetToScrollOffset[0] - self.getHorizontalBar().getValue(), oldPos[1] + self.getFrameWidth(0) + self._widgetToScrollOffset[1])
+            oldPos = (0, self.getWidgetToScroll().getY() - (self._widgetToScrollOffset[1]))
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0] - self.getHorizontalBar().getValue(), oldPos[1] + self._widgetToScrollOffset[1])
             self.getWidgetToScroll().move(newPos[0], newPos[1])
 
         if self.getVerticalBar().getValueChanded():
-            oldPos = (self.getWidgetToScroll().getX() - (self.getFrameWidth(1) + self._widgetToScrollOffset[0]), 0)
-            newPos = (oldPos[0] + self.getFrameWidth(1) + self._widgetToScrollOffset[0], oldPos[1] + self.getFrameWidth(0) - self.getVerticalBar().getValue())
+            oldPos = (self.getWidgetToScroll().getX() - (self._widgetToScrollOffset[0]), 0)
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalBar().getValue())
             self.getWidgetToScroll().move(newPos[0], newPos[1])
