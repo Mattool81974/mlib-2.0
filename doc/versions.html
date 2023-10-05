@@ -13,6 +13,19 @@
             Les versions sont aussi chronologiques.</br>
             Il est indiqué sur chaque fonction/classe/variable la version à laquelle elle a étée ajouté/modifié.
         </div>
+        <h3>2.1.0, parue le 05/10/2023-11:00</h3>
+        <div>
+            -Ajout de caractère <a href="./classe/mtext.html#forbiddenCaracter">interdit</a>/<a href="./classe/mtext.html#authorizedCaracter">autorisé</a> dans MText.</br>
+            -Ajout de <a href="./classe/mwidget.html#ingoreUserEvent">ignoreUserEvent</a> pour ignorer les évènements utilisateur dans MWidget.</br>
+            -Ajout de <a href="./classe/mapp.html#maxFps">maxFps</a> dans MApp.</br>
+            -Ajout de <a href="./classe/mapp.html#setWidgetToFocus">setWidgetToFocus</a> pour pouvoir focus un widget en particulier dans MApp.</br>
+            -Ajout d'une méthode pour avoir la <a href="./classe/mapp.html#getMousePos">position</a> de la souris dans MApp.</br>
+            -Amélioration du fonctionnement de MButton en rajoute "oneFrame" à <a href="./classe/mbutton.html#isGettingLeftClicked">isGettingLeftClicked()</a> et <a href="./classe/mbutton.html#isGettingRightClicked">isGettingRightClicked()</a>.</br>
+            -Modification de la façon dont est généré la bordure dans MFrame avec <a href="./classe/mframe.html#getFrameRendered">getFrameRendered()</a>.</br>
+            -Modification du <a href="./classe/mtext.html#getGenerator">générateur</a> dans MText qui prend en charge des fichiers .ttf (SysFont -> Font).</br>
+            -Optimisation de <a href="./classe/mwidget.html#_render">_render</a> par l'ajout de .convertAlpha aux surface après rendu dans MWidget.</br>
+            -Supression des imports implicites dans MLib (que des "import lib" et plus "from lib import *").
+        </div>
         <h3>2.0.1, parue le 28/09/2023-18:30</h3>
         <div>
             -Ajout de <a href="./classe/mwidget.html#delete">delete</a> dans MWidget pour mieux anticiper la suppresion d'un widget.</br>

@@ -1,9 +1,8 @@
-from math import *
-from pygame import *
+import math
 import pygame
-from pyperclip import *
-import os as os
-from time import localtime, time_ns
+import pyperclip
+import os
+import time
 
 pygame.init()
 
@@ -18,6 +17,7 @@ class MWidget:
         self.cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW
         self.focused = False
         self.height = height
+        self.ignoreUserEvent = False
         self.mouseDown = []
         self.mouseUp = []
         self.overflighted = False
@@ -93,6 +93,9 @@ class MWidget:
     def getHeight(self): #Return the value of height
         return self.height
     
+    def getIgnoreUserEvent(self): #Return ignoreUserEvent
+        return self.ignoreUserEvent
+
     def getID(self): #Return the value of _id
         return self._id
     
@@ -173,6 +176,9 @@ class MWidget:
             self.height = newHeight
             self._isResizedAtThisFrame = True
             self.setShouldModify(True)
+
+    def setIgnoreUserEvent(self, ignoreUserEvent): #Change the value of ignoreUserEvent
+        self.ignoreUserEvent = ignoreUserEvent
     
     def setParent(self, newParent): #Change the value of parent
         if self.parent != 0:
@@ -275,11 +281,14 @@ class MWidget:
     def _render(self): #Render widget and return rendering
 
         if self.getShouldModify(): #If the widget should do the render, do it
-            widgetSurface = Surface((self.width, self.height), pygame.SRCALPHA)
+            widgetSurface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
 
-            widgetSurface.blit(self._renderBeforeHierarchy(widgetSurface), (0, 0, self.getWidth(), self.getHeight()))
-            widgetSurface.blit(self._renderHierarchy(widgetSurface), (0, 0, self.getWidth(), self.getHeight()))
-            widgetSurface.blit(self._renderAfterHierarchy(widgetSurface), (0, 0, self.getWidth(), self.getHeight()))
+            surfaceABlit = self._renderBeforeHierarchy(widgetSurface).convert_alpha()
+            widgetSurface.blit(surfaceABlit, (0, 0, self.getWidth(), self.getHeight()))
+            surfaceABlit = self._renderHierarchy(widgetSurface).convert_alpha()
+            widgetSurface.blit(surfaceABlit, (0, 0, self.getWidth(), self.getHeight()))
+            surfaceABlit = self._renderAfterHierarchy(widgetSurface).convert_alpha()
+            widgetSurface.blit(surfaceABlit, (0, 0, self.getWidth(), self.getHeight()))
 
             self._lastSurface = widgetSurface #Store the last generated surface into _lastSurface
 
@@ -315,12 +324,14 @@ class MApp(MWidget):
         self.frameCount = 0
         self.focusedWidget = self
         self.fps = 0
+        self.maxFps = -1
+        self.mousePos = (0, 0)
         self.pressedKey = []
         self.printFps = printFps
         self.windowIcon = ""
         self.setWindowIcon(windowIcon)
         self.setWindowTitle(windowTitle)
-        self._deltaTimeCache = time_ns()
+        self._deltaTimeCache = time.time_ns()
         self._fpsCount = 0
         self._fpsDuration = 0
         self._lastOverflightedWidget = 0
@@ -339,8 +350,8 @@ class MApp(MWidget):
         self.frameGraphics()
 
     def frameEvent(self): #Do all events updates in the application
-        self.deltaTime = (time_ns() - self._deltaTimeCache)/(10**9)
-        self._deltaTimeCache = time_ns() #Calculate deltaTime
+        self.deltaTime = (time.time_ns() - self._deltaTimeCache)/(10**9)
+        self._deltaTimeCache = time.time_ns() #Calculate deltaTime
 
         self._fpsDuration += self.deltaTime
         if self._fpsDuration >= 1: #Handle fps counting
@@ -361,6 +372,20 @@ class MApp(MWidget):
 
                 self.setConsoleContent("")
 
+        if self.getMaxFps() != -1: #Gérer le nombre maximum de fps
+            if self.getDeltaTime() > 0:
+                fpsRatio = ((1/self.getMaxFps()) - (self.getDeltaTime())) * 2
+                #print(fpsRatio)
+                if fpsRatio > 0:
+                    temp = time.time_ns()
+                    while (time.time_ns() - temp)/(10**9) < fpsRatio:
+                        pass
+            else:
+                fpsRatio = (1/self.getMaxFps())*10**9
+                temp = time.time_ns()
+                while (time.time_ns() - temp) < fpsRatio:
+                    pass
+
         self._fpsCount += 1
 
         self.pressedKey.clear()
@@ -376,13 +401,13 @@ class MApp(MWidget):
 
         cursor = self.getCursorOnOverflight()
 
-        mousePos = pygame.mouse.get_pos() #Get mouse position
+        self.mousePos = pygame.mouse.get_pos() #Get mouse position
 
         overflightedWidget = self
         i = 0
         while i < len(overflightedWidget.getChildren()): #Find the overflighted widget
             widget = overflightedWidget.getChildrenAtIndex(-(i + 1))
-            if widget.posIn(mousePos):
+            if widget.posIn(self.mousePos) and widget.getVisible() and not widget.getIgnoreUserEvent():
                 overflightedWidget = widget
                 i = -1
             i += 1
@@ -393,7 +418,7 @@ class MApp(MWidget):
         if self._lastOverflightedWidget != overflightedWidget:
             if self._lastOverflightedWidget != 0: self._lastOverflightedWidget._isNotOverflightedAnymore()
             self._lastOverflightedWidget = overflightedWidget
-        overflightedWidget._isGettingOverflighted((mousePos[0] - overflightedWidget.absoluteX(), mousePos[1] - overflightedWidget.absoluteY()))
+        overflightedWidget._isGettingOverflighted((self.mousePos[0] - overflightedWidget.absoluteX(), self.mousePos[1] - overflightedWidget.absoluteY()))
 
         events = pygame.event.get()
         for event in events: #Event handler
@@ -403,14 +428,7 @@ class MApp(MWidget):
             elif event.type == pygame.MOUSEBUTTONDOWN: #If the mouse is clicked
                 if overflightedWidget.mouseDown.count(event.button) == 0: overflightedWidget.mouseDown.append(event.button)
                 if self.focusedWidget != overflightedWidget:
-                    self.focusedWidget.focused = False
-                    if self.getConsole():
-                        self.writeConsole("Widget not focused anymore", indentation = 0, writer = self.focusedWidget)
-                    self.focusedWidget._isNotFocusedAnymore()
-                    self.focusedWidget = overflightedWidget
-                    self.focusedWidget.focused = True
-                if self.getConsole():
-                    self.writeConsole("Mouse clicked", indentation = 0, writer = self.focusedWidget)
+                    self.setWidgetToFocus(overflightedWidget)
                 overflightedWidget._isGettingMouseDown(event.button, (event.pos[0] - overflightedWidget.absoluteX(), event.pos[1] - overflightedWidget.absoluteY()))
             elif event.type == pygame.MOUSEBUTTONUP: #If the mouse is stopping of being clicked
                 if overflightedWidget.mouseUp.count(event.button) == 0: overflightedWidget.mouseUp.append(event.button)
@@ -461,6 +479,12 @@ class MApp(MWidget):
     def getFps(self): #Return fps
         return self.fps
     
+    def getMaxFps(self): #Return maxFps
+        return self.maxFps
+
+    def getMousePos(self): #Return mousePos
+        return self.mousePos
+
     def getPressedKey(self): #Return pressedKey
         return self.pressedKey
     
@@ -498,13 +522,27 @@ class MApp(MWidget):
             f.write("")
             f.close()
 
+    def setMaxFps(self, maxFps): #Change the value of maxFfps
+        if self.maxFps != maxFps:
+            self.maxFps = maxFps
+
     def setPrintFps(self, printFps): #Change the value of printFps
         self.printFps = printFps
 
+    def setWidgetToFocus(self, widgetToFocus): #Change the widget focused
+        self.focusedWidget.focused = False
+        if self.getConsole():
+            self.writeConsole("Widget not focused anymore", indentation = 0, writer = self.focusedWidget)
+        self.focusedWidget._isNotFocusedAnymore()
+        self.focusedWidget = widgetToFocus
+        self.focusedWidget.focused = True
+        if self.getConsole():
+            self.writeConsole("Mouse clicked", indentation = 0, writer = self.focusedWidget)
+
     def setWindowIcon(self, windowIcon): #Change the value of windowIcon
-        if windowIcon != "" and windowIcon != self.getWindowIcon() and path.exists(windowIcon):
+        if windowIcon != "" and windowIcon != self.getWindowIcon() and os.path.exists(windowIcon):
             self.windowIcon = windowIcon
-            display.set_icon(image.load(windowIcon))
+            pygame.display.set_icon(pygame.image.load(windowIcon))
 
     def setWindowTitle(self, windowTitle): #Change the title of the window
         self.windowTitle = windowTitle
@@ -512,9 +550,9 @@ class MApp(MWidget):
         pygame.display.set_caption(windowTitle)
 
     def writeConsole(self, toWrite, indentation = 0, writer = 0): #Write something into the console
-        tns = time_ns()/(10**9)
+        tns = time.time_ns()/(10**9)
         
-        date = localtime(tns)
+        date = time.localtime(tns)
         dateStr = str(date.tm_mday) + "/" + str(date.tm_mon) + "/" + str(date.tm_year) + "-" + str(date.tm_hour) + ":" + str(date.tm_min) + ":" + str(date.tm_sec)
         indent = (" " * (indentation * 2))
         toAdd = dateStr + " | frame : " + str(self.frameCount) + "\n" #French system pattern
@@ -575,6 +613,12 @@ class MFrame(MWidget):
     def getFrameColor(self): #Return frameColor
         return self.frameColor
     
+    def getFrameRendered(self, surface: pygame.Surface): #Return a surface with the frame rendered on it
+        toReturn = pygame.Surface((self.getWidth(), self.getHeight()), pygame.SRCALPHA)
+        toReturn.fill(self.getFrameColor())
+        toReturn.blit(surface.subsurface((self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))), (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))))
+        return toReturn
+
     def getFrameWidth(self, index = 0): #Return the value of frameBottomWidth if 1, frameLeftWidth if 2, frameRightWidth if 3, frameTopWidth if 4
         if index == 0:
             return self.frameTopWidth
@@ -645,15 +689,15 @@ class MFrame(MWidget):
                 self.frameTopWidth = frameWidth
                 self.setShouldModify(True)
 
-    def _renderAfterHierarchy(self, surface): #Render widget on surface after hierarchy render
-        if not self.frameBeforeHierarchy:
-            pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
+    def _renderAfterHierarchy(self, surface: pygame.Surface): #Render widget on surface after hierarchy render
+        if self.getFrameBeforeHierarchy():
+            return self.getFrameRendered(surface)
         return surface
 
-    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
-        if self.frameBeforeHierarchy:
-            pygame.draw.rect(surface, self.frameColor, (0, 0, self.getWidth(), self.getHeight()), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
-        pygame.draw.rect(surface, self.backgroundColor, (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), 0, 0, self.leftTopCornerRadius, self.rightTopCornerRadius, self.leftBottomCornerRadius, self.rightBottomCornerRadius)
+    def _renderBeforeHierarchy(self, surface: pygame.Surface): #Render widget on surface before hierarchy render
+        surface = super()._renderBeforeHierarchy(surface)
+        if not self.getFrameBeforeHierarchy():
+            return self.getFrameRendered(surface)
         return surface
 
 ###################### Usefull class to display image
@@ -701,7 +745,7 @@ class MImage(MFrame):
         if os.path.exists(imageLink):
             if imageLink != self.imageLink:
                 self.imageLink = imageLink
-                self._image = image.load(imageLink)
+                self._image = pygame.image.load(imageLink)
                 self._imageToDraw = self._image
 
                 if editSize:
@@ -769,18 +813,18 @@ class MImage(MFrame):
         if self.getImageReframing() != 0:
             if self.getImageReframing() == 1:
                 resizeNumber = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)))/self._image.get_width()
-                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+                self._imageToDraw = pygame.transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
             elif self.getImageReframing() == 2:
                 resizeNumber = (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))/self._image.get_height()
-                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
+                self._imageToDraw = pygame.transform.scale(self._image, (self._image.get_width() * resizeNumber, self._image.get_height() * resizeNumber))
             elif self.getImageReframing() == 3:
                 resizeNumberW = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)))/self._image.get_width()
                 resizeNumberH = (self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))/self._image.get_height()
-                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+                self._imageToDraw = pygame.transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
             else:
                 resizeNumberW = self.getImageSize()[0]/self._image.get_width()
                 resizeNumberH = self.getImageSize()[1]/self._image.get_height()
-                self._imageToDraw = transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
+                self._imageToDraw = pygame.transform.scale(self._image, (self._image.get_width() * resizeNumberW, self._image.get_height() * resizeNumberH))
             self.setShouldModify(True)
 
 ###################### Usefull class to use text
@@ -789,6 +833,7 @@ class MText(MFrame):
         super().__init__(x, y, width, height, parent, widgetType)
 
         self.antiAnaliasing = False
+        self.authorizedCaracter = ""
         self.cursorPosition = 0
         self.cursorVisible = False
         self.cursorWidth = 2
@@ -796,6 +841,7 @@ class MText(MFrame):
         self.dynamicTextCutType = 1
         self.font = "arial"
         self.fontSize = 12
+        self.forbiddenCaracter = ""
         self.input = False
         self.selection = False
         self.selectionBackgroundColor = (25, 102, 255)
@@ -845,25 +891,29 @@ class MText(MFrame):
 
     def appendText(self, text, appendAtCursor = True, moveCursor = True): #Append "text" to text
         i = 0
-        while i < len(text): #Delete ord(13) weird caracter
-            if(ord(text[i])) == 13:
+        while i < len(text): #Delete ord(13) weird caracter and forbidden caracters
+            if(ord(text[i])) == 13 or self.getForbiddenCaracter().count(text[i]) != 0 or (self.getAuthorizedCaracter() != "" and self.getAuthorizedCaracter().count(text[i]) == 0):
                text = text[:i] + text[i+1:len(text)]
                i -= 1
             i += 1
         
-        newText = self.getText()
-        if appendAtCursor:
-            newText = newText[0:self.getCursorPosition()] + text + newText[self.getCursorPosition():]
-        else:
-            newText += text
+        if text != "":
+            newText = self.getText()
+            if appendAtCursor:
+                newText = newText[0:self.getCursorPosition()] + text + newText[self.getCursorPosition():]
+            else:
+                newText += text
 
-        self.setText(newText)
+            self.setText(newText)
 
-        if moveCursor:
-            self.setCursorPosition(self.getCursorPosition() + len(text))
+            if moveCursor:
+                self.setCursorPosition(self.getCursorPosition() + len(text))
 
     def getAntiAnaliasing(self): #Return antiAnaliasing
         return self.antiAnaliasing
+
+    def getAuthorizedCaracter(self): #Return authorizedCaracter
+        return self.authorizedCaracter
 
     def getCursorPosition(self): #Return cursorPosition
         return self.cursorPosition
@@ -1031,8 +1081,13 @@ class MText(MFrame):
     def getFontSize(self): #Return fontSize
         return self.fontSize
     
+    def getForbiddenCaracter(self): #Return forbiddenCaracter
+        return self.forbiddenCaracter
+
     def getGenerator(self): #Return the generator of the mtext
-        return pygame.font.SysFont(self.font, self.fontSize)
+        if os.path.exists(self.getFont()):
+            return pygame.font.Font(self.getFont(), self.getFontSize())
+        return pygame.font.SysFont(self.getFont(), self.getFontSize())
 
     def getInput(self): #Return input
         return self.input
@@ -1091,6 +1146,10 @@ class MText(MFrame):
             self.antiAnaliasing = antiAnaliasing
             self.setShouldModify(True)
 
+    def setAuthorizedCaracter(self, authorizedCaracter): #Return authorizedCaracter
+        if self.getAuthorizedCaracter() != authorizedCaracter:
+            self.authorizedCaracter = authorizedCaracter
+
     def setCursorPosition(self, cursorPosition): #Change the value of cursorPosition
         if self.cursorPosition != cursorPosition and cursorPosition >= 0 and cursorPosition <= len(self.getText()):
             self.cursorPosition = cursorPosition
@@ -1126,6 +1185,10 @@ class MText(MFrame):
         if self.fontSize != fontSize:
             self.fontSize = fontSize
             self.setShouldModify(True)
+
+    def setForbiddenCaracter(self, forbiddenCaracter): #Return forbiddenCaracter
+        if self.getForbiddenCaracter() != forbiddenCaracter:
+            self.forbiddenCaracter = forbiddenCaracter
 
     def setInput(self, input): #Change the value of input
         self.input = input
@@ -1586,9 +1649,9 @@ class MText(MFrame):
                         textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
                         textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
                         textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
-                        surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
+                        surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
-                        textSurface = Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
+                        textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         textSurface.blit(surfaceSelectionBackground, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface2, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
@@ -1598,9 +1661,9 @@ class MText(MFrame):
                     else:
                         textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
                         textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        surfaceSelectionBackground = Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
+                        surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
-                        textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
+                        textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         textSurface.blit(surfaceSelectionBackground, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface2, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
@@ -1608,18 +1671,18 @@ class MText(MFrame):
                 elif isSelected: #Line in the middle of the selection
                     if textLength <= self.getSelectionStop() + selectionStartOffset: #And end at this line too
                         textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
+                        surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
-                        textSurface = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
+                        textSurface = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         textSurface.blit(surfaceSelectionBackground, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
                     else: #End selection in a another line than the first selection position
                         textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
                         textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
-                        surfaceSelectionBackground = Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
+                        surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
-                        textSurface = Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
+                        textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         textSurface.blit(surfaceSelectionBackground, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         textSurface.blit(textSurface2, (textSurface1.get_width(), 0, textSurface2.get_width(), textSurface2.get_height()))
@@ -1740,15 +1803,15 @@ class MText(MFrame):
                 self.setSelectionPos(0, len(self.getText()))
             elif key == pygame.K_c and self._controlPressed:
                 if self.getSelection() and self.getSelectedText() != -1:
-                    copy(self.getSelectedText())
+                    pyperclip.copy(self.getSelectedText())
             elif key == pygame.K_v and self._controlPressed:
                 if self.getSelection() and self.getSelectedText() != -1:
                     self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                     self.setSelectionPos(0, 0)
-                self.appendText(paste())
+                self.appendText(pyperclip.paste())
             elif key == pygame.K_x and self._controlPressed:
                 if self.getSelection() and self.getSelectedText() != -1:
-                    copy(self.getSelectedText())
+                    pyperclip.copy(self.getSelectedText())
                     self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                     self.setSelectionPos(0, 0)
 
@@ -1854,7 +1917,7 @@ class MText(MFrame):
         for textSurface in surfaces:
             textHeight += textSurface.get_height()
 
-        surface = Surface(self._getTextDisplaySize(), pygame.SRCALPHA)
+        surface = pygame.Surface(self._getTextDisplaySize(), pygame.SRCALPHA)
 
         if self.getTextVerticalAlignment() == 1: #Calculate y including vertical alignment particularity
             y = (surface.get_height()/2 - textHeight/2)
@@ -1898,7 +1961,7 @@ class MText(MFrame):
             self._backspacePressedTime += deltaTime
             if self._backspacePressedTime > 0.5:
                 n = (self._backspacePressedTime - 0.5)*10
-                if ceil(n) >= self._backspaceNumber:
+                if math.ceil(n) >= self._backspaceNumber:
                     self._doBackspaceEffet()
                     self._backspaceNumber += 0.5
 
@@ -1906,7 +1969,7 @@ class MText(MFrame):
             self._bottomArrowPressedTime += deltaTime
             if self._bottomArrowPressedTime > 0.5:
                 n = (self._bottomArrowPressedTime - 0.5)*10
-                if ceil(n) >= self._bottomArrowNumber:
+                if math.ceil(n) >= self._bottomArrowNumber:
                     self._bottomArrowPressedAtThisFrame = True
                     self._bottomArrowNumber += 0.5
                     self._cursorBottom()
@@ -1915,7 +1978,7 @@ class MText(MFrame):
             self._leftArrowPressedTime += deltaTime
             if self._leftArrowPressedTime > 0.5:
                 n = (self._leftArrowPressedTime - 0.5)*10
-                if ceil(n) >= self._leftArrowNumber:
+                if math.ceil(n) >= self._leftArrowNumber:
                     self._cursorLeft()
                     self._cursorVisibleTime = 0
                     self._setCursorIsVisible(True)
@@ -1925,7 +1988,7 @@ class MText(MFrame):
             self._returnPressedTime += deltaTime
             if self._returnPressedTime > 0.5:
                 n = (self._returnPressedTime - 0.5)*10
-                if ceil(n) >= self._returnNumber:
+                if math.ceil(n) >= self._returnNumber:
                     if self.getSelection() and self.getSelectedText() != -1:
                         self._removeTextAtPos(len(self.getSelectedText()), self.getSelectionStop())
                         self.setSelectionPos(0, 0)
@@ -1936,7 +1999,7 @@ class MText(MFrame):
             self._rightArrowPressedTime += deltaTime
             if self._rightArrowPressedTime > 0.5:
                 n = (self._rightArrowPressedTime - 0.5)*10
-                if ceil(n) >= self._rightArrowNumber:
+                if math.ceil(n) >= self._rightArrowNumber:
                     self._cursorRight()
                     self._cursorVisibleTime = 0
                     self._setCursorIsVisible(True)
@@ -1946,7 +2009,7 @@ class MText(MFrame):
             self._topArrowPressedTime += deltaTime
             if self._topArrowPressedTime > 0.5:
                 n = (self._topArrowPressedTime - 0.5)*10
-                if ceil(n) >= self._topArrowNumber:
+                if math.ceil(n) >= self._topArrowNumber:
                     self._topArrowPressedAtThisFrame = True
                     self._topArrowNumber += 0.5
                     self._cursorTop()
@@ -2000,10 +2063,14 @@ class MButton(MText):
     def getTextColorOnOverflight(self):
         return self.textColorOnOverflight
 
-    def isGettingLeftClicked(self):
+    def isGettingLeftClicked(self, oneFrame = True):
+        if oneFrame:
+            return self.mouseDown.count(1)
         return self.leftClicked
     
-    def isGettingRightClicked(self):
+    def isGettingRightClicked(self, oneFrame = True):
+        if oneFrame:
+            return self.mouseDown.count(3)
         return self.rightClicked
     
     def setBackgroundColor(self, backgroundColor, notButton = True):
@@ -2322,7 +2389,7 @@ class MBar(MFrame):
         if self._buttonOverflighted and self.getChangeButtonBackgroundColorOnOverflight():
             buttonBackgroundColor = self.getButtonBackgroundColorOnOverflight()
 
-        draw.rect(surface, buttonBackgroundColor, finalRect)
+        pygame.draw.rect(surface, buttonBackgroundColor, finalRect)
 
         return surface
     
