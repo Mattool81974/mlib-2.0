@@ -43,6 +43,12 @@
             Retourne la valeur de la <a href="#buttonBackgroundColorOnOverflight">couleur</a> d'arrière plan du bouton amovible lors du survol du curseur.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
+        <h3 id="getButtonOrientationPos">getButtonOrientationPos()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Calcul et renvoie la coordonnée sur l'axe de navigation du bouton selon <a href="#value">value</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
         <h3 id="getButtonOrientationLength">getButtonOrientationLength</h3>
         <div>
             Paramètres : aucun</br>
@@ -84,11 +90,11 @@
             Retourne si la <a href="#value">valeur</a> a été <a href="#_valueChanged">modifié</a> durant cette frame.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
-        <h3 id="getButtonOrientationPos">getButtonOrientationPos()</h3>
+        <h3 id="getWheelMultiplicator">getWheelMultiplicator()</h3>
         <div>
             Paramètres : aucun</br>
-            Calcul et renvoie la coordonnée sur l'axe de navigation du bouton selon <a href="#value">value</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+            Retourne le <a href="#wheelMultiplicator">coefficient</a> auquelle multiplier la valeur de la roulette de la souris dans <a href="#_mouseWheel">_mouseWheel</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="isValueIn">isValueIn()</h3>
         <div>
@@ -146,6 +152,12 @@
             Change la <a href="#value">valeur</a> actuelle dans le MSlider par "value".</br>
             Modifié à la <a href="../versions.html">version</a> 2.0.1.
         </div>
+        <h3 id="setWheelMultiplicator">setWheelMultiplicator()</h3>
+        <div>
+            Paramètres : wheelMultiplicator (nouveau <a href="#wheelMultiplicator">coefficient</a> auquelle multiplier la valeur de la roulette de la souris dans <a href="#_mouseWheel">_mouseWheel</a>)</br>
+            Change la valeur du <a href="#wheelMultiplicator">coefficient</a> auquelle multiplier la valeur de la roulette de la souris dans <a href="#_mouseWheel">_mouseWheel</a> par "wheelMultiplicator".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
         <h3 id="softResetWidget">softResetWidget()</h3>
         <div>
             Paramètres : aucun</br>
@@ -196,7 +208,7 @@
             Permet d'appeler <a href="#_doOverflightedEffect">_doOverflightedEffect</a> lors du survol du curseur.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isGettingOverflighted">MWidget</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
-        </div>
+        </div>=
         <h3 id="_isNotOverflightedAnymore">_isNotOverflightedAnymore()</h3>
         <div>
             Paramètres : aucun</br>
@@ -211,12 +223,19 @@
             Retourne si la position "relativePos" est au dessus du bouton amovible.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
-        <h3 id = "_mouseMove">_mouseMove()</h3>
+        <h3 id="_mouseMove">_mouseMove()</h3>
         <div>
             Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
             Fonction appelé lorsque le widget est focus est que l'utilisateur bouge la souris.</br>
             Dans MSlider, elle permet de changer la valeur du slider selon le mouvement de la souris.</br>
             Modifié à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="_mouseWheel">_mouseWheel()</h3>
+        <div>
+            Paramètres : rotation (valeur de la rotation de la molette)</br>
+            Fonction appelé lorsque le widget est focus est que l'utilisateur tourne la molette.</br>
+            Dans MSlider, elle change la <a href="#value">valeur</a> présente dans le Slider en multiplitant rotation par <a href="#wheelMultiplicator">wheelMultiplicator</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>
@@ -272,6 +291,11 @@
         <div>
             Valeur actuelle dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
+        <h3 id="wheelMultiplicator">wheelMultiplicator</h3>
+        <div>
+            Valeur ajoutée à la rotation de la molette dans <a href="#_mouseWheel">_mouseWheel</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="ORIENTATION">ORIENTATION</h3>
         <div>

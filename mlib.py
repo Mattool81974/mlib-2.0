@@ -275,7 +275,7 @@ class MWidget:
     def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         pass
 
-    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mosue whell is rotating
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mouse whell is rotating
         pass
 
     def _removeChild(self, child): #Remove a child to the widget
@@ -2186,6 +2186,7 @@ class MSlider(MFrame):
         self.posAtClick = (0, 0)
         self.step = 0
         self.value = minValue
+        self.wheelMultiplicator = 10
         self.ORIENTATION = orientation
         self._buttonClicked = False
         self._buttonOverflighted = False
@@ -2246,6 +2247,9 @@ class MSlider(MFrame):
     def getValueChanded(self): #Return _valueChanged
         return self._valueChanged
     
+    def getWheelMultiplicator(self): #Return wheelMultiplicator
+        return self.wheelMultiplicator
+
     def isValueIn(self, value): #Return if value is between minValue and maxValue
         return value >= self.getMinValue() and value <= self.getMaxValue()
     
@@ -2294,6 +2298,9 @@ class MSlider(MFrame):
             self.value = value
             self._valueChanged = True
             self.setShouldModify(True)
+
+    def setWheelMultiplicator(self, wheelMultipilcator): #Change the value of wheelMultiplicator
+        self.wheelMultiplicator = wheelMultipilcator
 
     def softResetWidget(self): #Reset some attributes without graphics modification
         super().softResetWidget()
@@ -2384,6 +2391,10 @@ class MSlider(MFrame):
             toAdd -= self.posAtClick[0]
             self.setValue(round(self._getValueAtPos((self.posAtClick[1] + self.getButtonOrientationLength() / 2) + toAdd)))
 
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mosue whell is rotating
+        if not self._buttonClicked:
+            self.setValue(self.getValue() - rotation * self.getWheelMultiplicator())
+
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
@@ -2409,6 +2420,7 @@ class MScrollArea(MWidget):
         self.horizontalSlider = MSlider(0, 0, 10, self.sliderOrientationLength, self.getHeight() - self.sliderOrientationLength, self.getWidth() - (self.sliderOrientationLength), self.sliderOrientationLength, self)
         self.verticalSlider = MSlider(1, 0, 10, 0, 0, self.sliderOrientationLength, self.getHeight() - (self.sliderOrientationLength), self)
         self.widgetToScroll = 0
+        self._shiftPressed = False
         self._widgetToScrollOffset = (self.sliderOrientationLength, self.sliderOrientationLength)
 
         self.horizontalSlider.setChangeButtonBackgroundColorOnOverflight(True)
@@ -2502,7 +2514,7 @@ class MScrollArea(MWidget):
         self.setWidgetToScroll(0)
         self.setWidgetToScroll(temp)
 
-    def setWidgetToScroll(self, widgetToScroll): #Change widgetToScroll
+    def setWidgetToScroll(self, widgetToScroll: MWidget): #Change widgetToScroll
         if self.getWidgetToScroll() != widgetToScroll:
             self.widgetToScroll = widgetToScroll
             if widgetToScroll != 0:
@@ -2511,7 +2523,19 @@ class MScrollArea(MWidget):
                     self.promoveChild(self.horizontalSlider)
                     self.promoveChild(self.verticalSlider)
                 widgetToScroll.move(self._widgetToScrollOffset[0], 0)
+                widgetToScroll.setIgnoreUserEvent(True)
             self.placeSlider()
+
+    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
+        if key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = False
+
+    def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        if key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = True
+
+    def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        self._shiftPressed = False
 
     def _lastUpdate(self, deltaTime): #Function called every frame after event handle and user actions
         if self.widgetToScroll.isResized():
@@ -2527,3 +2551,11 @@ class MScrollArea(MWidget):
             oldPos = (self.getWidgetToScroll().getX() - (self._widgetToScrollOffset[0]), 0)
             newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalSlider().getValue())
             self.getWidgetToScroll().move(newPos[0], newPos[1])
+
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mouse whell is rotating
+        if self._shiftPressed:
+            if self.getHorizontalSlider().getVisible():
+                self.getHorizontalSlider()._mouseWheel(rotation)
+        else:
+            if self.getVerticalSlider().getVisible():
+                self.getVerticalSlider()._mouseWheel(rotation)
