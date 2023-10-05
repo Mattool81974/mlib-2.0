@@ -2269,27 +2269,34 @@ class MSlider(MFrame):
             self.buttonBackgroundColorOnOverflight = buttonBackgroundColorOnOverflight
             self.setShouldModify(True)
 
-    def setButtonOrientationLength(self, buttonOrientationLength): #Change the value of buttonOrientationLength
+    def setButtonOrientationLength(self, buttonOrientationLength: int): #Change the value of buttonOrientationLength
         if self.getButtonOrientationLength() != buttonOrientationLength:
             self.buttonOrientationLength = buttonOrientationLength
             self.setShouldModify(True)
     
-    def setMaxValue(self, maxValue): #Change the value of maxValue
+    def setMaxValue(self, maxValue: int): #Change the value of maxValue
         if self.getMaxValue() != maxValue and maxValue >= self.getMinValue() and self.getValue() <= maxValue:
             self.maxValue = maxValue
             self.setShouldModify(True)
     
-    def setMinValue(self, minValue): #Change the value of maxValue
+    def setMinValue(self, minValue: int): #Change the value of maxValue
         if self.getMinValue() != minValue and minValue <= self.getMaxValue() and self.getValue() >= minValue:
             self.minValue = minValue
             self.setShouldModify(True)
     
-    def setStep(self, step): #Change the value of step
+    def setStep(self, step: int): #Change the value of step
         if self.getStep() != step:
-            self.step = step
-            self.setShouldModify(True)
+            if step != 0:
+                range = self.getMaxValue() - self.getMinValue()
+                if range/step == round(range/step):
+                    self.step = step
+                    self.setValue(self.getMinValue())
+                    self.setWheelMultiplicator(step)
+                    self.setShouldModify(True)
+            else:
+                self.step = 0
     
-    def setValue(self, value): #Change the value of value
+    def setValue(self, value: int): #Change the value of value
         if self.getValue() != value:
             if value > self.getMaxValue():
                 value = self.getMaxValue()
@@ -2299,7 +2306,7 @@ class MSlider(MFrame):
             self._valueChanged = True
             self.setShouldModify(True)
 
-    def setWheelMultiplicator(self, wheelMultipilcator): #Change the value of wheelMultiplicator
+    def setWheelMultiplicator(self, wheelMultipilcator: int): #Change the value of wheelMultiplicator
         self.wheelMultiplicator = wheelMultipilcator
 
     def softResetWidget(self): #Reset some attributes without graphics modification

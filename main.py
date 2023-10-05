@@ -20,26 +20,17 @@ scrolleur.setBackgroundColor((0, 0, 0))
 
 img.resize(800, 800)
 
-texte = MText(phrase, 600, 0, 300, 300, mapp)
-texte.setDynamicTextCut(True)
-texte.setFontSize(23)
-texte.setAntiAnaliasing(True)
-
-texte2 = MText(phrase, 600, 300, 300, 300, mapp)
-texte2.setDynamicTextCut(True)
-texte2.setFontSize(23)
-texte2.setAntiAnaliasing(False)
-
-bouton = MButton("A", 0, 600, 100, 50, mapp)
-lol = MWidget(0, 350, 100, 50, mapp)
-lol.setVisible(False)
-
-entre = MText("", 100, 600, 200, 50, mapp)
-entre.setFrameWidth(2)
-entre.setInput(True)
+slider = MSlider(1, 0, 500, 610, 10, 15, 600, mapp)
+slider.setStep(50)
+texte = MText("0", 630, 10, 200, 50, mapp)
+texte.setFontSize(22)
+texte.setTextHorizontalAlignment(1)
+texte.setTextVerticalAlignment(1)
 
 while True:
     mapp.frameEvent()
+
+    texte.setText(str(slider.getValue()))
     
     mapp.frameGraphics()
     pygame.display.flip()
