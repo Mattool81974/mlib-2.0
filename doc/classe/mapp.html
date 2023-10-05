@@ -37,7 +37,7 @@
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux <a href="../base.html#event">évènements</a>.</br>
             Cette fonction s'occupe aussi d'actualiser le <a href="#deltaTime">deltaTime</a>, puis <a href="#fps">fps</a>, puis de stocker la <a href="#consoleSystem">console</a> sous format ".txt".</br>
             Il est FORTEMENT conseillé d'appeler cette fonction au début d'une frame.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.1.
+            Modifié à la <a href="../versions.html">version</a> 2.1.0.
         </div>
         <h3 id="frameGraphics">frameGraphics()</h3>
         <div>
@@ -76,6 +76,18 @@
             Paramètres : aucun</br>
             Retourne <a href="#fps">fps</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="getMaxFps">getMaxFps()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le nombre <a href="#maxFps">maximum</a> de fps.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
+        </div>
+        <h3 id="getMousePos">getMousePos()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#mousePos">position</a> de la souris.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
         </div>
         <h3 id="getPressedKey">getPressedKey()</h3>
         <div>
@@ -131,11 +143,23 @@
             Change la valeur du <a href="#consoleFile">chemin d'accés</a> du fichier où stocker la console par "consoleFile".</br>
             Ajouté à la <a href="../versions.html">version</a> 1.4.0.
         </div>
+        <h3 id="setMaxFps">setMaxFps()</h3>
+        <div>
+            Paramètres : maxFps (nouveau nombre <a href="#maxFps">maximum</a> de fps)</br>
+            Change le nombre <a href="#maxFps">maximum</a> de fps par "maxFps".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
+        </div>
         <h3 id="setPrintFps">setPrintFps()</h3>
         <div>
             Paramètres : printFps (nouvelle valeur de <a href="#printFps">printFps</a>)</br>
             Change la valeur de <a href="#printFps">printFps</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="setWidgetToFocus">setWidgetToFocus()</h3>
+        <div>
+            Paramètres : widgetToFocus (nouveau widget à focus)</br>
+            Applique le focus sur le widget "widgetToFocus".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
         </div>
         <h3 id="setWindowIcon">setWindowIcon()</h3>
         <div>
@@ -216,6 +240,17 @@
         <div>
             Nombre de frames par secondes.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id = "maxFps">maxFps</h3>
+        <div>
+            Nombre de frame par seconde maximale (a peu près).</br>
+            Le nombre est égal à -1 si aucune limite n'est présente.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
+        </div>
+        <h3 id = "mousePos">mousePos</h3>
+        <div>
+            Position de la souris à la frame demandée.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.1.0.
         </div>
         <h3 id = "pressedKey">pressedKey</h3>
         <div>
