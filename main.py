@@ -27,10 +27,11 @@ texte.setFontSize(22)
 texte.setTextHorizontalAlignment(1)
 texte.setTextVerticalAlignment(1)
 
+input = MTextInputLine("Âge", 10, 610, 100, 40, mapp)
+input.setFontSize(22)
+
 while True:
     mapp.frameEvent()
-
-    texte.setText(str(slider.getValue()))
     
     mapp.frameGraphics()
     pygame.display.flip()

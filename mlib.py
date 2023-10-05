@@ -1649,9 +1649,9 @@ class MText(MFrame):
                     isSelected = True
                     selectionStarted = True
                     if textLength > self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
+                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1662,8 +1662,8 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
                     else:
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1673,7 +1673,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                 elif isSelected: #Line in the middle of the selection
                     if textLength <= self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
@@ -1681,8 +1681,8 @@ class MText(MFrame):
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
                     else: #End selection in a another line than the first selection position
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1692,7 +1692,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
             else:
-                textSurface = generator.render(piece, self.getAntiAnaliasing(), self.textColor)
+                textSurface = generator.render(piece, self.getAntiAnaliasing(), self.textColor).convert_alpha()
                 surfaces.append(textSurface)
             i += 1
             textY += textHeight
@@ -2569,3 +2569,60 @@ class MScrollArea(MWidget):
         else:
             if self.getVerticalSlider().getVisible():
                 self.getVerticalSlider()._mouseWheel(rotation)
+
+###################### Secondary class which represents an symplified mtext for do text input on one line
+class MTextInputLine(MText):
+    def __init__(self, informationText, x, y, width, height, parent, widgetType="MTextInputLine"):
+        super().__init__(informationText, x, y, width, height, parent, widgetType)
+
+        self.informationColor = (70, 70, 70)
+        self.informationText = informationText
+        self.inputColor = (0, 0, 0)
+
+        self.setForbiddenCaracter(["\n"])
+        self.setFrameWidth(2)
+        self.setInput(True)
+        self.setTextColor(self.informationColor)
+        self.setTextVerticalAlignment(1)
+
+    def getInformationColor(self): #Return informationColor
+        return self.informationColor
+
+    def getInformationText(self): #Return informationText
+        return self.informationText
+    
+    def getInputColor(self): #Return input color
+        return self.inputColor
+    
+    def setInformationColor(self, informationColor): #Change the value of informationColor
+        if self.informationColor != informationColor:
+            self.informationColor = informationColor
+            if self.getText() == self.getInformationText():
+                self.setShouldModify(True)
+    
+    def setInformationText(self, informationText): #Change the value of informationText
+        if self.informationText != informationText:
+            lastInformationText = self.informationText
+            self.informationText = informationText
+            if (self.getText() == "" or self.getText() == lastInformationText) and not self.getFocused():
+                self.setShouldModify(True)
+
+    def setInputColor(self, inputColor): #Change the value of inputColor
+        if self.inputColor != inputColor:
+            self.inputColor = inputColor
+            if self.getText() != self.informationText and self.getText() != "":
+                self.setShouldModify(True)
+    
+    def _isGettingMouseDown(self, button, relativePos):
+        if self.getText() == self.getInformationText():
+            self.setText("")
+        self.setTextColor(self.getInputColor())
+
+        super()._isGettingMouseDown(button, relativePos)
+
+    def _isNotFocusedAnymore(self):
+        super()._isNotFocusedAnymore()
+
+        if self.getText() == "":
+            self.setTextColor(self.getInformationColor())
+            self.setText(self.getInformationText())
