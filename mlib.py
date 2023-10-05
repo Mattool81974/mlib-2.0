@@ -6,7 +6,10 @@ import time
 
 pygame.init()
 
-#Nombre de widget existants
+#MLib version
+VERSION = "2.2.0"
+
+#Number of existing widget
 _nbWidget = 0
 
 ###################### Base widget class
@@ -2167,9 +2170,9 @@ class MButton(MText):
     def _isNotOverflightedAnymore(self):
         self._doNotOverflightedEffect()
 
-###################### Secondary class which represents bar/slider
-class MBar(MFrame):
-    def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MBar"): #Construct an MBar object
+###################### Secondary class which represents slider
+class MSlider(MFrame):
+    def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MSlider"): #Construct an MSlider object
         super().__init__(x, y, width, height, parent, widgetType)
 
         self.buttonBackgroundColor = (130, 127, 120)
@@ -2180,6 +2183,7 @@ class MBar(MFrame):
         self.changeButtonBackgroundColorOnOverflight = False
         self.maxValue = maxValue
         self.minValue = minValue
+        self.posAtClick = (0, 0)
         self.step = 0
         self.value = minValue
         self.ORIENTATION = orientation
@@ -2295,12 +2299,12 @@ class MBar(MFrame):
         super().softResetWidget()
         self._valueChanged = False
 
-    def _doNotOverflightEffect(self): #Apply effect on the MBar when not overflighted by the cursor
+    def _doNotOverflightEffect(self): #Apply effect on the MSlider when not overflighted by the cursor
         if self._buttonOverflighted:
             self._buttonOverflighted = False
             self.setShouldModify(True)
 
-    def _doOverflightEffect(self, relativePos): #Apply effect on the MBar when overflighted by the cursor
+    def _doOverflightEffect(self, relativePos): #Apply effect on the MSlider when overflighted by the cursor
         if self._isPosOverButton(relativePos):
             if not self._buttonOverflighted:
                 self._buttonOverflighted = True
@@ -2337,6 +2341,9 @@ class MBar(MFrame):
 
     def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
+            self.posAtClick = (relativePos[0], self.getButtonOrientationPos())
+            if self.getOrientation() == 1:
+                    self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
             if self._isPosOverButton(relativePos):
                 self._buttonClicked = True
             else:
@@ -2374,7 +2381,8 @@ class MBar(MFrame):
             toAdd = pos[0]
             if self.getOrientation() == 1:
                 toAdd = pos[1]
-            self.setValue(round(self._getValueAtPos(toAdd)))
+            toAdd -= self.posAtClick[0]
+            self.setValue(round(self._getValueAtPos((self.posAtClick[1] + self.getButtonOrientationLength() / 2) + toAdd)))
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
@@ -2397,94 +2405,94 @@ class MBar(MFrame):
 class MScrollArea(MWidget):
     def __init__(self, widgetToScroll, x, y, width, height, parent, widgetType="MScrollArea"): #Construct an MScrollArea object
         super().__init__(x, y, width, height, parent, widgetType)
-        self.barOrientationLength = 15
-        self.horizontalBar = MBar(0, 0, 10, self.barOrientationLength, self.getHeight() - self.barOrientationLength, self.getWidth() - (self.barOrientationLength), self.barOrientationLength, self)
-        self.verticalBar = MBar(1, 0, 10, 0, 0, self.barOrientationLength, self.getHeight() - (self.barOrientationLength), self)
+        self.sliderOrientationLength = 15
+        self.horizontalSlider = MSlider(0, 0, 10, self.sliderOrientationLength, self.getHeight() - self.sliderOrientationLength, self.getWidth() - (self.sliderOrientationLength), self.sliderOrientationLength, self)
+        self.verticalSlider = MSlider(1, 0, 10, 0, 0, self.sliderOrientationLength, self.getHeight() - (self.sliderOrientationLength), self)
         self.widgetToScroll = 0
-        self._widgetToScrollOffset = (self.barOrientationLength, self.barOrientationLength)
+        self._widgetToScrollOffset = (self.sliderOrientationLength, self.sliderOrientationLength)
 
-        self.horizontalBar.setChangeButtonBackgroundColorOnOverflight(True)
-        self.horizontalBar.setVisible(False)
-        self.verticalBar.setChangeButtonBackgroundColorOnOverflight(True)
-        self.verticalBar.setVisible(False)
+        self.horizontalSlider.setChangeButtonBackgroundColorOnOverflight(True)
+        self.horizontalSlider.setVisible(False)
+        self.verticalSlider.setChangeButtonBackgroundColorOnOverflight(True)
+        self.verticalSlider.setVisible(False)
 
         self.setWidgetToScroll(widgetToScroll)
 
-    def getBarOrientationLength(self): #Return barOrientationLength
-        return self.barOrientationLength
+    def getSliderOrientationLength(self): #Return sliderOrientationLength
+        return self.sliderOrientationLength
 
-    def getHorizontalBar(self): #Return horizontalBar
-        return self.horizontalBar
+    def getHorizontalSlider(self): #Return horizontalSlider
+        return self.horizontalSlider
     
-    def getVerticalBar(self): #Return verticalBar
-        return self.verticalBar
+    def getVerticalSlider(self): #Return verticalSlider
+        return self.verticalSlider
     
     def getWidgetToScroll(self): #Return widgetToScroll
         return self.widgetToScroll
 
-    def placeBar(self): #Place bar into the MScrollArea
-        horizontalBarNecessary = False
-        verticalBarNecessary = False
+    def placeSlider(self): #Place slider into the MScrollArea
+        horizontalSliderNecessary = False
+        verticalSliderNecessary = False
 
         if self.getWidgetToScroll() != 0:
             if self.getWidth() < self.getWidgetToScroll().getWidth():
-                horizontalBarNecessary = True
+                horizontalSliderNecessary = True
 
-            if self.getHeight() - (self.getBarOrientationLength() * horizontalBarNecessary) < self.getWidgetToScroll().getHeight():
-                verticalBarNecessary = True
+            if self.getHeight() - (self.getSliderOrientationLength() * horizontalSliderNecessary) < self.getWidgetToScroll().getHeight():
+                verticalSliderNecessary = True
 
-            if self.getWidth() - (self.getBarOrientationLength() * verticalBarNecessary) < self.getWidgetToScroll().getWidth():
-                horizontalBarNecessary = True
+            if self.getWidth() - (self.getSliderOrientationLength() * verticalSliderNecessary) < self.getWidgetToScroll().getWidth():
+                horizontalSliderNecessary = True
 
-        if horizontalBarNecessary:
-            self._widgetToScrollOffset = (0, self.barOrientationLength)
+        if horizontalSliderNecessary:
+            self._widgetToScrollOffset = (0, self.sliderOrientationLength)
         else:
             self._widgetToScrollOffset = (0, 0)
 
-        if verticalBarNecessary:
-            self._widgetToScrollOffset = (self.barOrientationLength, self._widgetToScrollOffset[1])
+        if verticalSliderNecessary:
+            self._widgetToScrollOffset = (self.sliderOrientationLength, self._widgetToScrollOffset[1])
         else:
             self._widgetToScrollOffset = (0, self._widgetToScrollOffset[1])
 
-        if horizontalBarNecessary:
-            if not self.getHorizontalBar().getVisible():
+        if horizontalSliderNecessary:
+            if not self.getHorizontalSlider().getVisible():
                 maxValue = self.getWidgetToScroll().getWidth() - (self.getWidth() - (self._widgetToScrollOffset[0]))
 
-                self.getHorizontalBar().setVisible(True)
+                self.getHorizontalSlider().setVisible(True)
 
                 bolRatio = (self.getWidth()) / self.getWidgetToScroll().getWidth()
-                self.getHorizontalBar().setButtonOrientationLength((self.getHorizontalBar().getWidth()) * bolRatio)
-                self.getHorizontalBar().setMinValue(0)
-                self.getHorizontalBar().setMaxValue(maxValue)
+                self.getHorizontalSlider().setButtonOrientationLength((self.getHorizontalSlider().getWidth()) * bolRatio)
+                self.getHorizontalSlider().setMinValue(0)
+                self.getHorizontalSlider().setMaxValue(maxValue)
 
-            if verticalBarNecessary:
-                self.getHorizontalBar().setX(self.barOrientationLength)
-                self.getHorizontalBar().setWidth(self.getWidth() - self.barOrientationLength)
+            if verticalSliderNecessary:
+                self.getHorizontalSlider().setX(self.sliderOrientationLength)
+                self.getHorizontalSlider().setWidth(self.getWidth() - self.sliderOrientationLength)
             else:
-                self.getHorizontalBar().setX(0)
-                self.getHorizontalBar().setWidth(self.getWidth())
+                self.getHorizontalSlider().setX(0)
+                self.getHorizontalSlider().setWidth(self.getWidth())
         else:
-            if self.getHorizontalBar().getVisible():
-                self.getHorizontalBar().setVisible(False)
+            if self.getHorizontalSlider().getVisible():
+                self.getHorizontalSlider().setVisible(False)
 
-        if verticalBarNecessary:
-            if not self.getVerticalBar().getVisible():
+        if verticalSliderNecessary:
+            if not self.getVerticalSlider().getVisible():
                 maxValue = self.getWidgetToScroll().getHeight() - (self.getHeight() - (self._widgetToScrollOffset[1]))
 
-                self.getVerticalBar().setVisible(True)
+                self.getVerticalSlider().setVisible(True)
 
                 bolRatio = (self.getHeight()) / self.getWidgetToScroll().getHeight()
-                self.getVerticalBar().setButtonOrientationLength((self.getVerticalBar().getHeight()) * bolRatio)
-                self.getVerticalBar().setMinValue(0)
-                self.getVerticalBar().setMaxValue(maxValue)
+                self.getVerticalSlider().setButtonOrientationLength((self.getVerticalSlider().getHeight()) * bolRatio)
+                self.getVerticalSlider().setMinValue(0)
+                self.getVerticalSlider().setMaxValue(maxValue)
 
-            if horizontalBarNecessary:
-                self.getVerticalBar().setHeight(self.getHeight() - self.barOrientationLength)
+            if horizontalSliderNecessary:
+                self.getVerticalSlider().setHeight(self.getHeight() - self.sliderOrientationLength)
             else:
-                self.getVerticalBar().setHeight(self.getHeight())
+                self.getVerticalSlider().setHeight(self.getHeight())
         else:
-            if self.getVerticalBar().getVisible():
-                self.getVerticalBar().setVisible(False)
+            if self.getVerticalSlider().getVisible():
+                self.getVerticalSlider().setVisible(False)
 
         if self.getWidgetToScroll() != 0:
             self.getWidgetToScroll().move(self._widgetToScrollOffset[0], 0)
@@ -2500,22 +2508,22 @@ class MScrollArea(MWidget):
             if widgetToScroll != 0:
                 if widgetToScroll.getParent() != self:
                     widgetToScroll.setParent(self)
-                    self.promoveChild(self.horizontalBar)
-                    self.promoveChild(self.verticalBar)
+                    self.promoveChild(self.horizontalSlider)
+                    self.promoveChild(self.verticalSlider)
                 widgetToScroll.move(self._widgetToScrollOffset[0], 0)
-            self.placeBar()
+            self.placeSlider()
 
     def _lastUpdate(self, deltaTime): #Function called every frame after event handle and user actions
         if self.widgetToScroll.isResized():
             self.reload()
 
     def _lateUpdate(self, deltaTime): #Function called every frame after event handle
-        if self.getHorizontalBar().getValueChanded():
+        if self.getHorizontalSlider().getValueChanded():
             oldPos = (0, self.getWidgetToScroll().getY() - (self._widgetToScrollOffset[1]))
-            newPos = (oldPos[0] + self._widgetToScrollOffset[0] - self.getHorizontalBar().getValue(), oldPos[1] + self._widgetToScrollOffset[1])
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0] - self.getHorizontalSlider().getValue(), oldPos[1] + self._widgetToScrollOffset[1])
             self.getWidgetToScroll().move(newPos[0], newPos[1])
 
-        if self.getVerticalBar().getValueChanded():
+        if self.getVerticalSlider().getValueChanded():
             oldPos = (self.getWidgetToScroll().getX() - (self._widgetToScrollOffset[0]), 0)
-            newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalBar().getValue())
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalSlider().getValue())
             self.getWidgetToScroll().move(newPos[0], newPos[1])

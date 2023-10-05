@@ -3,31 +3,32 @@
     <head>
         <link rel="stylesheet" href="../style.css">
         <meta charset="utf-8">
-        <title>MLib - MBar</title>
+        <title>MLib - MSlider</title>
     </head>
     <body>
-        <h1>MBar</h1>
+        <h1>MSlider</h1>
         <div>
-            MBar est une classe secondaire pour définir une barre/slider.</br>
+            MSlider est une classe secondaire pour définir un slider.</br>
             Elle hérite de <a href="mframe.html">MFrame</a>.</br>
+            Avant la <a href="../versions.html">version</a> 2.1.0, elle s'appelait "MBar".</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="display">Affichage</h3>
         <div>
-            MBar hérite de MFrame. Elle contient une petite <a href="./mframe.html#setFrameWidth">bordure</a> de 1 de large. Elle peut être horizontale ou verticale selon <a href="#ORIENTATION">ORIENTATION</a>.
-            Elle contient un bouton amovible pour changer la valeur dans le MBar.
+            MSlider hérite de MFrame. Elle contient une petite <a href="./mframe.html#setFrameWidth">bordure</a> de 1 de large. Elle peut être horizontale ou verticale selon <a href="#ORIENTATION">ORIENTATION</a>.
+            Elle contient un bouton amovible pour changer la valeur dans le MSlider.
         </div>
         <h3 id="working">Fonctionnement</h3>
         <div>
-            MBar permet d'utiliser un bouton amovible pour sélectionner une valeur, comprise entre <a href="#minValue">minValue</a> <a href="#maxValue">maxValue</a>.
-            Chaque valeur dans le MBar est séparé de <a href="#step">step</a> unités (pas encore disponible).
+            MSlider permet d'utiliser un bouton amovible pour sélectionner une valeur, comprise entre <a href="#minValue">minValue</a> <a href="#maxValue">maxValue</a>.
+            Chaque valeur dans le MSlider est séparé de <a href="#step">step</a> unités (pas encore disponible).
         </div>
 
         <h2>Fonctions</h2>
         <h3 id="__init__">__init__()</h3>
         <div>
-            Paramètres : orientation (assignée à la variable <a href="#ORIENTATION">ORIENTATION</a>), minValue (assignée à la variable <a href="#minValue">minValue</a>), maxValue (assignée à la variable <a href="#maxValue">maxValue</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a> de MWidget), y (assignée à la variabe <a href="./mwidget.html#y">y</a> de MWidget), width (assignée à la variable <a href="./mwidget.html#width">width</a> de MWidget), height (assignée à la variable <a href="./mwidget.html#height">height</a> de MWidget), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a> de MWidget), widgetType (assignée à la variable <a href="./mwidget.html#_type">_type</a> de MWidget, basiquememnt mit à "MBar")</br>
-            Construit un objet MBar.</br>
+            Paramètres : orientation (assignée à la variable <a href="#ORIENTATION">ORIENTATION</a>), minValue (assignée à la variable <a href="#minValue">minValue</a>), maxValue (assignée à la variable <a href="#maxValue">maxValue</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a> de MWidget), y (assignée à la variabe <a href="./mwidget.html#y">y</a> de MWidget), width (assignée à la variable <a href="./mwidget.html#width">width</a> de MWidget), height (assignée à la variable <a href="./mwidget.html#height">height</a> de MWidget), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a> de MWidget), widgetType (assignée à la variable <a href="./mwidget.html#_type">_type</a> de MWidget, basiquememnt mit à "MSlider")</br>
+            Construit un objet MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="getButtonBackgroundColor">getButtonBackgroundColor()</h3>
@@ -56,25 +57,25 @@
         <h3 id="getMaxValue">getMaxValue()</h3>
         <div>
             Paramètres : aucun</br>
-            Retourne la <a href="#maxValue">valeur maximale</a> possible dans le MBar.</br>
+            Retourne la <a href="#maxValue">valeur maximale</a> possible dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="getMinValue">getMinValue()</h3>
         <div>
             Paramètres : aucun</br>
-            Retourne la <a href="#minValue">valeur minimale</a> possible dans le MBar.</br>
+            Retourne la <a href="#minValue">valeur minimale</a> possible dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="getStep">getStep()</h3>
         <div>
             Paramètres : aucun</br>
-            Retourne le <a href="#step">pas</a> entre chaque valeur dans le MBar.</br>
+            Retourne le <a href="#step">pas</a> entre chaque valeur dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="getValue">getValue()</h3>
         <div>
             Paramètres : aucun</br>
-            Retourne la <a href="#value">valeur</a> actuelle dans le MBar.</br>
+            Retourne la <a href="#value">valeur</a> actuelle dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="getValueChanged">getValueChanged()</h3>
@@ -121,53 +122,53 @@
         </div>
         <h3 id="setMaxValue">setMaxValue()</h3>
         <div>
-            Paramètres : maxValue (nouvelle <a href="#maxValue">valeur maximale</a> possible dans le MBar)</br>
-            Change la <a href="#maxValue">valeur maximale</a> possible dans le MBar par "maxValue".</br>
+            Paramètres : maxValue (nouvelle <a href="#maxValue">valeur maximale</a> possible dans le MSlider)</br>
+            Change la <a href="#maxValue">valeur maximale</a> possible dans le MSlider par "maxValue".</br>
             Cette valeur doit être supérieur ou égal à <a href="#minValue">minValue</a> et <a href="#value">value</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="setMinValue">setMinValue()</h3>
         <div>
-            Paramètres : minValue (nouvelle <a href="#minValue">valeur minimale</a> possible dans le MBar)</br>
-            Change la <a href="#minValue">valeur minimale</a> possible dans le MBar par "minValue".</br>
+            Paramètres : minValue (nouvelle <a href="#minValue">valeur minimale</a> possible dans le MSlider)</br>
+            Change la <a href="#minValue">valeur minimale</a> possible dans le MSlider par "minValue".</br>
             Cette valeur doit être sinférieur ou égal à <a href="#maxValue">maxValue</a> et <a href="#value">value</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="setStep">setStep()</h3>
         <div>
-            Paramètres : step (nouveau <a href="#step">pas</a> entre chaque valeur dans le MBar)</br>
-            Change le <a href="#step">pas</a> entre chaque valeur dans le MBar par "step".</br>
+            Paramètres : step (nouveau <a href="#step">pas</a> entre chaque valeur dans le MSlider)</br>
+            Change le <a href="#step">pas</a> entre chaque valeur dans le MSlider par "step".</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="setValue">setValue()</h3>
         <div>
-            Paramètres : value (nouvelle <a href="#value">valeur</a> actuelle dans le MBar)</br>
-            Change la <a href="#value">valeur</a> actuelle dans le MBar par "value".</br>
+            Paramètres : value (nouvelle <a href="#value">valeur</a> actuelle dans le MSlider)</br>
+            Change la <a href="#value">valeur</a> actuelle dans le MSlider par "value".</br>
             Modifié à la <a href="../versions.html">version</a> 2.0.1.
         </div>
         <h3 id="softResetWidget">softResetWidget()</h3>
         <div>
             Paramètres : aucun</br>
             Effectue un reset du widget sans modifications graphiques.</br>
-            Dans MBar, elle met <a href="#_valueChanged">_valueChanged</a> à False.</br>
+            Dans MSlider, elle met <a href="#_valueChanged">_valueChanged</a> à False.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="_doNotOverflightedEffect">_doNotOverflightedEffect()</h3>
         <div>
             Paramètres : aucun</br>
-            Effectue sur le MBar les actions nécessaires lorsque le MBar est normal (non survolé).</br>
+            Effectue sur le MSlider les actions nécessaires lorsque le MSlider est normal (non survolé).</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="_doOverflightedEffect">_doOverflightedEffect()</h3>
         <div>
             Paramètres : aucun</br>
-            Effectue sur le MBar les actions nécessaires lorsque le MBar est survolé.</br>
+            Effectue sur le MSlider les actions nécessaires lorsque le MSlider est survolé.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="_getValueAtPos">_getValueAtPos()</h3>
         <div>
-            Paramètres : relativePos (position à tester dans le MBar)</br>
-            Retourne la valeur du MBar à la position "relativePos".</br>
+            Paramètres : relativePos (position à tester dans le MSlider)</br>
+            Retourne la valeur du MSlider à la position "relativePos".</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
@@ -177,7 +178,7 @@
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
             Met à jour <a href="#_buttonClicked">_buttonClicked</a> si nécessaire.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isGettingMouseDown">MWidget</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="_isGettingMouseUp">_isGettingMouseUp()</h3>
         <div>
@@ -210,11 +211,18 @@
             Retourne si la position "relativePos" est au dessus du bouton amovible.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
+        <h3 id = "_mouseMove">_mouseMove()</h3>
+        <div>
+            Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
+            Fonction appelé lorsque le widget est focus est que l'utilisateur bouge la souris.</br>
+            Dans MSlider, elle permet de changer la valeur du slider selon le mouvement de la souris.</br>
+            Modifié à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
         <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
         <div>
             Paramètres : surface (surface parent)</br>
             Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
-            Dans MBar, elle s'occupe d'afficher le bouton amovible.</br>
+            Dans MSlider, elle s'occupe d'afficher le bouton amovible.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.</br>
             Modifié à la <a href="../versions.html">version</a> 2.0.0.
         </div>
@@ -242,27 +250,32 @@
         </div>
         <h3 id="maxValue">maxValue</h3>
         <div>
-            Valeur maximale possible dans le MBar.</br>
+            Valeur maximale possible dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="minValue">minValue</h3>
         <div>
-            Valeur minimale possible dans le MBar.</br>
+            Valeur minimale possible dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
+        <h3 id="posAtClick">posAtClick</h3>
+        <div>
+            Tuple qui contient (position de la souris sur l'axe d'orientation lors d'un click, position du bouton d'orientation sur l'axe d'orientation lors d'un click).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="step">step</h3>
         <div>
-            Pas entre chaque dans le MBar.</br>
+            Pas entre chaque dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="value">value</h3>
         <div>
-            Valeur actuelle dans le MBar.</br>
+            Valeur actuelle dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="ORIENTATION">ORIENTATION</h3>
         <div>
-            Variable constante défini dans le constructeur définissant l'orientation du MBar (0 si horizontal et 1 si vertical).</br>
+            Variable constante défini dans le constructeur définissant l'orientation du MSlider (0 si horizontal et 1 si vertical).</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
         <h3 id="_buttonClicked">_buttonClicked</h3>
@@ -277,7 +290,7 @@
         </div>
         <h3 id="_valueChanged">_valueChanged</h3>
         <div>
-            Booléen qui indique si la valeur dans le MBar a été modifié pendant cette frame.</br>
+            Booléen qui indique si la valeur dans le MSlider a été modifié pendant cette frame.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
         </div>
     </body>
