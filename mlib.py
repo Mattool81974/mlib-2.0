@@ -2351,6 +2351,9 @@ class MSlider(MFrame):
 
         toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
 
+        if self.getStep() != 0:
+            toReturn = self.getStep() * round(toReturn/self.getStep())
+
         return round(toReturn)
 
     def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)

@@ -20,8 +20,8 @@ scrolleur.setBackgroundColor((0, 0, 0))
 
 img.resize(800, 800)
 
-slider = MSlider(1, 0, 500, 610, 10, 15, 600, mapp)
-slider.setStep(50)
+slider = MSlider(1, 0, 500000, 610, 10, 15, 600, mapp)
+slider.setStep(1)
 texte = MText("0", 630, 10, 200, 50, mapp)
 texte.setFontSize(22)
 texte.setTextHorizontalAlignment(1)
