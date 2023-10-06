@@ -846,6 +846,7 @@ class MText(MFrame):
         self.fontSize = 12
         self.forbiddenCaracter = ""
         self.input = False
+        self.maxTextLength = 0
         self.selection = False
         self.selectionBackgroundColor = (25, 102, 255)
         self.selectionStart = 0
@@ -1095,6 +1096,9 @@ class MText(MFrame):
     def getInput(self): #Return input
         return self.input
 
+    def getMaxTextLengt(self): #Return maxTextLength
+        return self.maxTextLength
+
     def getSelectedText(self): #Return the selected text into the mtext
         if self.getSelection() and self.getSelectionStart() != self.getSelectionStop():
             return self.getText()[self.getSelectionStart():self.getSelectionStop()]
@@ -1198,6 +1202,12 @@ class MText(MFrame):
         self.setCursorVisible(input)
         self.setSelection(input)
     
+    def setMaxTextLengt(self, maxTextLength): #Return maxTextLength
+        if self.getMaxTextLengt() != maxTextLength:
+            self.maxTextLength = maxTextLength
+            if len(self.getText()) > maxTextLength:
+                self.setText(self.getText[:maxTextLength])
+
     def setSelection(self, selection): #Change the value of selection
         if selection != self.getSelection():
             self.selection = selection
@@ -1250,10 +1260,14 @@ class MText(MFrame):
 
     def setText(self, text): #Change the value of text
         if self.text != text:
+            if self.getMaxTextLengt() != 0 and len(text) > self.getMaxTextLengt():
+                text = text[:self.getMaxTextLengt()]
             self.text = text
             self._checkSelection()
             self._cursorVisibleTime = 0
             self._setCursorIsVisible(True)
+            if len(text) < self.getCursorPosition():
+                self.setCursorPosition(len(text))
             self.setShouldModify(True)
 
     def setTextColor(self, textColor): #Change the value of textColor
