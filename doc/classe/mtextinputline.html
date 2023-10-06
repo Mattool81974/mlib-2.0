@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MTextInputLine</title>
+    </head>
+    <body>
+        <h1>MTextInputLine</h1>
+        <div>
+            MTextInputLine est une classe secondaire pour définir une entrée texte en une ligne plus facilement qu'avec <a href="./mtext.html">MText</a>.</br>
+            Elle hérite de <a href="mtext.html">MText</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3>Différences à MText</h3>
+        <div>
+            Cette classe est très similaire à MText à quelques exceptions.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id="__init__">__init__()</h3>
+        <div>
+            Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a> de MWidget), y (assignée à la variabe <a href="./mwidget.html#y">y</a> de MWidget), width (assignée à la variable <a href="./mwidget.html#width">width</a> de MWidget), height (assignée à la variable <a href="./mwidget.html#height">height</a> de MWidget), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a> de MWidget), widgetType (assignée à la variable <a href="./mwidget.html#_type">_type</a> de MWidget, basiquememnt mit à "MButton")</br>
+            Construit un objet MTextInputLine.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="getInformationColor">getInformationColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#informationColor">couleur</a> du texte d'information.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="getInformationText">getInformationText()</h3>
+        <div>
+           Paramètres : aucun</br>
+           Retourne le texte d'<a href="#informationText">information</a>afficher avant l'entrée utilisateur pour donner des informations de l'utilité de cette entrée à ce dernier.</br>
+           Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="getInputColor">getInputColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#inputColor">couleur</a> du texte entré par l'utilisateur.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="setInformationColor">setInformationColor()</h3>
+        <div>
+            Paramètres : informationColor (nouvelle <a href="#informationColor">couleur</a> du texte d'information)</br>
+            Change la <a href="#informationColor">couleur</a> du texte d'information par "informationColor".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="setInformationText">setInformationText()</h3>
+        <div>
+           Paramètres : informationText (nouveau texte d'<a href="#informationText">information</a>afficher avant l'entrée utilisateur pour donner des informations de l'utilité de cette entrée à ce dernier)</br>
+           Change le texte d'<a href="#informationText">information</a>afficher avant l'entrée utilisateur pour donner des informations de l'utilité de cette entrée à ce dernier par informationText.</br>
+           Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="setInputColor">setInputColor()</h3>
+        <div>
+            Paramètres : inputColor (nouvelle <a href="#inputColor">couleur</a> du texte entré par l'utilisateur)</br>
+            Change la <a href="#inputColor">couleur</a> du texte entré par l'utilisateur par "inputColor".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
+        <div>
+            Paramètres : button (nombre entier du bouton de souris clické), relativePos (position relative au widget du curseur de la souris)</br>
+            Fonction appelé lorsque le widget est clické.</br>
+            Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
+            Dans MTextInputLine, elle sert à enlever <a href="#informationText">informationText</a> du texte quand l'utilisateur veut le modifier.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="_isNotFocusedAnymore">_isNotFocusedAnymore()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Fonction appelé lorsque le widget n'est plus focus.</br>
+            Dans MTextInputLine, elle sert à remettre <a href="#informationText">informationText</a> du texte quand l'utilisateur déselectionne le MTextInputLine sans laisser de texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+
+        <h2>Variables</h2>
+        <h3 id="informationColor">informationColor</h3>
+        <div>
+            Couleur du texte d'information.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="informationText">informationText</h3>
+        <div>
+            Texte d'information afficher avant l'entrée utilisateur pour donner des informations de l'utilité de cette entrée à ce dernier.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+        <h3 id="inputColor">inputColor</h3>
+        <div>
+            Couleur du texte entrée par l'utilisateur.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
+    </body>
+</html>

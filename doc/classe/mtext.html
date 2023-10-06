@@ -134,6 +134,12 @@
             Retourne si le widget est utilisé comme <a href="#input">entré</a> ou non.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id="getMaxTextLength">getMaxTextLength</h3>
+        <div>
+            Paramètrs : aucun</br>
+            Retourne la <a href="#maxTextLength">taille</a> maximale du texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
         <h3 id="getSelectedText">getSelectedText()</h3>
         <div>
             Paramètres : aucun</br>
@@ -284,6 +290,12 @@
             Elle change aussi l'apparence du <a href="#setCursorVisible">curseur</a> et de la <a href="#setSelection">sélection</a> si "changeAll" est True.</br>
             Modifié à la <a href="../versions.html">version</a> 1.3.0.
         </div>
+        <h3 id="setMaxTextLength">setMaxTextLength</h3>
+        <div>
+            Paramètrs : maxTextLength (nouvelle <a href="#maxTextLength">taille</a> maximale du texte)</br>
+            Change la <a href="#maxTextLength">taille</a> maximale du texte par "maxTextLength".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
+        </div>
         <h3 id="setSelection">setSelection()</h3>
         <div>
             Paramètres : selection (nouvelle valeur de si la <a href="#selection">sélection</a> est possible ou non)</br>
@@ -324,7 +336,7 @@
         <div>
             Paramètres : text (nouveau texte à afficher)</br>
             Change la valeur de <a href="#text">text</a> à "text".</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.1.0.
         </div>
         <h3 id="setTextColor">setTextColor()</h3>
         <div>
@@ -463,7 +475,7 @@
             Cependant, si le texte est hors du MText (trop haut, trop bas ou trop décalé), le rendu n'est pas fait.</br>
             Si generator est à 0, generator sera égal à <a href="#getGenerator">getGenerator</a>.</br>
             Si pieces est à 0, pieces sera égal à <a href="#getCuttedPiece">getCuttedPiece</a>.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.1.
+            Modifié à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
         <div>
@@ -629,6 +641,12 @@
             Booléen qui indique si le MText est utilisé comme une entrée ou non.</br>
             Si il est égal à True, alors le MText réagira aux entrées du clavier si il est focus grâce à <a href="./mwidget.html#_isKeyGettingPressed">_isKeyGettingPressed()</a> de MWidget.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id="maxTextLength">maxTextLength</h3>
+        <div>
+            Longueur maximale du texte.</br>
+            Si il est à 0, il n'y a pas de limite de taille de texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.2.0.
         </div>
         <h3 id="selection">selection</h3>
         <div>

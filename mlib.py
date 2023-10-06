@@ -6,7 +6,10 @@ import time
 
 pygame.init()
 
-#Nombre de widget existants
+#MLib version
+VERSION = "2.2.0"
+
+#Number of existing widget
 _nbWidget = 0
 
 ###################### Base widget class
@@ -272,7 +275,7 @@ class MWidget:
     def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         pass
 
-    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mosue whell is rotating
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mouse whell is rotating
         pass
 
     def _removeChild(self, child): #Remove a child to the widget
@@ -843,6 +846,7 @@ class MText(MFrame):
         self.fontSize = 12
         self.forbiddenCaracter = ""
         self.input = False
+        self.maxTextLength = 0
         self.selection = False
         self.selectionBackgroundColor = (25, 102, 255)
         self.selectionStart = 0
@@ -1092,6 +1096,9 @@ class MText(MFrame):
     def getInput(self): #Return input
         return self.input
 
+    def getMaxTextLengt(self): #Return maxTextLength
+        return self.maxTextLength
+
     def getSelectedText(self): #Return the selected text into the mtext
         if self.getSelection() and self.getSelectionStart() != self.getSelectionStop():
             return self.getText()[self.getSelectionStart():self.getSelectionStop()]
@@ -1195,6 +1202,12 @@ class MText(MFrame):
         self.setCursorVisible(input)
         self.setSelection(input)
     
+    def setMaxTextLengt(self, maxTextLength): #Return maxTextLength
+        if self.getMaxTextLengt() != maxTextLength:
+            self.maxTextLength = maxTextLength
+            if len(self.getText()) > maxTextLength:
+                self.setText(self.getText[:maxTextLength])
+
     def setSelection(self, selection): #Change the value of selection
         if selection != self.getSelection():
             self.selection = selection
@@ -1247,10 +1260,14 @@ class MText(MFrame):
 
     def setText(self, text): #Change the value of text
         if self.text != text:
+            if self.getMaxTextLengt() != 0 and len(text) > self.getMaxTextLengt():
+                text = text[:self.getMaxTextLengt()]
             self.text = text
             self._checkSelection()
             self._cursorVisibleTime = 0
             self._setCursorIsVisible(True)
+            if len(text) < self.getCursorPosition():
+                self.setCursorPosition(len(text))
             self.setShouldModify(True)
 
     def setTextColor(self, textColor): #Change the value of textColor
@@ -1646,9 +1663,9 @@ class MText(MFrame):
                     isSelected = True
                     selectionStarted = True
                     if textLength > self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
+                        textSurface3 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop()+selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width() + textSurface3.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1659,8 +1676,8 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
                     else:
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset)], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStart()+selectionStartOffset):len(piece)-(textLength-self.getSelectionStop())], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1670,7 +1687,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                 elif isSelected: #Line in the middle of the selection
                     if textLength <= self.getSelectionStop() + selectionStartOffset: #And end at this line too
-                        textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor())
+                        textSurface1 = generator.render(piece, self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
@@ -1678,8 +1695,8 @@ class MText(MFrame):
                         textSurface.blit(textSurface1, (0, 0, textSurface1.get_width(), textSurface1.get_height()))
                         surfaces.append(textSurface)
                     else: #End selection in a another line than the first selection position
-                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor())
-                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor())
+                        textSurface1 = generator.render(piece[:len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset)], self.getAntiAnaliasing(), self.getSelectionTextColor()).convert_alpha()
+                        textSurface2 = generator.render(piece[len(piece)-(textLength-self.getSelectionStop() + selectionStartOffset):], self.getAntiAnaliasing(), self.getTextColor()).convert_alpha()
                         surfaceSelectionBackground = pygame.Surface((textSurface1.get_width(), textSurface1.get_height()), pygame.SRCALPHA)
                         surfaceSelectionBackground.fill(self.getSelectionBackgroundColor())
                         textSurface = pygame.Surface((textSurface1.get_width() + textSurface2.get_width(), textSurface2.get_height()), pygame.SRCALPHA)
@@ -1689,7 +1706,7 @@ class MText(MFrame):
                         surfaces.append(textSurface)
                         isSelected = False
             else:
-                textSurface = generator.render(piece, self.getAntiAnaliasing(), self.textColor)
+                textSurface = generator.render(piece, self.getAntiAnaliasing(), self.textColor).convert_alpha()
                 surfaces.append(textSurface)
             i += 1
             textY += textHeight
@@ -2167,9 +2184,9 @@ class MButton(MText):
     def _isNotOverflightedAnymore(self):
         self._doNotOverflightedEffect()
 
-###################### Secondary class which represents bar/slider
-class MBar(MFrame):
-    def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MBar"): #Construct an MBar object
+###################### Secondary class which represents slider
+class MSlider(MFrame):
+    def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MSlider"): #Construct an MSlider object
         super().__init__(x, y, width, height, parent, widgetType)
 
         self.buttonBackgroundColor = (130, 127, 120)
@@ -2180,8 +2197,10 @@ class MBar(MFrame):
         self.changeButtonBackgroundColorOnOverflight = False
         self.maxValue = maxValue
         self.minValue = minValue
+        self.posAtClick = (0, 0)
         self.step = 0
         self.value = minValue
+        self.wheelMultiplicator = 10
         self.ORIENTATION = orientation
         self._buttonClicked = False
         self._buttonOverflighted = False
@@ -2242,6 +2261,9 @@ class MBar(MFrame):
     def getValueChanded(self): #Return _valueChanged
         return self._valueChanged
     
+    def getWheelMultiplicator(self): #Return wheelMultiplicator
+        return self.wheelMultiplicator
+
     def isValueIn(self, value): #Return if value is between minValue and maxValue
         return value >= self.getMinValue() and value <= self.getMaxValue()
     
@@ -2261,27 +2283,34 @@ class MBar(MFrame):
             self.buttonBackgroundColorOnOverflight = buttonBackgroundColorOnOverflight
             self.setShouldModify(True)
 
-    def setButtonOrientationLength(self, buttonOrientationLength): #Change the value of buttonOrientationLength
+    def setButtonOrientationLength(self, buttonOrientationLength: int): #Change the value of buttonOrientationLength
         if self.getButtonOrientationLength() != buttonOrientationLength:
             self.buttonOrientationLength = buttonOrientationLength
             self.setShouldModify(True)
     
-    def setMaxValue(self, maxValue): #Change the value of maxValue
+    def setMaxValue(self, maxValue: int): #Change the value of maxValue
         if self.getMaxValue() != maxValue and maxValue >= self.getMinValue() and self.getValue() <= maxValue:
             self.maxValue = maxValue
             self.setShouldModify(True)
     
-    def setMinValue(self, minValue): #Change the value of maxValue
+    def setMinValue(self, minValue: int): #Change the value of maxValue
         if self.getMinValue() != minValue and minValue <= self.getMaxValue() and self.getValue() >= minValue:
             self.minValue = minValue
             self.setShouldModify(True)
     
-    def setStep(self, step): #Change the value of step
+    def setStep(self, step: int): #Change the value of step
         if self.getStep() != step:
-            self.step = step
-            self.setShouldModify(True)
+            if step != 0:
+                range = self.getMaxValue() - self.getMinValue()
+                if range/step == round(range/step):
+                    self.step = step
+                    self.setValue(self.getMinValue())
+                    self.setWheelMultiplicator(step)
+                    self.setShouldModify(True)
+            else:
+                self.step = 0
     
-    def setValue(self, value): #Change the value of value
+    def setValue(self, value: int): #Change the value of value
         if self.getValue() != value:
             if value > self.getMaxValue():
                 value = self.getMaxValue()
@@ -2291,16 +2320,19 @@ class MBar(MFrame):
             self._valueChanged = True
             self.setShouldModify(True)
 
+    def setWheelMultiplicator(self, wheelMultipilcator: int): #Change the value of wheelMultiplicator
+        self.wheelMultiplicator = wheelMultipilcator
+
     def softResetWidget(self): #Reset some attributes without graphics modification
         super().softResetWidget()
         self._valueChanged = False
 
-    def _doNotOverflightEffect(self): #Apply effect on the MBar when not overflighted by the cursor
+    def _doNotOverflightEffect(self): #Apply effect on the MSlider when not overflighted by the cursor
         if self._buttonOverflighted:
             self._buttonOverflighted = False
             self.setShouldModify(True)
 
-    def _doOverflightEffect(self, relativePos): #Apply effect on the MBar when overflighted by the cursor
+    def _doOverflightEffect(self, relativePos): #Apply effect on the MSlider when overflighted by the cursor
         if self._isPosOverButton(relativePos):
             if not self._buttonOverflighted:
                 self._buttonOverflighted = True
@@ -2333,10 +2365,16 @@ class MBar(MFrame):
 
         toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
 
+        if self.getStep() != 0:
+            toReturn = self.getStep() * round(toReturn/self.getStep())
+
         return round(toReturn)
 
     def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
+            self.posAtClick = (relativePos[0], self.getButtonOrientationPos())
+            if self.getOrientation() == 1:
+                    self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
             if self._isPosOverButton(relativePos):
                 self._buttonClicked = True
             else:
@@ -2374,7 +2412,12 @@ class MBar(MFrame):
             toAdd = pos[0]
             if self.getOrientation() == 1:
                 toAdd = pos[1]
-            self.setValue(round(self._getValueAtPos(toAdd)))
+            toAdd -= self.posAtClick[0]
+            self.setValue(round(self._getValueAtPos((self.posAtClick[1] + self.getButtonOrientationLength() / 2) + toAdd)))
+
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mosue whell is rotating
+        if not self._buttonClicked:
+            self.setValue(self.getValue() - rotation * self.getWheelMultiplicator())
 
     def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
@@ -2397,94 +2440,95 @@ class MBar(MFrame):
 class MScrollArea(MWidget):
     def __init__(self, widgetToScroll, x, y, width, height, parent, widgetType="MScrollArea"): #Construct an MScrollArea object
         super().__init__(x, y, width, height, parent, widgetType)
-        self.barOrientationLength = 15
-        self.horizontalBar = MBar(0, 0, 10, self.barOrientationLength, self.getHeight() - self.barOrientationLength, self.getWidth() - (self.barOrientationLength), self.barOrientationLength, self)
-        self.verticalBar = MBar(1, 0, 10, 0, 0, self.barOrientationLength, self.getHeight() - (self.barOrientationLength), self)
+        self.sliderOrientationLength = 15
+        self.horizontalSlider = MSlider(0, 0, 10, self.sliderOrientationLength, self.getHeight() - self.sliderOrientationLength, self.getWidth() - (self.sliderOrientationLength), self.sliderOrientationLength, self)
+        self.verticalSlider = MSlider(1, 0, 10, 0, 0, self.sliderOrientationLength, self.getHeight() - (self.sliderOrientationLength), self)
         self.widgetToScroll = 0
-        self._widgetToScrollOffset = (self.barOrientationLength, self.barOrientationLength)
+        self._shiftPressed = False
+        self._widgetToScrollOffset = (self.sliderOrientationLength, self.sliderOrientationLength)
 
-        self.horizontalBar.setChangeButtonBackgroundColorOnOverflight(True)
-        self.horizontalBar.setVisible(False)
-        self.verticalBar.setChangeButtonBackgroundColorOnOverflight(True)
-        self.verticalBar.setVisible(False)
+        self.horizontalSlider.setChangeButtonBackgroundColorOnOverflight(True)
+        self.horizontalSlider.setVisible(False)
+        self.verticalSlider.setChangeButtonBackgroundColorOnOverflight(True)
+        self.verticalSlider.setVisible(False)
 
         self.setWidgetToScroll(widgetToScroll)
 
-    def getBarOrientationLength(self): #Return barOrientationLength
-        return self.barOrientationLength
+    def getSliderOrientationLength(self): #Return sliderOrientationLength
+        return self.sliderOrientationLength
 
-    def getHorizontalBar(self): #Return horizontalBar
-        return self.horizontalBar
+    def getHorizontalSlider(self): #Return horizontalSlider
+        return self.horizontalSlider
     
-    def getVerticalBar(self): #Return verticalBar
-        return self.verticalBar
+    def getVerticalSlider(self): #Return verticalSlider
+        return self.verticalSlider
     
     def getWidgetToScroll(self): #Return widgetToScroll
         return self.widgetToScroll
 
-    def placeBar(self): #Place bar into the MScrollArea
-        horizontalBarNecessary = False
-        verticalBarNecessary = False
+    def placeSlider(self): #Place slider into the MScrollArea
+        horizontalSliderNecessary = False
+        verticalSliderNecessary = False
 
         if self.getWidgetToScroll() != 0:
             if self.getWidth() < self.getWidgetToScroll().getWidth():
-                horizontalBarNecessary = True
+                horizontalSliderNecessary = True
 
-            if self.getHeight() - (self.getBarOrientationLength() * horizontalBarNecessary) < self.getWidgetToScroll().getHeight():
-                verticalBarNecessary = True
+            if self.getHeight() - (self.getSliderOrientationLength() * horizontalSliderNecessary) < self.getWidgetToScroll().getHeight():
+                verticalSliderNecessary = True
 
-            if self.getWidth() - (self.getBarOrientationLength() * verticalBarNecessary) < self.getWidgetToScroll().getWidth():
-                horizontalBarNecessary = True
+            if self.getWidth() - (self.getSliderOrientationLength() * verticalSliderNecessary) < self.getWidgetToScroll().getWidth():
+                horizontalSliderNecessary = True
 
-        if horizontalBarNecessary:
-            self._widgetToScrollOffset = (0, self.barOrientationLength)
+        if horizontalSliderNecessary:
+            self._widgetToScrollOffset = (0, self.sliderOrientationLength)
         else:
             self._widgetToScrollOffset = (0, 0)
 
-        if verticalBarNecessary:
-            self._widgetToScrollOffset = (self.barOrientationLength, self._widgetToScrollOffset[1])
+        if verticalSliderNecessary:
+            self._widgetToScrollOffset = (self.sliderOrientationLength, self._widgetToScrollOffset[1])
         else:
             self._widgetToScrollOffset = (0, self._widgetToScrollOffset[1])
 
-        if horizontalBarNecessary:
-            if not self.getHorizontalBar().getVisible():
+        if horizontalSliderNecessary:
+            if not self.getHorizontalSlider().getVisible():
                 maxValue = self.getWidgetToScroll().getWidth() - (self.getWidth() - (self._widgetToScrollOffset[0]))
 
-                self.getHorizontalBar().setVisible(True)
+                self.getHorizontalSlider().setVisible(True)
 
                 bolRatio = (self.getWidth()) / self.getWidgetToScroll().getWidth()
-                self.getHorizontalBar().setButtonOrientationLength((self.getHorizontalBar().getWidth()) * bolRatio)
-                self.getHorizontalBar().setMinValue(0)
-                self.getHorizontalBar().setMaxValue(maxValue)
+                self.getHorizontalSlider().setButtonOrientationLength((self.getHorizontalSlider().getWidth()) * bolRatio)
+                self.getHorizontalSlider().setMinValue(0)
+                self.getHorizontalSlider().setMaxValue(maxValue)
 
-            if verticalBarNecessary:
-                self.getHorizontalBar().setX(self.barOrientationLength)
-                self.getHorizontalBar().setWidth(self.getWidth() - self.barOrientationLength)
+            if verticalSliderNecessary:
+                self.getHorizontalSlider().setX(self.sliderOrientationLength)
+                self.getHorizontalSlider().setWidth(self.getWidth() - self.sliderOrientationLength)
             else:
-                self.getHorizontalBar().setX(0)
-                self.getHorizontalBar().setWidth(self.getWidth())
+                self.getHorizontalSlider().setX(0)
+                self.getHorizontalSlider().setWidth(self.getWidth())
         else:
-            if self.getHorizontalBar().getVisible():
-                self.getHorizontalBar().setVisible(False)
+            if self.getHorizontalSlider().getVisible():
+                self.getHorizontalSlider().setVisible(False)
 
-        if verticalBarNecessary:
-            if not self.getVerticalBar().getVisible():
+        if verticalSliderNecessary:
+            if not self.getVerticalSlider().getVisible():
                 maxValue = self.getWidgetToScroll().getHeight() - (self.getHeight() - (self._widgetToScrollOffset[1]))
 
-                self.getVerticalBar().setVisible(True)
+                self.getVerticalSlider().setVisible(True)
 
                 bolRatio = (self.getHeight()) / self.getWidgetToScroll().getHeight()
-                self.getVerticalBar().setButtonOrientationLength((self.getVerticalBar().getHeight()) * bolRatio)
-                self.getVerticalBar().setMinValue(0)
-                self.getVerticalBar().setMaxValue(maxValue)
+                self.getVerticalSlider().setButtonOrientationLength((self.getVerticalSlider().getHeight()) * bolRatio)
+                self.getVerticalSlider().setMinValue(0)
+                self.getVerticalSlider().setMaxValue(maxValue)
 
-            if horizontalBarNecessary:
-                self.getVerticalBar().setHeight(self.getHeight() - self.barOrientationLength)
+            if horizontalSliderNecessary:
+                self.getVerticalSlider().setHeight(self.getHeight() - self.sliderOrientationLength)
             else:
-                self.getVerticalBar().setHeight(self.getHeight())
+                self.getVerticalSlider().setHeight(self.getHeight())
         else:
-            if self.getVerticalBar().getVisible():
-                self.getVerticalBar().setVisible(False)
+            if self.getVerticalSlider().getVisible():
+                self.getVerticalSlider().setVisible(False)
 
         if self.getWidgetToScroll() != 0:
             self.getWidgetToScroll().move(self._widgetToScrollOffset[0], 0)
@@ -2494,28 +2538,105 @@ class MScrollArea(MWidget):
         self.setWidgetToScroll(0)
         self.setWidgetToScroll(temp)
 
-    def setWidgetToScroll(self, widgetToScroll): #Change widgetToScroll
+    def setWidgetToScroll(self, widgetToScroll: MWidget): #Change widgetToScroll
         if self.getWidgetToScroll() != widgetToScroll:
             self.widgetToScroll = widgetToScroll
             if widgetToScroll != 0:
                 if widgetToScroll.getParent() != self:
                     widgetToScroll.setParent(self)
-                    self.promoveChild(self.horizontalBar)
-                    self.promoveChild(self.verticalBar)
+                    self.promoveChild(self.horizontalSlider)
+                    self.promoveChild(self.verticalSlider)
                 widgetToScroll.move(self._widgetToScrollOffset[0], 0)
-            self.placeBar()
+                widgetToScroll.setIgnoreUserEvent(True)
+            self.placeSlider()
+
+    def _isKeyGettingDropped(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is dropped on the keyboard (applicated for only one frame)
+        if key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = False
+
+    def _isKeyGettingPressed(self, key): #Function usefull for heritage, call by MApp when the widget is focused and a key is pressed on the keyboard (applicated for only one frame)
+        if key == pygame.K_RSHIFT or key == pygame.K_LSHIFT:
+            self._shiftPressed = True
+
+    def _isNotFocusedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not focused anymore
+        self._shiftPressed = False
 
     def _lastUpdate(self, deltaTime): #Function called every frame after event handle and user actions
         if self.widgetToScroll.isResized():
             self.reload()
 
     def _lateUpdate(self, deltaTime): #Function called every frame after event handle
-        if self.getHorizontalBar().getValueChanded():
+        if self.getHorizontalSlider().getValueChanded():
             oldPos = (0, self.getWidgetToScroll().getY() - (self._widgetToScrollOffset[1]))
-            newPos = (oldPos[0] + self._widgetToScrollOffset[0] - self.getHorizontalBar().getValue(), oldPos[1] + self._widgetToScrollOffset[1])
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0] - self.getHorizontalSlider().getValue(), oldPos[1] + self._widgetToScrollOffset[1])
             self.getWidgetToScroll().move(newPos[0], newPos[1])
 
-        if self.getVerticalBar().getValueChanded():
+        if self.getVerticalSlider().getValueChanded():
             oldPos = (self.getWidgetToScroll().getX() - (self._widgetToScrollOffset[0]), 0)
-            newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalBar().getValue())
+            newPos = (oldPos[0] + self._widgetToScrollOffset[0], oldPos[1] - self.getVerticalSlider().getValue())
             self.getWidgetToScroll().move(newPos[0], newPos[1])
+
+    def _mouseWheel(self, rotation): #Function usefull for heritage, call by MApp when the widget is focused nad the mouse whell is rotating
+        if self._shiftPressed:
+            if self.getHorizontalSlider().getVisible():
+                self.getHorizontalSlider()._mouseWheel(rotation)
+        else:
+            if self.getVerticalSlider().getVisible():
+                self.getVerticalSlider()._mouseWheel(rotation)
+
+###################### Secondary class which represents an symplified mtext for do text input on one line
+class MTextInputLine(MText):
+    def __init__(self, informationText, x, y, width, height, parent, widgetType="MTextInputLine"):
+        super().__init__(informationText, x, y, width, height, parent, widgetType)
+
+        self.informationColor = (70, 70, 70)
+        self.informationText = informationText
+        self.inputColor = (0, 0, 0)
+
+        self.setForbiddenCaracter(["\n"])
+        self.setFrameWidth(2)
+        self.setInput(True)
+        self.setTextColor(self.informationColor)
+        self.setTextVerticalAlignment(1)
+
+    def getInformationColor(self): #Return informationColor
+        return self.informationColor
+
+    def getInformationText(self): #Return informationText
+        return self.informationText
+    
+    def getInputColor(self): #Return input color
+        return self.inputColor
+    
+    def setInformationColor(self, informationColor): #Change the value of informationColor
+        if self.informationColor != informationColor:
+            self.informationColor = informationColor
+            if self.getText() == self.getInformationText():
+                self.setShouldModify(True)
+    
+    def setInformationText(self, informationText): #Change the value of informationText
+        if self.informationText != informationText:
+            lastInformationText = self.informationText
+            self.informationText = informationText
+            if (self.getText() == "" or self.getText() == lastInformationText) and not self.getFocused():
+                self.setShouldModify(True)
+
+    def setInputColor(self, inputColor): #Change the value of inputColor
+        if self.inputColor != inputColor:
+            self.inputColor = inputColor
+            if self.getText() != self.informationText and self.getText() != "":
+                self.setShouldModify(True)
+    
+    def _isGettingMouseDown(self, button, relativePos):
+        if self.getText() == self.getInformationText():
+            self.setText("")
+        self.setTextColor(self.getInputColor())
+
+        super()._isGettingMouseDown(button, relativePos)
+
+    def _isNotFocusedAnymore(self):
+        super()._isNotFocusedAnymore()
+
+        if self.getText() == "":
+            self.setTextColor(self.getInformationColor())
+            self.setText(self.getInformationText())
