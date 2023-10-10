@@ -2640,3 +2640,325 @@ class MTextInputLine(MText):
         if self.getText() == "":
             self.setTextColor(self.getInformationColor())
             self.setText(self.getInformationText())
+
+class MBar(MFrame):
+    ORIENTATION_BOTTOM_TO_TOP = 3
+    ORIENTATION_LEFT_TO_RIGHT = 0
+    ORIENTATION_RIGHT_TO_LEFT = 2
+    ORIENTATION_TOP_TO_BOTTOM = 1
+
+    def __init__(self, orientation: int, x: int, y: int, width: int, height: int, parent: MWidget, widgetType: str ="MBar") -> None:
+        """Construct an MBar object
+
+        Args:
+            orientation (int): orientation of the bar (0 if horizontal from left to right, 1 if vertical from top to bottom, 2 if horizontal from right to left, 3 if vertical from bottom to top)
+            x (int): x position of the bar
+            y (int): y position of the bar
+            width (int): width of the bar
+            height (int): height of the bar
+            parent (MWidget): parent of the bar
+            widgetType (str, optional): type of the bar. Defaults to "MBar".
+        """
+        super().__init__(x, y, width, height, parent, widgetType)
+
+        self.animation = True
+        self.animationColor = (0, 180, 0)
+        self.animationSpeed = 100
+        self.barColor = (0, 255, 0)
+        self.maxValue = 100
+        self.minValue = 0
+        self.ORIENTATION = orientation
+        self.value = 0
+        self._animationSize = round(self.getWidth()/10)
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            self._animationSize = round(self.getHeight()/10)
+        self._animationState = 0
+
+        self.setFrameWidth(1)
+
+    def barRect(self) -> tuple:
+        surfaceRect = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))
+
+        barHeight = surfaceRect[1]
+        barWidth = surfaceRect[0]
+        barX = 0
+        barY = 0
+
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            barHeight *= ((self.getValue()-self.getMinValue())/self.getRange())
+            barHeight = round(barHeight)
+            if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+                barY = surfaceRect[1] - barHeight
+        else:
+            barWidth *= ((self.getValue()-self.getMinValue())/self.getRange())
+            barWidth = round(barWidth)
+            if self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT:
+                barX = surfaceRect[0] - barWidth
+
+        return (barX, barY, barWidth, barHeight)
+
+    def barSurface(self) -> pygame.Surface:
+        """Return the surface with the progression bar drew
+
+        Returns:
+            pygame.Surface: surface with the progession bar drew
+        """
+        surface = pygame.Surface((self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), pygame.SRCALPHA)
+
+        barX, barY, barWidth, barHeight = self.barRect()
+
+        pygame.draw.rect(surface, self.getBarColor(), (barX, barY, barWidth, barHeight))
+
+        heightAnim = 0 #Calculate animation rect
+        xAnim = 0
+        yAnim= 0
+        widthAnim = 0
+
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+            widthAnim = self.getWidth()
+            yAnim = self.getHeight() - self._animationState
+        elif self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            widthAnim = self.getWidth()
+            yAnim = self._animationState
+        elif self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT:
+            heightAnim = self.getHeight()
+            xAnim = self._animationState
+        else:
+            heightAnim = self.getHeight()
+            xAnim = self.getWidth() - self._animationState
+
+        for i in range(math.ceil(self._animationSize/2)): #Drawing animation
+            ratio = 1-(i / math.ceil(self._animationSize/2))
+
+            color = (self.getBarColor()[0] + (self.getAnimationColor()[0] - self.getBarColor()[0]) * ratio, self.getBarColor()[1] + (self.getAnimationColor()[1] - self.getBarColor()[1]) * ratio, self.getBarColor()[2] + (self.getAnimationColor()[2] - self.getBarColor()[2]) * ratio)
+            if self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+                if yAnim - i <= barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim - i), (xAnim + widthAnim, yAnim - i))
+                if yAnim + i <= barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim + i), (xAnim + widthAnim, yAnim + i))
+            elif self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+                if yAnim - i >= surface.get_height() - barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim - i), (xAnim + widthAnim, yAnim - i))
+                if yAnim + i >= surface.get_height() - barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim + i), (xAnim + widthAnim, yAnim + i))
+            elif self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT:
+                if xAnim - i <= barWidth:
+                    pygame.draw.line(surface, color, (xAnim - i, yAnim), (xAnim - i, yAnim + heightAnim))
+                if xAnim + i <= barWidth:
+                    pygame.draw.line(surface, color, (xAnim + i, yAnim), (xAnim + i, yAnim + heightAnim))
+            else:
+                if xAnim - i >= surface.get_width() - barWidth:
+                    pygame.draw.line(surface, color, (xAnim - i, yAnim), (xAnim - i, yAnim + heightAnim))
+                if xAnim + i >= surface.get_width() - barWidth:
+                    pygame.draw.line(surface, color, (xAnim + i, yAnim), (xAnim + i, yAnim + heightAnim))
+
+        return surface
+    
+    def getAnimation(self) -> bool:
+        """Return if an animation is played
+
+        Returns:
+            bool: if an animation is played
+        """
+        return self.animation
+    
+    def getAnimationColor(self) -> tuple:
+        """Return the color of the animation part
+
+        Returns:
+            tuple: color of the animation part
+        """
+        return self.animationColor
+    
+    def getAnimationSpeed(self) -> float:
+        """Return the animation speed
+
+        Returns:
+            float: animation speed
+        """
+        return self.animationSpeed
+    
+    def getBarColor(self) -> tuple:
+        """Return the bar color
+
+        Returns:
+            tuple: bar color
+        """
+        return self.barColor
+    
+    def getBarLengthInOrientationAxis(self) -> float:
+        """Return the size of the bar in the orientation axis
+
+        Returns:
+            float: size of the bar in the orientation axis
+        """
+        return self.barRect()[2] if (self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT) else self.barRect()[3]
+
+    def getMaxValue(self) -> float:
+        """Return the maximum value storable into the MBar
+
+        Returns:
+            float: the maximum value storable into the MBar
+        """
+        return self.maxValue
+    
+    def getMinValue(self) -> float:
+        """Return the minimum value storable into the MBar
+
+        Returns:
+            float: the minimum value storable into the MBar
+        """
+        return self.minValue
+    
+    def getRange(self) -> float:
+        """Return the range of value in the MBar
+
+        Returns:
+            float: range of value in the MBar
+        """
+        return self.getMaxValue() - self.getMinValue()
+    
+    def getOrientation(self) -> int:
+        """Return orientation of the MBar
+
+        Returns:
+            int: orientation of the MBar
+        """
+        return self.ORIENTATION
+    
+    def getOrientationAxisLength(self) -> float:
+        """Return width or height depending on orientation
+
+        Returns:
+            float: width or height depending on orientation
+        """
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            return self.getHeight()
+        else:
+            return self.getWidth()
+
+    def getValue(self) -> float:
+        """Return the value stored into the the MBar
+
+        Returns:
+            float: the value stored into the the MBar
+        """
+        return self.value
+    
+    def setAnimation(self, animation: bool) -> None:
+        """Change the value that if the animation is played
+
+        Args:
+            animation (bool): new value of if animation is played
+        """
+        if self.getAnimation() != animation:
+            self.animation = True
+
+    def setAnimationColor(self, animationColor: str) -> None:
+        """Change the animation color
+
+        Args:
+            animationColor (str): new animation color
+        
+        """
+        if self.getAnimationColor() != animationColor:
+            self.animationColor = animationColor
+            if self.getAnimation():
+                self.setShouldModify(True)
+
+    def setAnimationSpeed(self, animationSpeed: float) -> None:
+        """Change the value of the animation speed
+
+        Args:
+            animationSpeed (float): new animation speed
+        """
+        if self.getAnimationSpeed()  != animationSpeed:
+            self.animationSpeed = animationSpeed
+    
+    def setBarColor(self, barColor: tuple) -> None:
+        """Change the value of the color of the bar
+
+        Args:
+            barColor (tuple): new color of the bar
+        """
+        if self.getBarColor() != barColor:
+            self.barColor = barColor
+
+    def setHeight(self, height: float) -> None:
+        """Change the height of the widget
+
+        Args:
+            height (float): new height of the widget
+        """
+        super().setHeight(height)
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            self._animationSize = round(self.getHeight()/10)
+    
+    def setMaxValue(self, maxValue: float) -> None:
+        """Change the maximum value storable into the MBar and change value if necessary
+
+        Args:
+            maxValue (float): new  maximum value storable into the MBar
+        """
+        if self.getMaxValue() != maxValue and self.getMinValue() < maxValue:
+            self.maxValue = maxValue
+            if self.getValue() > maxValue:
+                self.setValue(maxValue)
+            self.setShouldModify(True)
+
+    def setMinValue(self, minValue: float) -> None:
+        """Change the minimum value storable into the MBar and change value if necessary
+
+        Args:
+            minValue (float): new  minimum value storable into the MBar
+        """
+        if self.getMinValue() != minValue and self.getMaxValue() > minValue:
+            self.minValue = minValue
+            if self.getValue() < minValue:
+                self.setValue(minValue)
+            self.setShouldModify(True)
+    
+    def setValue(self, value: float) -> None:
+        """Change the value stored into the MBar if value is between minValue and maxValue
+
+        Args:
+            value (float): new value to store into the MBar
+        """
+        if self.getValue() != value and value >= self.minValue and value <= self.maxValue:
+            self.value = value
+            self.setShouldModify(True)
+
+    def setWidth(self, width: float) -> None:
+        """Change the width of the widget
+
+        Args:
+            width (float): new width of the widget
+        """
+        super().setWidth(width)
+        if self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT:
+            self._animationSize = round(self.getWidth()/10)
+
+    def _renderBeforeHierarchy(self, surface: pygame.Surface) -> pygame.Surface:
+        """Draw the graphics element of this MBar
+
+        Args:
+            surface (pygame.Surface): surface to draw element
+
+        Returns:
+            pygame.Surface: surface after drawing element
+        """
+        surface = super()._renderBeforeHierarchy(surface)
+
+        bar = self.barSurface()
+        surface.blit(bar, (self.getFrameWidth(1), self.getFrameWidth(0), bar.get_width(), bar.get_height()))
+
+        return surface
+    
+    def _update(self, deltaTime):
+        if self.getAnimation():
+            self._animationState += self.animationSpeed * deltaTime
+            maxLength = self.getBarLengthInOrientationAxis()
+            if self._animationState > maxLength:
+                self._animationState -= maxLength
+            if self._animationState < (self.getBarLengthInOrientationAxis()) or self._animationState - (self.getBarLengthInOrientationAxis()) < self._animationSize / 2:
+                self.setShouldModify(True)
