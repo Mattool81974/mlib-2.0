@@ -2186,13 +2186,18 @@ class MButton(MText):
 
 ###################### Secondary class which represents slider
 class MSlider(MFrame):
+    ORIENTATION_BOTTOM_TO_TOP = 3
+    ORIENTATION_LEFT_TO_RIGHT = 0
+    ORIENTATION_RIGHT_TO_LEFT = 2
+    ORIENTATION_TOP_TO_BOTTOM = 1
+
     def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MSlider"): #Construct an MSlider object
         super().__init__(x, y, width, height, parent, widgetType)
 
         self.buttonBackgroundColor = (130, 127, 120)
         self.buttonBackgroundColorOnOverflight = (180, 177, 170)
         self.buttonOrientationLength = (self.getHeight() - 2) / 10
-        if orientation == 0:
+        if orientation == MSlider.ORIENTATION_LEFT_TO_RIGHT or orientation == MSlider.ORIENTATION_RIGHT_TO_LEFT:
             self.buttonOrientationLength = (self.getWidth() - 2) / 10
         self.changeButtonBackgroundColorOnOverflight = False
         self.maxValue = maxValue
@@ -2219,24 +2224,33 @@ class MSlider(MFrame):
         return self.buttonOrientationLength
     
     def getButtonOrientationPos(self): #Return the orientation pos of the button
-        if self.getValue() <= self.getMinValue():
-            return 0
-        
         frame1 = self.getFrameWidth(1)
+        frame4 = self.getFrameWidth(3)
         if self.getOrientation() == 1:
             frame1 = self.getFrameWidth(0)
+            frame4 = self.getFrameWidth(2)
+        
+        if self.getValue() <= self.getMinValue():
+            if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+                return 0
+            return self.getOrientationAxisLength() - (self.getButtonOrientationLength())
 
-        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
-        if self.getOrientation() == 1:
-            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        buttonNavigationLength = self.getWidth() - (frame1 + frame4)
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+            buttonNavigationLength = self.getHeight() - (frame1 + frame4)
         realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
 
         if self.getValue() >= self.getMaxValue():
-            return realButtonNavigationLength + frame1
+            if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+                return realButtonNavigationLength + frame1
+            return 0
 
         valuePercentage = (self.getValue() - self.getMinValue()) / (self.getMaxValue() - self.getMinValue())
 
-        pos = realButtonNavigationLength * valuePercentage
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            pos = realButtonNavigationLength * valuePercentage
+        else:
+            pos = realButtonNavigationLength * (1 - valuePercentage)
 
         return pos
     
@@ -2252,6 +2266,17 @@ class MSlider(MFrame):
     def getOrientation(self): #Return ORIENTATION
         return self.ORIENTATION
     
+    def getOrientationAxisLength(self) -> float:
+        """Return width or height depending on orientation
+
+        Returns:
+            float: width or height depending on orientation
+        """
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+            return self.getHeight()
+        else:
+            return self.getWidth()
+
     def getStep(self): #Return step
         return self.step
     
@@ -2332,7 +2357,7 @@ class MSlider(MFrame):
             self._buttonOverflighted = False
             self.setShouldModify(True)
 
-    def _doOverflightEffect(self, relativePos): #Apply effect on the MSlider when overflighted by the cursor
+    def _doOverflightEffect(self, relativePos: tuple): #Apply effect on the MSlider when overflighted by the cursor
         if self._isPosOverButton(relativePos):
             if not self._buttonOverflighted:
                 self._buttonOverflighted = True
@@ -2342,63 +2367,71 @@ class MSlider(MFrame):
                 self._buttonOverflighted = False
                 self.setShouldModify(True)
 
-    def _getValueAtPos(self, relativePos): #Return the value at a relative pos
+    def _getValueAtPos(self, relativePos: tuple): #Return the value at a relative pos
         frame1 = self.getFrameWidth(1)
+        frame4 = self.getFrameWidth(3)
         if self.getOrientation() == 1:
             frame1 = self.getFrameWidth(0)
+            frame4 = self.getFrameWidth(2)
 
-        if relativePos <= frame1 + self.getButtonOrientationLength() / 2:
-            return self.getMinValue()
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            if relativePos <= frame1 + self.getButtonOrientationLength() / 2:
+                return self.getMinValue()
+        else:
+            if relativePos >= self.getOrientationAxisLength() - (frame4 + self.getButtonOrientationLength() / 2):
+                return self.getMinValue()
 
-        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
-        if self.getOrientation() == 1:
-            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        buttonNavigationLength = self.getOrientationAxisLength() - (frame1 + frame4)
         realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
 
-        if relativePos >= buttonNavigationLength - frame1:
-            return self.getMaxValue()
-
-        if self.getOrientation() == 0:
-            relativePos -= self.getFrameWidth(1) + self.getButtonOrientationLength()/2
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            if relativePos >= buttonNavigationLength - frame1:
+                return self.getMaxValue()
         else:
-            relativePos -= self.getFrameWidth(0) + self.getButtonOrientationLength()/2
+            if relativePos <= frame1:
+                return self.getMaxValue()
 
-        toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
+        relativePos -= frame1 + self.getButtonOrientationLength()/2
+
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
+        else:
+            toReturn = (1 - relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
 
         if self.getStep() != 0:
             toReturn = self.getStep() * round(toReturn/self.getStep())
 
         return round(toReturn)
 
-    def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+    def _isGettingMouseDown(self, button: list, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
             self.posAtClick = (relativePos[0], self.getButtonOrientationPos())
-            if self.getOrientation() == 1:
-                    self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
+            if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+                self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
             if self._isPosOverButton(relativePos):
                 self._buttonClicked = True
             else:
                 toAdd = relativePos[0]
-                if self.getOrientation() == 1:
+                if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
                     toAdd = relativePos[1]
                 toAdd = self._getValueAtPos(toAdd)
                 if toAdd > self.getMaxValue(): toAdd = self.getMaxValue()
                 if toAdd < self.getMinValue(): toAdd = self.getMinValue(())
                 self.setValue(toAdd)
 
-    def _isGettingMouseUp(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is not clicked anymore (called for only one frame) with button = left button (1) and right button (2)
+    def _isGettingMouseUp(self, button: list, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is not clicked anymore (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
             self._buttonClicked = False
 
-    def _isGettingOverflighted(self, relativePos): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
+    def _isGettingOverflighted(self, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         self._doOverflightEffect(relativePos)
 
     def _isNotOverflightedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not overflighted anymore
         self._doNotOverflightEffect()
 
-    def _isPosOverButton(self, relativePos): #Return if pos overflight the button or not
+    def _isPosOverButton(self, relativePos: tuple): #Return if pos overflight the button or not
         good = True #Check if the cursor is overflighting the button
-        if self.getOrientation() == 1: #Vertical
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM: #Vertical
             good = relativePos[0] >= self.getFrameWidth(1) and relativePos[0] <= self.getWidth() - self.getFrameWidth(3)
             good = good and relativePos[1] >= self.getButtonOrientationPos() and relativePos[1] <= self.getButtonOrientationPos() + self.getButtonOrientationLength()
         else: #Horizontal
@@ -2407,10 +2440,10 @@ class MSlider(MFrame):
         
         return good
     
-    def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
+    def _mouseMove(self, buttons: list, pos: tuple, relativeMove: tuple): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         if self._buttonClicked:
             toAdd = pos[0]
-            if self.getOrientation() == 1:
+            if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
                 toAdd = pos[1]
             toAdd -= self.posAtClick[0]
             self.setValue(round(self._getValueAtPos((self.posAtClick[1] + self.getButtonOrientationLength() / 2) + toAdd)))
@@ -2419,12 +2452,12 @@ class MSlider(MFrame):
         if not self._buttonClicked:
             self.setValue(self.getValue() - rotation * self.getWheelMultiplicator())
 
-    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+    def _renderBeforeHierarchy(self, surface: pygame.Surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
         #Calculate button position
         finalRect = (self.getFrameWidth(1), self.getFrameWidth(0) + self.getButtonOrientationPos(), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getButtonOrientationLength())
-        if self.getOrientation() == 0:
+        if self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MSlider.ORIENTATION_RIGHT_TO_LEFT:
             finalRect = (self.getFrameWidth(1) + self.getButtonOrientationPos(), self.getFrameWidth(0), self.getButtonOrientationLength(), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))
 
         #Choose button color
