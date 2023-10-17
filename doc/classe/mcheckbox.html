@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MCheckBox</title>
+    </head>
+    <body>
+        <h1>MCheckBox</h1>
+        <div>
+            MCheckBox est une classe secondaire implicite pour définir une liste de bouton cochable.</br>
+            Elle hérite de <a href="./mobject.html">MObject</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "working">Fonctionnement</h3>
+        <div>
+            MCheckbox est une classe qui ne comporte pas d'affichage graphique. Elle s'occupe uniquement de lier des boutons pour leur permettre de fonctionner comme des boutons cochables.
+            Il est déconseillé de modifier les boutons après leur passage dans <a href="#addButton">addButton</a>.</br>
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : app (assignée à la variable <a href="./mobject.html#_mapp">_mapp</a>), objectType (assignée à la variable <a href="./mobject.html#_type">_type</a>, basiquememnt mit à "MCheckBox")</br>
+            Construit un objet MCheckBox.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "addButton">addButton()</h3>
+        <div>
+            Paramètres : name (nom du bouton dans le MCheckBox), button (<a href="./mbutton.html">MButton</a> qui correspond à ce nom)</br>
+            Rajoute le bouton "button" sous le nom "name" dans les choix sélectionnables.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getActualChoice">getActualChoice()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#actualChoice">choix</a> actuel dans le MCheckBox.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getChangeFrameColorOnChoice">getChangeFrameColorOnChoice()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#changeFrameColorOnChoice">booléen</a> de si le bouton choisie change sa couleur de bordure.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getChangeFrameWidthOnChoice">getChangeFrameWidthOnChoice()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la valeur du <a href="#changeFrameWidthOnChoice">booléen</a> de si le bouton choisie change sa largeur de bordure.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getFrameColorOnChoice">getFrameColorOnChoice()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#frameColorOnChoice">couleur</a> de la bordure du bouton choisie si <a href="#changeFrameColorOnChoice">changeFrameColorOnChoice</a> est True.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getFrameWidthOnChoice">getFrameWidthOnChoice()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setActualChoice">setActualChoice()</h3>
+        <div>
+            Paramètres : actualChoice (nouveau <a href="#actualChoice">choix</a> actuel)</br>
+            Change le <a href="#actualChoice">choix</a> actuel dans le MCheckBox par "actualChoice".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setChangeFrameColorOnChoice">setChangeFrameColorOnChoice()</h3>
+        <div>
+            Paramètres : changeFrameColorOnChoice (nouvelle valeur du <a href="#changeFrameColorOnChoice">booléen</a> de si le bouton choisie change sa couleur de bordure)</br>
+            Change la valeur du <a href="#changeFrameColorOnChoice">booléen</a> de si le bouton choisie change sa couleur de bordure par "changeFrameColorOnChoice".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setChangeFrameWidthOnChoice">setChangeFrameWidthOnChoice()</h3>
+        <div>
+            Paramètres : changeFrameWidthOnChoice (nouvelle valeur du <a href="#changeFrameWidthOnChoice">booléen</a> de si le bouton choisie change sa largeur de bordure)</br>
+            Change la valeur du <a href="#changeFrameWidthOnChoice">booléen</a> de si le bouton choisie change sa largeur de bordure par "changeFrameWidthOnChoice".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setFrameColorOnChoice">setFrameColorOnChoice()</h3>
+        <div>
+            Paramètres : frameColorOnChoice (nouvelle <a href="#frameColorOnChoice">couleur</a> de la bordure du bouton choisie si <a href="#changeFrameColorOnChoice">changeFrameColorOnChoice</a> est True)</br>
+            Change la <a href="#frameColorOnChoice">couleur</a> de la bordure du bouton choisie si <a href="#changeFrameColorOnChoice">changeFrameColorOnChoice</a> est True par "frameColorOnChoice".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setFrameWidthOnChoice">setFrameWidthOnChoice()</h3>
+        <div>
+            Paramètres : frameWidthOnChoice (nouvelle <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True)</br>
+            Change la <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True par "frameWidthOnChoice".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_lateUpdate">_lateUpdate()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame après le contrôle des éléments.</br>
+            Dans MCheckBox, elle sert à détecter les clicks des boutons et adapter l'état du MCheckBox en conséquence.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
+
+        <h2>Variables</h2>
+        <h3 id = "actualChoice">actualChoice</h3>
+        <div>
+            Choix actuel selon le bouton pressé, "" si aucun bouton n'a été pressé.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "baseDataByButton">baseDataByButton</h3>
+        <div>
+            Dictionnaire ayant comme clé un bouton et comme valeur les donénes de base sur le bouton.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "buttonsByName">buttonsByName</h3>
+        <div>
+            Dictionnaire ayant comme clé le nom du bouton et comme valeur le bouton.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "changeFrameColorOnChoice">changeFrameColorOnChoice</h3>
+        <div>
+            Booléen qui indique si le bouton choisie change sa couleur de bordure.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "changeFrameWidthOnChoice">changeFrameWidthOnChoice</h3>
+        <div>
+            Booléen qui indique si le bouton choisie change sa largeur de bordure.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "frameColorOnChoice">frameColorOnChoice</h3>
+        <div>
+            Couleur de la bordure du bouton choisie si <a href="#changeFrameColorOnChoice">changeFrameColorOnChoice</a> est True.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "frameWidthOnChoice">frameWidthOnChoice</h3>
+        <div>
+            Largeur de la bordure du bouton choisie si <a href="#changeFrameWidthOnChoice">changeFrameWidthOnChoice</a> est True.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "nameByButton">nameByButton</h3>
+        <div>
+            Dictionnaire ayant comme le bouton et comme valeur le nom du bouton.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+    </body>
+</html>

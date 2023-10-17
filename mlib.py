@@ -12,10 +12,62 @@ VERSION = "2.2.0"
 #Number of existing widget
 _nbWidget = 0
 
-###################### Base widget class
-class MWidget:
-    def __init__(self, x, y, width, height, parent, widgetType = "MWidget"): #MWidget's constructor
-        global _nbWidget
+class MObject:
+    """Main MLib object class
+    """
+
+    nbObject = 0
+
+    def __init__(self, app, objectType: str = "MObject") -> None:
+        self._id = MObject.nbObject
+        self._mapp = app
+        self._type = objectType
+
+        MObject.nbObject += 1
+
+        if app != 0:
+            app._declaringObject(self)
+
+    def _lastUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle and user program
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+    def _lateUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+    def _update(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+class MWidget(MObject):
+    """Base widget class, herit from MObject
+    """
+
+    def __init__(self, x: float, y: float, width: float, height: float, parent, widgetType: str = "MWidget") -> None:
+        """MWidget's constructor
+
+        Args:
+            x (float): x pos of the widget
+            y (float): y pos of the widget
+            width (float): width of the widget
+            height (float): height of the widget
+            parent (MWidget): parent widget of the widget
+            widgetType (str, optional): type of the widget. Defaults to "MWidget".
+        """
+        super().__init__(0, widgetType)
         self.backgroundColor = (255, 255, 255)
         self.cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW
         self.focused = False
@@ -32,13 +84,9 @@ class MWidget:
         self.y = y
         self._BACKGROUNDCOLOR = self.backgroundColor
         self._children = []
-        self._id = _nbWidget
         self._isMovingAtThisFrame = False
         self._isResizedAtThisFrame = False
         self._lastSurface = 0
-        self._type = widgetType
-
-        _nbWidget += 1
 
         if parent != 0:
             self.setParent(parent)
@@ -266,12 +314,6 @@ class MWidget:
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
-    def _lastUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle and user program
-        pass
-
-    def _lateUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle
-        pass
-    
     def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         pass
 
@@ -312,9 +354,6 @@ class MWidget:
             if child.getVisible():
                 surface.blit(child._render(), child.getRect())
         return surface
-    
-    def _update(self, deltaTime): #Function usefull for heritage, call by MApp every frame
-        pass
 
 ###################### Main application class
 class MApp(MWidget):
@@ -339,6 +378,7 @@ class MApp(MWidget):
         self._fpsDuration = 0
         self._lastOverflightedWidget = 0
         self._modifiedWidget = []
+        self._objects = []
         self._pygameWindow = pygameWindow
         self._widgets = []
 
@@ -393,8 +433,11 @@ class MApp(MWidget):
 
         self.pressedKey.clear()
 
-        for i in self._widgets: #Soft reset all widget
+        for i in self._widgets: #Update and soft reset all widget
             if self.frameCount > 0:i.softResetWidget()
+            i._update(self.getDeltaTime())
+
+        for i in self._objects: #Update all objects
             i._update(self.getDeltaTime())
 
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
@@ -459,10 +502,16 @@ class MApp(MWidget):
         for i in self._widgets: #Late update every widgets
             i._lateUpdate(self.getDeltaTime())
 
+        for i in self._objects: #Late update every widgets
+            i._lateUpdate(self.getDeltaTime())
+
         self.frameCount += 1
 
     def frameGraphics(self): #Do all graphics updates in the application
-        for i in self._widgets: #Late update every widgets
+        for i in self._widgets: #Last update every widgets
+            i._lastUpdate(self.getDeltaTime())
+
+        for i in self._objects: #Last update every widgets
             i._lastUpdate(self.getDeltaTime())
 
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
@@ -572,7 +621,21 @@ class MApp(MWidget):
                 return True
         return False
 
-    def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp or pass hit to his parent (function defined in MWidget)
+    def _declaringObject(self, object: MObject) -> None:
+        """Declare an object to the MApp
+
+        Args:
+            object (MObject): object to declares to the MApp
+        """
+        if self._objects.count(object) == 0:
+            self._objects.append(object)
+
+    def _declaringWidget(self, widget: MWidget) -> None:
+        """Declare widget to the MApp if the widget is a MApp or pass hit to his parent (function defined in MWidget)
+
+        Args:
+            widget (MWidget): widget to declare
+        """
         if not self._containsWidget(widget):
             self._widgets.append(widget)
             widget._mapp = self
@@ -2674,6 +2737,7 @@ class MTextInputLine(MText):
             self.setTextColor(self.getInformationColor())
             self.setText(self.getInformationText())
 
+###################### Secondary class which represents an informational bar
 class MBar(MFrame):
     ORIENTATION_BOTTOM_TO_TOP = 3
     ORIENTATION_LEFT_TO_RIGHT = 0
@@ -2995,3 +3059,157 @@ class MBar(MFrame):
                 self._animationState -= maxLength
             if self._animationState < (self.getBarLengthInOrientationAxis()) or self._animationState - (self.getBarLengthInOrientationAxis()) < self._animationSize / 2:
                 self.setShouldModify(True)
+
+class MCheckBox(MObject):
+    """Class which make check box creation easier
+    """
+
+    def __init__(self, app: MApp, objectType: str = "MCheckBox") -> None:
+        """Construct an MCheckBox object
+
+        Args:
+            app (MApp): main app into the program
+            objectType (str, optional): type of the object. Defaults to "MCheckBox".
+        """
+        super().__init__(app, objectType)
+        self.actualChoice = ""
+        self.baseDataByButton = {}
+        self.buttonsByName = {}
+        self.changeFrameColorOnChoice = False
+        self.changeFrameWidthOnChoice = False
+        self.frameColorOnChoice = (120, 120, 120)
+        self.frameWidthOnChoice = 5
+        self.nameByButton = {}
+
+    def addButton(self, name: str, button: MButton) -> None:
+        """Add a new button into the MCheckBox
+
+        Args:
+            name (str): name of the button
+            button (MButton): button to add
+        """
+        buttons = list(self.buttonsByName.values())
+        names = list(self.nameByButton.values())
+        if buttons.count(button) == 0 and names.count(name) == 0:
+            datas = {"frameColor": button.getFrameColor(), "frameWidth": button.getFrameWidth()}
+
+            self.baseDataByButton[button] = datas
+            self.buttonsByName[name] = button
+            self.nameByButton[button] = name
+
+    def applyActionOnChoice(self) -> None:
+        """Do all action to the chose button
+        """
+        if self.getActualChoice() != "":
+            buttons = list(self.buttonsByName.values())
+            for b in buttons:
+                datas = self.baseDataByButton[b]
+                b.setFrameColor(datas["frameColor"])
+                b.setFrameWidth(datas["frameWidth"])
+
+            if self.getChangeFrameColorOnChoice():
+                self.buttonsByName[self.getActualChoice()].setFrameColor(self.getFrameColorOnChoice())
+
+            if self.getChangeFrameWidthOnChoice():
+                self.buttonsByName[self.getActualChoice()].setFrameWidth(self.getFrameWidthOnChoice())
+
+    def getActualChoice(self) -> str:
+        """Return the actual choice
+
+        Returns:
+            str: actual choice
+        """
+        return self.actualChoice
+    
+    def getChangeFrameColorOnChoice(self) -> bool:
+        """Return if the chose button change his frame color
+
+        Returns:
+            bool: if the chose button change his frame color
+        """
+        return self.changeFrameColorOnChoice
+    
+    def getChangeFrameWidthOnChoice(self) -> bool:
+        """Return if the chose button change his frame width
+
+        Returns:
+            bool: if the chose button change his frame width
+        """
+        return self.changeFrameWidthOnChoice
+    
+    def getFrameColorOnChoice(self) -> tuple:
+        """Return the color of the frame to apply to the chosen button
+
+        Returns:
+            tuple: color of the frame to apply to the chosen button
+        """
+        return self.frameColorOnChoice
+    
+    def getFrameWidthOnChoice(self) -> int:
+        """Return the width of the frame to apply to the chosen button
+
+        Returns:
+            int: width of the frame to apply to the chosen button
+        """
+        return self.frameWidthOnChoice
+    
+    def setActualChoice(self, actualChoice: str) -> None:
+        """Change the value of the actuel choice
+
+        Args:
+            actualChoice (str): new actual choice
+        """
+        names = list(self.nameByButton.values())
+        if self.getActualChoice() != actualChoice and names.count(actualChoice) > 0:
+            self.actualChoice = actualChoice
+            self.applyActionOnChoice()
+    
+    def setChangeFrameColorOnChoice(self, changeFrameColorOnChoice: bool) -> None:
+        """Change if the chose button change his frame color
+
+        Args:
+            changeFrameColorOnChoice (bool): new if the chose button change his frame color
+        """
+        if self.getChangeFrameColorOnChoice() != changeFrameColorOnChoice:
+            self.changeFrameColorOnChoice = changeFrameColorOnChoice
+            self.applyActionOnChoice()
+
+    def setChangeFrameWidthOnChoice(self, changeFrameWidthOnChoice: bool) -> None:
+        """Change if the chose button change his frame width
+
+        Args:
+            changeFrameWidthOnChoice (bool): new if the chose button change his frame width
+        """
+        if self.getChangeFrameWidthOnChoice() != changeFrameWidthOnChoice:
+            self.changeFrameWidthOnChoice = changeFrameWidthOnChoice
+            self.applyActionOnChoice()
+
+    def setFrameColorOnChoice(self, frameColorOnChoice: tuple) -> None:
+        """Change the color to apply to the chosen button
+
+        Args:
+            frameColorOnChoice (tuple): new color to apply to the chosen button
+        """
+        if self.getFrameColorOnChoice() != frameColorOnChoice:
+            self.frameColorOnChoice = frameColorOnChoice
+            self.applyActionOnChoice()
+
+    def setFrameWidthOnChoice(self, frameWidthOnChoice: int) -> None:
+        """Change the width of the frame to apply to the chosen button
+
+        Returns:
+            int: new width of the frame to apply to the chosen button
+        """
+        if self.getFrameWidthOnChoice() != frameWidthOnChoice:
+            self.frameWidthOnChoice = frameWidthOnChoice
+            self.applyActionOnChoice()
+    
+    def _lateUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        for b in self.nameByButton:
+            if b.isGettingLeftClicked():
+                self.setActualChoice(self.nameByButton[b])

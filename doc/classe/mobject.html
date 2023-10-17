@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MObject</title>
+    </head>
+    <body>
+        <h1>MObject</h1>
+        <div>
+            MObject est une classe primaire pour définir certaines données de bases communes à tous les objets MLib.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : app (assignée à la variable <a href="#_mapp">_mapp</a>), objectType (assignée à la variable <a href="#_type">_type</a>, basiquememnt mit à "MObject")</br>
+            Construit un objet MObject.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getID">getID()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne l'<a href="#_id">id</a> de l'objet.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_lastUpdate">_lastUpdate()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame après le contrôle des évènements et des actions utilisateurs, juste avant <a href="./mapp.html#frameGraphics">frameGraphics</a>.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameGraphics">MApp</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_lateUpdate">_lateUpdate()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame après le contrôle des évènements.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_update">_update()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame avant le contrôel des évènements.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Variables statiques</h2>
+        <h3 id = "nbObject">nbObject</h3>
+        <div>
+            Nombre d'objets crées, incrémenté dans le constructeur de <a href="#__init__">MObject</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h2>Variables</h2>
+        <h3 id = "_id">_id</h3>
+        <div>
+            ID de l'objet (un nombre UNIQUE pour le définir).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_mapp">_mapp</h3>
+        <div>
+            Objet <a href = "./mapp.html">MApp</a> principal dans le programme.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_type">_type</h3>
+        <div>
+            Nom (de type str) pour décrire le type duu MObject.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+    </body>
+</html>

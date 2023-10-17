@@ -9,15 +9,16 @@
         <h1>MWidget</h1>
         <div>
             MWidget est la classe principale primaire pour définir un <a href="../base.html">widget</a>.</br>
+            Elle hérite de <a href="./mobject.html">MObject</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
 
         <h2>Fonctions</h2>
         <h3 id = "__init__">__init__()</h3>
         <div>
-            Paramètres : x (assignée à la variabe <a href="#x">x</a>), y (assignée à la variabe <a href="#y">y</a>), width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), widgetType (assignée à la variable <a href="#_type">_type</a>, basiquememnt mit à "MWidget")</br>
+            Paramètres : x (assignée à la variabe <a href="#x">x</a>), y (assignée à la variabe <a href="#y">y</a>), width (assignée à la variable <a href="#width">width</a>), height (assignée à la variable <a href="#height">height</a>), parent (assignée à la variable <a href="#parent">parent</a>), widgetType (assignée à la variable <a href="./mobject.html#_type">_type</a>, basiquememnt mit à "MWidget")</br>
             Construit un objet widget.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="absolutePos">absolutePos()</h3>
         <div>
@@ -74,12 +75,6 @@
             Paramètres : aucun</br>
             Retourne la valeur du booléen qui indique si le widget <a href="#ignoreUserEvent">ignore</a> les évènements utilisateur.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.1.0.
-        </div>
-        <h3 id="getID">getID()</h3>
-        <div>
-            Paramètres : aucun</br>
-            Retourne l'<a href="#_id">id</a> du widget.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
         <h3 id="getMouseDown">getMouseDown()</h3>
         <div>
@@ -336,20 +331,6 @@
             La fonction est concue pour que les modifications ne sont valables qu'une frame, il est donc conseillé, en cas d'utilisation de fonction "setQuelqueChose" de passer "False" comme second paramètre.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
-        <h3 id="_lastUpdate">_lastUpdate()</h3>
-        <div>
-            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
-            Fonction appelée à chaque frame après le contrôle des évènements et des actions utilisateurs, juste avant <a href="./mapp.html#frameGraphics">frameGraphics</a>.</br>
-            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameGraphics">MApp</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.1.
-        </div>
-        <h3 id="_lateUpdate">_lateUpdate()</h3>
-        <div>
-            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
-            Fonction appelée à chaque frame après le contrôle des évènements.</br>
-            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
-        </div>
         <h3 id = "_mouseMove">_mouseMove()</h3>
         <div>
             Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
@@ -399,13 +380,6 @@
             Paramètres : surface (surface parent)</br>
             Met la surface "surface" à jour avec la hiérarchie du widget (les widgets enfants avec <a href="#visible">visible</a> à True) et retourne "surface" mis à jour.<br>
             Cette fonction est appelée entre <a href="#_renderBeforeHierarchy">_renderBeforeHierarchy()</a> et <a href="#_renderAfterHierarchy">_renderAfterHierarchy()</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
-        </div>
-        <h3 id = "_update">_update()</h3>
-        <div>
-            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
-            Fonction appelée à chaque frame avant le contrôel des évènements.</br>
-            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
 
@@ -496,11 +470,6 @@
             Liste des enfants du widget.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
-        <h3 id = "_id">_id</h3>
-        <div>
-            ID du widget (un nombre UNIQUE pour le définir).</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
-        </div>
         <h3 id = "_isMovingAtThisFrame">_isMovingAtThisFrame</h3>
         <div>
             Booléen qui indique si le widget est en train de bouger (<a href="#setX">x</a> ou <a href="#setY">y</a> modifié) pendant cette frame.</br>
@@ -514,19 +483,6 @@
         <h3 id = "_lastSurface">_lastSurface</h3>
         <div>
             Surface correspondant à la dernière modification de la surface selon <a href="#_render">render</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
-        </div>
-        <h3 id = "_mapp">_mapp</h3>
-        <div>
-            Objet <a href = "./mapp.html">MApp</a> principal.</br>
-            Ajouté à la <a href="../versions.html">version</a> 1.0.0.
-        </div>
-        <h3 id = "_type">_type</h3>
-        <div>
-            Nom (de type str) pour décrire le type du widget.</br>
-            Voici les différents types :</br>
-            -MApp : représente les widgets de classe <a href="./mapp.html">MApp</a>.
-            -MFrame : représente les widgets de classe <a href="./mframe.html">MFrame</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
     </body>

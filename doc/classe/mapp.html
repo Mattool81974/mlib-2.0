@@ -37,7 +37,7 @@
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux <a href="../base.html#event">évènements</a>.</br>
             Cette fonction s'occupe aussi d'actualiser le <a href="#deltaTime">deltaTime</a>, puis <a href="#fps">fps</a>, puis de stocker la <a href="#consoleSystem">console</a> sous format ".txt".</br>
             Il est FORTEMENT conseillé d'appeler cette fonction au début d'une frame.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.1.0.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="frameGraphics">frameGraphics()</h3>
         <div>
@@ -45,7 +45,7 @@
             Effectue toutes les actions de la fenêtre graphique qui correspondent aux graphismes.</br>
             Juste avant, elle appelle <a href="./mwidget.html#_lastUpdate">_lastUpdate</a> de tous les widgets.</br>
             Il est FORTEMENT conseillé d'appeler cette fonction à la fin d'une frame.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.1.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="getConsole">getConsole()</h3>
         <div>
@@ -186,6 +186,12 @@
             Retourne si le "widget" est contenu dans <a href="#_widgets">_widgets</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
         </div>
+        <h3 id = "_declaringObject">_declaringObject()</h3>
+        <div>
+            Paramètres : object (objet à enregistrer)</br>
+            Fonction permettant d'enregistrer un objet dans <a href="#_objects">_objects</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
         <h3 id = "_declaringWidget">_declaringWidget()</h3>
         <div>
             Paramètres : widget (widget à enregistrer)</br>
@@ -296,6 +302,11 @@
         <div>
             Liste de tous les widgets modifiés à la dernière frame dans <a href="#frameEvent">frameEvent</a> pour leur appliquer <a href="./mwidget.html#resetWidget">resetWidget()</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 1.0.0.
+        </div>
+        <h3 id = "_objects">_objects</h3>
+        <div>
+            Liste de tous les objets présents dans le MApp.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id = "_pygameWindow">pygameWindow</h3>
         <div>
