@@ -3061,7 +3061,7 @@ class MBar(MFrame):
                 self.setShouldModify(True)
 
 class MCheckBox(MObject):
-    """Class which make check box creation easier
+    """Class which make check box creation easier, inherits from MObject
     """
 
     def __init__(self, app: MApp, objectType: str = "MCheckBox") -> None:
@@ -3213,3 +3213,220 @@ class MCheckBox(MObject):
         for b in self.nameByButton:
             if b.isGettingLeftClicked():
                 self.setActualChoice(self.nameByButton[b])
+
+class MChrono(MText):
+    """Class which allow to do simple chronometer, inherits from MText
+    """
+    FORMAT_HH_MM_SS = 0
+    FORMAT_HH_MM_CS = 1
+
+    def __init__(self, format: int, x: int, y: int, width: int, height: int, parent: MWidget, widgetType: str ="MChrono") -> None:
+        """Construct an MChrono object
+
+        Args:
+            format (int): format of the chronometer
+            x (int): x pos of the widget
+            y (int): y pos of the widget
+            width (int): width of the widget
+            height (int): height of the widget
+            parent (MWidget): parent of the widget
+            widgetType (str, optional): type of the widget. Defaults to "MChrono".
+        """
+        super().__init__("0", x, y, width, height, parent, widgetType)
+
+        self.format = format
+        self.importantTime = []
+        self.speed = 1
+        self.started = False
+        self.unitSeparation = ":"
+        self._nsToAdd = 0
+
+        self.updateChronometer()
+
+    def addNanoSecond(self, ns: float) -> None:
+        """Add ns nanoseconds to the MChrono
+
+        Args:
+            ns (float): number of nanoseconds to add to the MChrono
+        """
+        self._nsToAdd += ns
+        self.updateChronometer()
+
+    def addSecond(self, second: float) -> None:
+        """Add second seconds to the MChrono
+
+        Args:
+            second (float): number of seconds to add to the MChrono
+        """
+        self._nsToAdd += second*(10**9)
+        self.updateChronometer()
+
+    def getChronometerWithFormat(self) -> str:
+        """Return the time since the chronometer is running with the correct format
+
+        Returns:
+            str: time since the chronometer is running with the correct format
+        """
+        if self.getFormat() == MChrono.FORMAT_HH_MM_SS:
+            timeSinceStart = math.floor((math.floor(self.getTimeSinceStart(True)) * self.getSpeed() + self._nsToAdd)/(10**9))
+
+            hour = 0
+            while timeSinceStart >= 3600:
+                timeSinceStart -= 3600
+                hour += 1
+            hourInStr = str(hour)
+            if len(hourInStr) < 2: hourInStr = "0" + hourInStr
+
+            minute = 0
+            while timeSinceStart >= 60:
+                timeSinceStart -= 60
+                minute += 1
+            minuteInStr = str(minute)
+            if len(minuteInStr) < 2: minuteInStr = "0" + minuteInStr
+
+            secondInStr = str(timeSinceStart)
+            if len(secondInStr) < 2: secondInStr = "0" + secondInStr
+            return hourInStr + self.getUnitSeparation() + minuteInStr + self.getUnitSeparation() + secondInStr
+        elif self.getFormat() == MChrono.FORMAT_HH_MM_CS:
+            timeSinceStart = math.floor((math.floor(self.getTimeSinceStart(True)) * self.getSpeed() + self._nsToAdd)/(10**7))
+
+            minute = 0
+            while timeSinceStart >= 6000:
+                timeSinceStart -= 6000
+                minute += 1
+            minuteInStr = str(minute)
+            if len(minuteInStr) < 2: minuteInStr = "0" + minuteInStr
+
+            second = 0
+            while timeSinceStart >= 100:
+                timeSinceStart -= 100
+                second += 1
+            secondInStr = str(second)
+            if len(secondInStr) < 2: secondInStr = "0" + secondInStr
+
+            msInStr = str(timeSinceStart)
+            if len(msInStr) < 2: msInStr = "0" + msInStr
+
+            return minuteInStr + self.getUnitSeparation() + secondInStr + self.getUnitSeparation() + msInStr
+
+    def getFormat(self) -> int:
+        """Return the format of the chronometer
+
+        Returns:
+            int: format of the chronometer
+        """
+        return self.format
+    
+    def getSpeed(self) -> float:
+        """Return the speed of the chronometer
+
+        Returns:
+            float: speed of the chronometer
+        """
+        return self.speed
+    
+    def getTimeSinceStart(self, ns: bool = True) -> float:
+        """Return the amount of time passed since the first start
+
+        Args:
+            ns (bool, optional): if the return is in nano second or not. Defaults to True.
+
+        Returns:
+            float: amount of time passed since the first start
+        """
+        timePassed = 0
+
+        if len(self.importantTime) % 2 == 0:
+            for i in range(math.floor(len(self.importantTime)/2)):
+                j = i * 2
+                timePassed += self.importantTime[j + 1] - self.importantTime[j]
+        else:
+            for i in range(math.floor((len(self.importantTime) )/2)):
+                j = i * 2
+                timePassed += self.importantTime[j + 1] - self.importantTime[j]
+            timePassed += time.time_ns() - self.importantTime[-1]
+
+        if ns:
+            return timePassed
+        return timePassed/(10**9)
+
+    def getUnitSeparation(self) -> str:
+        """Return the separation of units
+
+        Returns:
+            str: separation of units
+        """
+        return self.unitSeparation
+    
+    def isStarted(self) -> bool:
+        """Return if the chronometer is started or not
+
+        Returns:
+            bool: if the chronometer is started or not
+        """
+        return self.started
+    
+    def reset(self) -> None:
+        """Reset the chronometer
+        """
+        started = self.isStarted()
+        if started: self.stop()
+        self.importantTime.clear()
+        if started: self.start()
+        self.updateChronometer()
+    
+    def setFormat(self, format: int) -> None:
+        """Change the value of the format
+
+        Args:
+            format (int): new value of the format
+        """
+        if self.getFormat() != format:
+            self.format = format
+            self.updateChronometer()
+
+    def setSpeed(self, speed: float) -> None:
+        """Change the value of the speed of the chronometer
+
+        Args:
+            speed (float): value of the speed of the chronometer
+        """
+        if self.getSpeed() != speed and speed != 0:
+            self.speed = speed
+
+    def setUnitSeparation(self, unitSeparation: str) -> None:
+        """Change the value of the separation of units
+
+        Args:
+            unitSeparation (str): value of the separation of units
+        """
+        if self.getUnitSeparation() != unitSeparation:
+            self.unitSeparation = unitSeparation
+            self.updateChronometer()
+
+    def start(self, offset: int = 0) -> None:
+        """Start the chronometer
+
+        Args:
+            offset (int): time in nanosecond where the chronometer should start
+        """
+        if not self.isStarted():
+            self.importantTime.append(time.time_ns() - offset)
+            self.started = True
+
+    def stop(self) -> None:
+        """Stop the chronometer
+        """
+        if self.isStarted():
+            self.importantTime.append(time.time_ns())
+            self.started = False
+
+    def updateChronometer(self) -> None:
+        """Update the chronometer text
+        """
+        newText = self.getChronometerWithFormat()
+        self.setText(newText)
+
+    def _update(self, deltaTime):
+        if self.isStarted():
+            self.updateChronometer()

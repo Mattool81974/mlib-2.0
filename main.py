@@ -1,30 +1,46 @@
 from mlib import *
+from random import randint
 
 TAILLE = [300, 400]
 
 fenetre = pygame.display.set_mode(TAILLE)
 mapp = MApp(fenetre, "Test", TAILLE[0], TAILLE[1], printFps=True)
 
-bouton1 = MButton("Leclerc", 25, 25, 125, 25, mapp)
-bouton2 = MButton("Leopard 2A6", 25, 175, 125, 25, mapp)
-bouton3 = MButton("Challenger 2", 150, 25, 125, 25, mapp)
-bouton4 = MButton("M1A2 Abrams", 150, 175, 125, 25, mapp)
+vert = MFrame(30, 175, 240, 120, mapp)
+vert.setBackgroundColor((0, 255, 0))
+vert.setVisible(False)
 
-bouton1.setFrameWidth(0)
-bouton2.setFrameWidth(0)
-bouton3.setFrameWidth(0)
-bouton4.setFrameWidth(0)
+bouton1 = MButton("Start", 30, 25, 120, 25, mapp)
+bouton2 = MButton("Stop", 85, 50, 120, 25, mapp)
+bouton3 = MButton("Reset", 150, 25, 120, 25, mapp)
 
-char = MCheckBox(mapp)
-char.addButton("Leclerc", bouton1)
-char.addButton("Leopard 2A6", bouton2)
-char.addButton("Challenger 2", bouton3)
-char.addButton("M1A2 Abrams", bouton4)
-char.setChangeFrameWidthOnChoice(True)
-char.setFrameWidthOnChoice(2)
+chrono = MChrono(MChrono.FORMAT_HH_MM_CS, 30, 100, 240, 50, mapp)
+chrono.setAntiAnaliasing(True)
+chrono.setFontSize(27)
+chrono.setTextHorizontalAlignment(1)
+chrono.setTextVerticalAlignment(1)
+
+chrono.setUnitSeparation(":")
+
+t = 5 + randint(0, 10)
+t0 = 0
+tb = True
 
 while True:
     mapp.frameEvent()
+
+    t0 += mapp.getDeltaTime()
+
+    if t0 > t and tb:
+        chrono.start()
+        vert.setVisible(True)
+        tb = False
+
+    if bouton1.isGettingLeftClicked(): chrono.start()
+
+    if bouton2.isGettingLeftClicked(): chrono.stop()
+
+    if bouton3.isGettingLeftClicked(): chrono.reset()
 
     mapp.frameGraphics()
     pygame.display.flip()
