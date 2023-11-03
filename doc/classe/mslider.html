@@ -47,7 +47,7 @@
         <div>
             Paramètres : aucun</br>
             Calcul et renvoie la coordonnée sur l'axe de navigation du bouton selon <a href="#value">value</a>.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="getButtonOrientationLength">getButtonOrientationLength</h3>
         <div>
@@ -71,6 +71,12 @@
             Paramètres : aucun</br>
             Retourne la <a href="#minValue">valeur minimale</a> possible dans le MSlider.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+        </div>
+        <h3 id="getOrientationAxisLength">getOrientationAxisLength()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="./mwidget.html#height">height</a> si l'<a href="#ORIENTATION">orientation</a> est <a href="#ORIENTATION_BOTTOM_TO_TOP">ORIENTATION_BOTTOM_TO_TOP</a> ou <a href="#ORIENTATION_TOP_TO_BOTTOM">ORIENTATION_TOP_TO_BOTTOM</a>, sinon retourne <a href="./mwidget.html#width">width</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="getStep">getStep()</h3>
         <div>
@@ -182,7 +188,7 @@
         <div>
             Paramètres : relativePos (position à tester dans le MSlider)</br>
             Retourne la valeur du MSlider à la position "relativePos".</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="_isGettingMouseDown">_isGettingMouseDown()</h3>
         <div>
@@ -191,7 +197,7 @@
             Si button est "1", la touche clické est la touche gauche, si button est "2", la touche clické est la molette, si button est "3", la touche clické est la touche droite.</br>
             Met à jour <a href="#_buttonClicked">_buttonClicked</a> si nécessaire.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_isGettingMouseDown">MWidget</a>.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.2.0.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="_isGettingMouseUp">_isGettingMouseUp()</h3>
         <div>
@@ -222,14 +228,14 @@
         <div>
             Paramètres : relativePos (position à tester)</br>
             Retourne si la position "relativePos" est au dessus du bouton amovible.</br>
-            Ajouté à la <a href="../versions.html">version</a> 2.0.0.
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="_mouseMove">_mouseMove()</h3>
         <div>
             Paramètres : buttons (touches de la souris clické), pos (nouvelle position de la souris), relativeMove (mouvement de la souris)</br>
             Fonction appelé lorsque le widget est focus est que l'utilisateur bouge la souris.</br>
             Dans MSlider, elle permet de changer la valeur du slider selon le mouvement de la souris.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.2.0.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
         <h3 id="_mouseWheel">_mouseWheel()</h3>
         <div>
@@ -244,9 +250,30 @@
             Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
             Dans MSlider, elle s'occupe d'afficher le bouton amovible.</br>
             Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.</br>
-            Modifié à la <a href="../versions.html">version</a> 2.0.0.
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
         </div>
 
+        <h2>Variables statiques</h2>
+        <h3 id="ORIENTATION_BOTTOM_TO_TOP">ORIENTATION_BOTTOM_TO_TOP</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si le slider va de bas en haut, donc 3.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_LEFT_TO_RIGHT">ORIENTATION_LEFT_TO_RIGHT</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si le slider va de la gauche à droite, donc 0.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_RIGHT_TO_LEFT">ORIENTATION_RIGHT_TO_LEFT</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si le slider va de la droite à gauche, donc 2.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_TOP_TO_BOTTOM">ORIENTATION_TOP_TO_BOTTOM</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si le slider va de haut en bas, donc 1.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
         <h2>Variables</h2>
         <h3 id="buttonBackgroundColor">buttonBackgroundColor</h3>
         <div>

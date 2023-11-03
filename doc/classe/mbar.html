@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MBar</title>
+    </head>
+    <body>
+        <h1>MBar</h1>
+        <div>
+            MBar est une classe secondaire pour définir une barre de progression.</br>
+            Elle hérite de <a href="mframe.html">MFrame</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : x (assignée à la variabe <a href="./mwidget.html#x">x</a> de MWidget), y (assignée à la variabe <a href="./mwidget.html#y">y</a> de MWidget), width (assignée à la variable <a href="./mwidget.html#width">width</a> de MWidget), height (assignée à la variable <a href="./mwidget.html#height">height</a> de MWidget), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a> de MWidget), widgetType (assignée à la variable <a href="./mwidget.html#_type">_type</a> de MWidget, basiquememnt mit à "MBar")</br>
+            Construit un objet MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="barRect">barRect()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le tuple (x, y, width, height) de la barre de progression.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="barSurface">barSurface()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la surface de la barre de progression du MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getAnimation">getAnimation()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne si l'<a href="#animation">animation</a> est jouée.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getAnimationColor">getAnimationColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#animationColor">couleur</a> de l'animation.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getAnimationSpeed">getAnimationSpeed()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#animationSpeed">vitesse</a> de l'animation.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getBarColor">getBarColor()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la <a href="#barColor">couleur</a> de la barre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getBarLengthInOrientationAxis">getBarLengthInOrientationAxis()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne la largeur ou la hauteur de la barre de progression selon l'<a href="#ORIENTATION">orientation</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getMaxValue">getMaxValue()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retour la <a href="#maxValue">valeur</a> maximale stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getMinValue">getMinValue()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retour la <a href="#minValue">valeur</a> minimale stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getRange">getRange()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="#maxValue">maxValue</a> - <a href="#minValue">minValue</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getOrientation">getOrientation()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne l'<a href="#ORIENTATION">orientation</a> de progession du MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getOrientationAxisLength">getOrientationAxisLength()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne <a href="./mwidget.html#height">height</a> si l'<a href="#ORIENTATION">orientation</a> est <a href="#ORIENTATION_BOTTOM_TO_TOP">ORIENTATION_BOTTOM_TO_TOP</a> ou <a href="#ORIENTATION_TOP_TO_BOTTOM">ORIENTATION_TOP_TO_BOTTOM</a>, sinon retourne <a href="./mwidget.html#width">width</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="getValue">getValue()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retour la <a href="#value">valeur</a> stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setAnimation">setAnimation()</h3>
+        <div>
+            Paramètres : animation (nouvelle valeur de si l'<a href="#animation">animation</a> est jouée)</br>
+            Change si l'<a href="#animation">animation</a> est jouée par "animation".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setAnimationColor">setAnimationColor()</h3>
+        <div>
+            Paramètres : animationColor (nouvelle <a href="#animationColor">couleur</a> de l'animation)</br>
+            Change la <a href="#animationColor">couleur</a> de l'animation par "animationColor".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setAnimationSpeed">setAnimationSpeed()</h3>
+        <div>
+            Paramètres : animationSpeed (nouvelle <a href="#animationSpeed">vitesse</a> de l'animation)</br>
+            Change la <a href="#animationSpeed">vitesse</a> de l'animation par "animationSpeed".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setBarColor">setBarColor()</h3>
+        <div>
+            Paramètres : barColor (nouvelle <a href="#barColor">couleur</a> de la barre)</br>
+            Change la <a href="#barColor">couleur</a> de la barre par barColor.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setMaxValue">setMaxValue()</h3>
+        <div>
+            Paramètres : maxValue (nouvelle <a href="#maxValue">valeur</a> maximale stockée dans le MBar)</br>
+            Change la <a href="#maxValue">valeur</a> maximale stockée dans le MBar par "maxValue".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setMinValue">setMinValue()</h3>
+        <div>
+            Paramètres : minValue (nouvelle <a href="#minValue">valeur</a> minimale stockée dans le MBar)</br>
+            Change la <a href="#minValue">valeur</a> minimale stockée dans le MBar par "minValue".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setValue">setValue()</h3>
+        <div>
+            Paramètres : value (nouvelle <a href="#value">valeur</a> stockée dans le MBar)</br>
+            Change la <a href="#value">valeur</a> stockée dans le MBar par "value".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="setWidth">setWidth()</h3>
+        <div>
+            Paramètres : width (nouvelle largeur du widget)</br>
+            Change la largeur du widget pour newWidth.</br>
+            Modifie aussi <a href="#_animationSize">_animationSize</a> si nécessaire.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#setWidth">MWidget</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_getAnimationState">_getAnimationState()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne l'<a href="_#animationState">état</a> de l'animation.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_renderBeforeHierarchy">_renderBeforeHierarchy()</h3>
+        <div>
+            Paramètres : surface (surface parent)</br>
+            Met la surface "surface" à jour avec le widget dessus et retourne "surface" mis à jour.</br>
+            Dans MBar, elle s'occupe d'afficher la barre de progression.</br>
+            Cette fonction est héritée de <a href="./mwidget.html#_renderBeforeHierarchy">MWidget</a>.</br>
+            Modifié à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_update">_update()</h3>
+        <div>
+            Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
+            Fonction appelée à chaque frame.</br>
+            Elle permet de gérer l'<a href="#animation">animation</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Variables statiques</h2>
+        <h3 id="ORIENTATION_BOTTOM_TO_TOP">ORIENTATION_BOTTOM_TO_TOP</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si la barre d'orientation va de bas en haut, donc 3.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_LEFT_TO_RIGHT">ORIENTATION_LEFT_TO_RIGHT</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si la barre d'orientation va de la gauche à droite, donc 0.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_RIGHT_TO_LEFT">ORIENTATION_RIGHT_TO_LEFT</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si la barre d'orientation va de la droite à gauche, donc 2.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION_TOP_TO_BOTTOM">ORIENTATION_TOP_TO_BOTTOM</h3>
+        <div>
+            Valeur de <a href="#ORIENTATION">ORIENTATION</a> si la barre d'orientation va de haut en bas, donc 1.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h2>Variables</h2>
+        <h3 id="animation">animation</h3>
+        <div>
+            Booléen qui indique si une animation est jouée.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="animationSpeed">animationSpeed</h3>
+        <div>
+            Vitesse de l'animation.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="barColor">barColor</h3>
+        <div>
+            Couleur de la barre de progression.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="maxValue">maxValue</h3>
+        <div>
+            Valeur maximale stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="minValue">minValue</h3>
+        <div>
+            Valeur minimale stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="ORIENTATION">ORIENTATION</h3>
+        <div>
+            Orientation du MBar vers laquelle progresse la barre de progression.</br>
+            Si il est égal à <a href="#ORIENTATION_BOTTOM_TO_TOP">ORIENTATION_BOTTOM_TO_TOP</a>, la barre d'orientation va de bas en haut.</br>
+            Si il est égal à <a href="#ORIENTATION_LEFT_TO_RIGHT">ORIENTATION_LEFT_TO_RIGHT</a>, la barre d'orientation va de la gauche à droite.</br>
+            Si il est égal à <a href="#ORIENTATION_RIGHT_TO_LEFT">ORIENTATION_RIGHT_TO_LEFT</a>, la barre d'orientation va de la droite à gauche.</br>
+            Si il est égal à <a href="#ORIENTATION_TOP_TO_BOTTOM">ORIENTATION_TOP_TO_BOTTOM</a>, la barre d'orientation va de haut en bas.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="value">value</h3>
+        <div>
+            Valeur stockée dans le MBar.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_animationSize">_animationSize</h3>
+        <div>
+            Taille de l'animation.</br>
+            Il est conseillé de le mettre à la taille de l'axe d'orientation divisé par 10.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id="_animationState">animationState</h3>
+        <div>
+            État de l'animation (entre 0 et la taille de la surface sur l'axe d'orientation).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+    </body>
+</html>

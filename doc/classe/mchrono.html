@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <link rel="stylesheet" href="../style.css">
+        <meta charset="utf-8">
+        <title>MLib - MChrono</title>
+    </head>
+    <body>
+        <h1>MChrono</h1>
+        <div>
+            MChrono est une classe secondaire implicite pour définir une liste de bouton cochable.</br>
+            Elle hérite de <a href="./mobject.html">MObject</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Fonctions</h2>
+        <h3 id = "__init__">__init__()</h3>
+        <div>
+            Paramètres : format (assignée à la variable <a href="#format">format</a>), x (assignée à la variabe <a href="./mwidget.html#x">x</a>), y (assignée à la variabe <a href="./mwidget.html#y">y</a>), width (assignée à la variable <a href="./mwidget.html#width">width</a>), height (assignée à la variable <a href="./mwidget.html#height">height</a>), parent (assignée à la variable <a href="./mwidget.html#parent">parent</a>), widgetType (assignée à la variable <a href="_type">_type</a>, basiquememnt mit à "MChrono")</br>
+            Construit un objet MChrono.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "addNanoSecond">addNanoSecond()</h3>
+        <div>
+            Paramètres : ns (nombre de nano secondes à ajouter)</br>
+            Rajoute "ns" nano secondes au chronomètre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "addSecond">addSecond()</h3>
+        <div>
+            Paramètres : second (nombre de secondes à ajouter)</br>
+            Rajoute "second" secondes au chronomètre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getChronometerWithFormat">getChronometerWithFormat()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le temps depuis que le chronomètre tourne selon le <a href="#format">format</a> du MChrono.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getFormat">getFormat()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne le <a href="#format">format</a> du MChrono.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getTimeSinceStart">getTimeSinceStart()</h3>
+        <div>
+            Paramètres : ns (si le retour doit être en nano seconde ou pas)</br>
+            Retourne le temps depuis le premier démarrage du chronomètre, en nano seconde si ns est True (seconde sinon).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "getUnitSeparation">getUnitSeparation()</h3>
+        <div>
+            Pramètres : aucun</br>
+            Retourne ce qui sépare les <a href="#unitSeparation">unités</a> dans le format.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "isStarted">isStarted()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne si le chronomètre est en <a href="#started">marche</a> ou non.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "reset">reset()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Remet le chronomètre à 0 en vidant <a href="#importantTime">importantTime</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setFormat">setFormat()</h3>
+        <div>
+            Paramètres : format (nouveau <a href="#format">format</a> du MChrono)</br>
+            Change le <a href="#format">format</a> du MChrono par "format".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setSpeed">setSpeed()</h3>
+        <div>
+            Paramètres : speed (nouvelle valeur de la <a href="#speed">vitesse</a> du chronomètre)</br>
+            Change la <a href="#speed">vitesse</a> du MChrono par "speed".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "setUnitSeparation">setUnitSeparation()</h3>
+        <div>
+            Pramètres : untiSeparation (nouvelle séparation des <a href="#unitSeparation">unités</a> dans le format)</br>
+            Change ce qui sépare les <a href="#unitSeparation">unités</a> dans le format par "unitSeparation".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "star">star()</h3>
+        <div>
+            Paramètres : offset (temps auquel le chronomètre doit commencer)</br>
+            Commence (ou recommence) le chronomètre avec un nombre "offset" de nanoseconde d'avance.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "stop">stop()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Arrête le chronomètre.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "updateChronometer">updateChronometer()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Met à jour le chronomètre avec le bon texte.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+
+        <h2>Variables statiques</h2>
+        <h3 id = "FORMAT_HH_MM_CS">FORMAT_HH_MM_CS</h3>
+        <div>
+            Format heure_minute_centieme de seconde.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "FORMAT_HH_MM_SS">FORMAT_HH_MM_SS</h3>
+        <div>
+            Format heure_minute_seconde.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h2>Variables</h2>
+        <h3 id = "format">format</h3>
+        <div>
+            Format d'affichage du chronomètre (il est conseillé d'utiliser les vaiables statiques de la classe).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "importantTime">importantTime</h3>
+        <div>
+            Liste de temps (en time_ns) selon le pattern start-stop-start-stop-...-start (chronomètre lancé) ou stop (chronomètre arrêté).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "speed">speed</h3>
+        <div>
+            Vitesse du chronomètre (si X2, speed = 2).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "started">started</h3>
+        <div>
+            Booléen qui indique si le chronomètre est en marche ou non.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "unitSeparation">unitSeparation</h3>
+        <div>
+            Chaîne de caractère qui sépare les différentes parties du format (seconde, minute, heure...)</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_nsToAdd">_nsToAdd</h3>
+        <div>
+            Nombre de nano secondes à ajouter au chrono.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+    </body>
+</html>

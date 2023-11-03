@@ -12,10 +12,62 @@ VERSION = "2.2.0"
 #Number of existing widget
 _nbWidget = 0
 
-###################### Base widget class
-class MWidget:
-    def __init__(self, x, y, width, height, parent, widgetType = "MWidget"): #MWidget's constructor
-        global _nbWidget
+class MObject:
+    """Main MLib object class
+    """
+
+    nbObject = 0
+
+    def __init__(self, app, objectType: str = "MObject") -> None:
+        self._id = MObject.nbObject
+        self._mapp = app
+        self._type = objectType
+
+        MObject.nbObject += 1
+
+        if app != 0:
+            app._declaringObject(self)
+
+    def _lastUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle and user program
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+    def _lateUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+    def _update(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        pass
+
+class MWidget(MObject):
+    """Base widget class, herit from MObject
+    """
+
+    def __init__(self, x: float, y: float, width: float, height: float, parent, widgetType: str = "MWidget") -> None:
+        """MWidget's constructor
+
+        Args:
+            x (float): x pos of the widget
+            y (float): y pos of the widget
+            width (float): width of the widget
+            height (float): height of the widget
+            parent (MWidget): parent widget of the widget
+            widgetType (str, optional): type of the widget. Defaults to "MWidget".
+        """
+        super().__init__(0, widgetType)
         self.backgroundColor = (255, 255, 255)
         self.cursorOnOverflight = pygame.SYSTEM_CURSOR_ARROW
         self.focused = False
@@ -32,13 +84,9 @@ class MWidget:
         self.y = y
         self._BACKGROUNDCOLOR = self.backgroundColor
         self._children = []
-        self._id = _nbWidget
         self._isMovingAtThisFrame = False
         self._isResizedAtThisFrame = False
         self._lastSurface = 0
-        self._type = widgetType
-
-        _nbWidget += 1
 
         if parent != 0:
             self.setParent(parent)
@@ -266,12 +314,6 @@ class MWidget:
     def _isTextGettingEntered(self, text): #Function usefull for heritage, call by MApp when the widget is focused and the user is typing a text
         pass
     
-    def _lastUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle and user program
-        pass
-
-    def _lateUpdate(self, deltaTime): #Function usefull for heritage, call by MApp every frame after event handle
-        pass
-    
     def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         pass
 
@@ -312,9 +354,6 @@ class MWidget:
             if child.getVisible():
                 surface.blit(child._render(), child.getRect())
         return surface
-    
-    def _update(self, deltaTime): #Function usefull for heritage, call by MApp every frame
-        pass
 
 ###################### Main application class
 class MApp(MWidget):
@@ -339,6 +378,7 @@ class MApp(MWidget):
         self._fpsDuration = 0
         self._lastOverflightedWidget = 0
         self._modifiedWidget = []
+        self._objects = []
         self._pygameWindow = pygameWindow
         self._widgets = []
 
@@ -393,8 +433,11 @@ class MApp(MWidget):
 
         self.pressedKey.clear()
 
-        for i in self._widgets: #Soft reset all widget
+        for i in self._widgets: #Update and soft reset all widget
             if self.frameCount > 0:i.softResetWidget()
+            i._update(self.getDeltaTime())
+
+        for i in self._objects: #Update all objects
             i._update(self.getDeltaTime())
 
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
@@ -459,10 +502,16 @@ class MApp(MWidget):
         for i in self._widgets: #Late update every widgets
             i._lateUpdate(self.getDeltaTime())
 
+        for i in self._objects: #Late update every widgets
+            i._lateUpdate(self.getDeltaTime())
+
         self.frameCount += 1
 
     def frameGraphics(self): #Do all graphics updates in the application
-        for i in self._widgets: #Late update every widgets
+        for i in self._widgets: #Last update every widgets
+            i._lastUpdate(self.getDeltaTime())
+
+        for i in self._objects: #Last update every widgets
             i._lastUpdate(self.getDeltaTime())
 
         self._pygameWindow.blit(self._render(), (0, 0, self.width, self.height))
@@ -572,7 +621,21 @@ class MApp(MWidget):
                 return True
         return False
 
-    def _declaringWidget(self, widget): #Declare widget to the MApp if the widget is a MApp or pass hit to his parent (function defined in MWidget)
+    def _declaringObject(self, object: MObject) -> None:
+        """Declare an object to the MApp
+
+        Args:
+            object (MObject): object to declares to the MApp
+        """
+        if self._objects.count(object) == 0:
+            self._objects.append(object)
+
+    def _declaringWidget(self, widget: MWidget) -> None:
+        """Declare widget to the MApp if the widget is a MApp or pass hit to his parent (function defined in MWidget)
+
+        Args:
+            widget (MWidget): widget to declare
+        """
         if not self._containsWidget(widget):
             self._widgets.append(widget)
             widget._mapp = self
@@ -2186,13 +2249,18 @@ class MButton(MText):
 
 ###################### Secondary class which represents slider
 class MSlider(MFrame):
+    ORIENTATION_BOTTOM_TO_TOP = 3
+    ORIENTATION_LEFT_TO_RIGHT = 0
+    ORIENTATION_RIGHT_TO_LEFT = 2
+    ORIENTATION_TOP_TO_BOTTOM = 1
+
     def __init__(self, orientation, minValue, maxValue, x, y, width, height, parent, widgetType="MSlider"): #Construct an MSlider object
         super().__init__(x, y, width, height, parent, widgetType)
 
         self.buttonBackgroundColor = (130, 127, 120)
         self.buttonBackgroundColorOnOverflight = (180, 177, 170)
         self.buttonOrientationLength = (self.getHeight() - 2) / 10
-        if orientation == 0:
+        if orientation == MSlider.ORIENTATION_LEFT_TO_RIGHT or orientation == MSlider.ORIENTATION_RIGHT_TO_LEFT:
             self.buttonOrientationLength = (self.getWidth() - 2) / 10
         self.changeButtonBackgroundColorOnOverflight = False
         self.maxValue = maxValue
@@ -2219,24 +2287,33 @@ class MSlider(MFrame):
         return self.buttonOrientationLength
     
     def getButtonOrientationPos(self): #Return the orientation pos of the button
-        if self.getValue() <= self.getMinValue():
-            return 0
-        
         frame1 = self.getFrameWidth(1)
+        frame4 = self.getFrameWidth(3)
         if self.getOrientation() == 1:
             frame1 = self.getFrameWidth(0)
+            frame4 = self.getFrameWidth(2)
+        
+        if self.getValue() <= self.getMinValue():
+            if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+                return 0
+            return self.getOrientationAxisLength() - (self.getButtonOrientationLength())
 
-        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
-        if self.getOrientation() == 1:
-            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        buttonNavigationLength = self.getWidth() - (frame1 + frame4)
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+            buttonNavigationLength = self.getHeight() - (frame1 + frame4)
         realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
 
         if self.getValue() >= self.getMaxValue():
-            return realButtonNavigationLength + frame1
+            if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+                return realButtonNavigationLength + frame1
+            return 0
 
         valuePercentage = (self.getValue() - self.getMinValue()) / (self.getMaxValue() - self.getMinValue())
 
-        pos = realButtonNavigationLength * valuePercentage
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            pos = realButtonNavigationLength * valuePercentage
+        else:
+            pos = realButtonNavigationLength * (1 - valuePercentage)
 
         return pos
     
@@ -2252,6 +2329,17 @@ class MSlider(MFrame):
     def getOrientation(self): #Return ORIENTATION
         return self.ORIENTATION
     
+    def getOrientationAxisLength(self) -> float:
+        """Return width or height depending on orientation
+
+        Returns:
+            float: width or height depending on orientation
+        """
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+            return self.getHeight()
+        else:
+            return self.getWidth()
+
     def getStep(self): #Return step
         return self.step
     
@@ -2332,7 +2420,7 @@ class MSlider(MFrame):
             self._buttonOverflighted = False
             self.setShouldModify(True)
 
-    def _doOverflightEffect(self, relativePos): #Apply effect on the MSlider when overflighted by the cursor
+    def _doOverflightEffect(self, relativePos: tuple): #Apply effect on the MSlider when overflighted by the cursor
         if self._isPosOverButton(relativePos):
             if not self._buttonOverflighted:
                 self._buttonOverflighted = True
@@ -2342,63 +2430,71 @@ class MSlider(MFrame):
                 self._buttonOverflighted = False
                 self.setShouldModify(True)
 
-    def _getValueAtPos(self, relativePos): #Return the value at a relative pos
+    def _getValueAtPos(self, relativePos: tuple): #Return the value at a relative pos
         frame1 = self.getFrameWidth(1)
+        frame4 = self.getFrameWidth(3)
         if self.getOrientation() == 1:
             frame1 = self.getFrameWidth(0)
+            frame4 = self.getFrameWidth(2)
 
-        if relativePos <= frame1 + self.getButtonOrientationLength() / 2:
-            return self.getMinValue()
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            if relativePos <= frame1 + self.getButtonOrientationLength() / 2:
+                return self.getMinValue()
+        else:
+            if relativePos >= self.getOrientationAxisLength() - (frame4 + self.getButtonOrientationLength() / 2):
+                return self.getMinValue()
 
-        buttonNavigationLength = self.getWidth() - (frame1 + self.getFrameWidth(3))
-        if self.getOrientation() == 1:
-            buttonNavigationLength = self.getHeight() - (frame1 + self.getFrameWidth(2))
+        buttonNavigationLength = self.getOrientationAxisLength() - (frame1 + frame4)
         realButtonNavigationLength = buttonNavigationLength - self.getButtonOrientationLength()
 
-        if relativePos >= buttonNavigationLength - frame1:
-            return self.getMaxValue()
-
-        if self.getOrientation() == 0:
-            relativePos -= self.getFrameWidth(1) + self.getButtonOrientationLength()/2
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            if relativePos >= buttonNavigationLength - frame1:
+                return self.getMaxValue()
         else:
-            relativePos -= self.getFrameWidth(0) + self.getButtonOrientationLength()/2
+            if relativePos <= frame1:
+                return self.getMaxValue()
 
-        toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
+        relativePos -= frame1 + self.getButtonOrientationLength()/2
+
+        if self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM or self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT:
+            toReturn = (relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
+        else:
+            toReturn = (1 - relativePos / realButtonNavigationLength) * (self.getMaxValue() - self.getMinValue())
 
         if self.getStep() != 0:
             toReturn = self.getStep() * round(toReturn/self.getStep())
 
         return round(toReturn)
 
-    def _isGettingMouseDown(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
+    def _isGettingMouseDown(self, button: list, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is clicked (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
             self.posAtClick = (relativePos[0], self.getButtonOrientationPos())
-            if self.getOrientation() == 1:
-                    self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
+            if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
+                self.posAtClick = (relativePos[1], self.getButtonOrientationPos())
             if self._isPosOverButton(relativePos):
                 self._buttonClicked = True
             else:
                 toAdd = relativePos[0]
-                if self.getOrientation() == 1:
+                if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
                     toAdd = relativePos[1]
                 toAdd = self._getValueAtPos(toAdd)
                 if toAdd > self.getMaxValue(): toAdd = self.getMaxValue()
                 if toAdd < self.getMinValue(): toAdd = self.getMinValue(())
                 self.setValue(toAdd)
 
-    def _isGettingMouseUp(self, button, relativePos): #Function usefull for heritage, call by MApp when the widget is not clicked anymore (called for only one frame) with button = left button (1) and right button (2)
+    def _isGettingMouseUp(self, button: list, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is not clicked anymore (called for only one frame) with button = left button (1) and right button (2)
         if button == 1:
             self._buttonClicked = False
 
-    def _isGettingOverflighted(self, relativePos): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
+    def _isGettingOverflighted(self, relativePos: tuple): #Function usefull for heritage, call by MApp when the widget is overflighted (applicated for only one frame)
         self._doOverflightEffect(relativePos)
 
     def _isNotOverflightedAnymore(self): #Function usefull for heritage, call by MApp when the widget is not overflighted anymore
         self._doNotOverflightEffect()
 
-    def _isPosOverButton(self, relativePos): #Return if pos overflight the button or not
+    def _isPosOverButton(self, relativePos: tuple): #Return if pos overflight the button or not
         good = True #Check if the cursor is overflighting the button
-        if self.getOrientation() == 1: #Vertical
+        if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM: #Vertical
             good = relativePos[0] >= self.getFrameWidth(1) and relativePos[0] <= self.getWidth() - self.getFrameWidth(3)
             good = good and relativePos[1] >= self.getButtonOrientationPos() and relativePos[1] <= self.getButtonOrientationPos() + self.getButtonOrientationLength()
         else: #Horizontal
@@ -2407,10 +2503,10 @@ class MSlider(MFrame):
         
         return good
     
-    def _mouseMove(self, buttons, pos, relativeMove): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
+    def _mouseMove(self, buttons: list, pos: tuple, relativeMove: tuple): #Function usefull for heritage, call by MApp when the widget is focused and the mouse is moved
         if self._buttonClicked:
             toAdd = pos[0]
-            if self.getOrientation() == 1:
+            if self.getOrientation() == MSlider.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MSlider.ORIENTATION_TOP_TO_BOTTOM:
                 toAdd = pos[1]
             toAdd -= self.posAtClick[0]
             self.setValue(round(self._getValueAtPos((self.posAtClick[1] + self.getButtonOrientationLength() / 2) + toAdd)))
@@ -2419,12 +2515,12 @@ class MSlider(MFrame):
         if not self._buttonClicked:
             self.setValue(self.getValue() - rotation * self.getWheelMultiplicator())
 
-    def _renderBeforeHierarchy(self, surface): #Render widget on surface before hierarchy render
+    def _renderBeforeHierarchy(self, surface: pygame.Surface): #Render widget on surface before hierarchy render
         surface = super()._renderBeforeHierarchy(surface)
 
         #Calculate button position
         finalRect = (self.getFrameWidth(1), self.getFrameWidth(0) + self.getButtonOrientationPos(), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getButtonOrientationLength())
-        if self.getOrientation() == 0:
+        if self.getOrientation() == MSlider.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MSlider.ORIENTATION_RIGHT_TO_LEFT:
             finalRect = (self.getFrameWidth(1) + self.getButtonOrientationPos(), self.getFrameWidth(0), self.getButtonOrientationLength(), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))
 
         #Choose button color
@@ -2640,3 +2736,697 @@ class MTextInputLine(MText):
         if self.getText() == "":
             self.setTextColor(self.getInformationColor())
             self.setText(self.getInformationText())
+
+###################### Secondary class which represents an informational bar
+class MBar(MFrame):
+    ORIENTATION_BOTTOM_TO_TOP = 3
+    ORIENTATION_LEFT_TO_RIGHT = 0
+    ORIENTATION_RIGHT_TO_LEFT = 2
+    ORIENTATION_TOP_TO_BOTTOM = 1
+
+    def __init__(self, orientation: int, x: int, y: int, width: int, height: int, parent: MWidget, widgetType: str ="MBar") -> None:
+        """Construct an MBar object
+
+        Args:
+            orientation (int): orientation of the bar (0 if horizontal from left to right, 1 if vertical from top to bottom, 2 if horizontal from right to left, 3 if vertical from bottom to top)
+            x (int): x position of the bar
+            y (int): y position of the bar
+            width (int): width of the bar
+            height (int): height of the bar
+            parent (MWidget): parent of the bar
+            widgetType (str, optional): type of the bar. Defaults to "MBar".
+        """
+        super().__init__(x, y, width, height, parent, widgetType)
+
+        self.animation = True
+        self.animationColor = (0, 180, 0)
+        self.animationSpeed = 100
+        self.barColor = (0, 255, 0)
+        self.maxValue = 100
+        self.minValue = 0
+        self.ORIENTATION = orientation
+        self.value = 0
+        self._animationSize = round(self.getWidth()/10)
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            self._animationSize = round(self.getHeight()/10)
+        self._animationState = 0
+
+        self.setFrameWidth(1)
+
+    def barRect(self) -> tuple:
+        surfaceRect = (self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))
+
+        barHeight = surfaceRect[1]
+        barWidth = surfaceRect[0]
+        barX = 0
+        barY = 0
+
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            barHeight *= ((self.getValue()-self.getMinValue())/self.getRange())
+            barHeight = round(barHeight)
+            if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+                barY = surfaceRect[1] - barHeight
+        else:
+            barWidth *= ((self.getValue()-self.getMinValue())/self.getRange())
+            barWidth = round(barWidth)
+            if self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT:
+                barX = surfaceRect[0] - barWidth
+
+        return (barX, barY, barWidth, barHeight)
+
+    def barSurface(self) -> pygame.Surface:
+        """Return the surface with the progression bar drew
+
+        Returns:
+            pygame.Surface: surface with the progession bar drew
+        """
+        surface = pygame.Surface((self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))), pygame.SRCALPHA)
+
+        barX, barY, barWidth, barHeight = self.barRect()
+
+        pygame.draw.rect(surface, self.getBarColor(), (barX, barY, barWidth, barHeight))
+
+        heightAnim = 0 #Calculate animation rect
+        xAnim = 0
+        yAnim= 0
+        widthAnim = 0
+
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+            widthAnim = self.getWidth()
+            yAnim = self.getHeight() - self._animationState
+        elif self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            widthAnim = self.getWidth()
+            yAnim = self._animationState
+        elif self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT:
+            heightAnim = self.getHeight()
+            xAnim = self._animationState
+        else:
+            heightAnim = self.getHeight()
+            xAnim = self.getWidth() - self._animationState
+
+        for i in range(math.ceil(self._animationSize/2)): #Drawing animation
+            ratio = 1-(i / math.ceil(self._animationSize/2))
+
+            color = (self.getBarColor()[0] + (self.getAnimationColor()[0] - self.getBarColor()[0]) * ratio, self.getBarColor()[1] + (self.getAnimationColor()[1] - self.getBarColor()[1]) * ratio, self.getBarColor()[2] + (self.getAnimationColor()[2] - self.getBarColor()[2]) * ratio)
+            if self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+                if yAnim - i <= barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim - i), (xAnim + widthAnim, yAnim - i))
+                if yAnim + i <= barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim + i), (xAnim + widthAnim, yAnim + i))
+            elif self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP:
+                if yAnim - i >= surface.get_height() - barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim - i), (xAnim + widthAnim, yAnim - i))
+                if yAnim + i >= surface.get_height() - barHeight:
+                    pygame.draw.line(surface, color, (xAnim, yAnim + i), (xAnim + widthAnim, yAnim + i))
+            elif self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT:
+                if xAnim - i <= barWidth:
+                    pygame.draw.line(surface, color, (xAnim - i, yAnim), (xAnim - i, yAnim + heightAnim))
+                if xAnim + i <= barWidth:
+                    pygame.draw.line(surface, color, (xAnim + i, yAnim), (xAnim + i, yAnim + heightAnim))
+            else:
+                if xAnim - i >= surface.get_width() - barWidth:
+                    pygame.draw.line(surface, color, (xAnim - i, yAnim), (xAnim - i, yAnim + heightAnim))
+                if xAnim + i >= surface.get_width() - barWidth:
+                    pygame.draw.line(surface, color, (xAnim + i, yAnim), (xAnim + i, yAnim + heightAnim))
+
+        return surface
+    
+    def getAnimation(self) -> bool:
+        """Return if an animation is played
+
+        Returns:
+            bool: if an animation is played
+        """
+        return self.animation
+    
+    def getAnimationColor(self) -> tuple:
+        """Return the color of the animation part
+
+        Returns:
+            tuple: color of the animation part
+        """
+        return self.animationColor
+    
+    def getAnimationSpeed(self) -> float:
+        """Return the animation speed
+
+        Returns:
+            float: animation speed
+        """
+        return self.animationSpeed
+    
+    def getBarColor(self) -> tuple:
+        """Return the bar color
+
+        Returns:
+            tuple: bar color
+        """
+        return self.barColor
+    
+    def getBarLengthInOrientationAxis(self) -> float:
+        """Return the size of the bar in the orientation axis
+
+        Returns:
+            float: size of the bar in the orientation axis
+        """
+        return self.barRect()[2] if (self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT) else self.barRect()[3]
+
+    def getMaxValue(self) -> float:
+        """Return the maximum value storable into the MBar
+
+        Returns:
+            float: the maximum value storable into the MBar
+        """
+        return self.maxValue
+    
+    def getMinValue(self) -> float:
+        """Return the minimum value storable into the MBar
+
+        Returns:
+            float: the minimum value storable into the MBar
+        """
+        return self.minValue
+    
+    def getRange(self) -> float:
+        """Return the range of value in the MBar
+
+        Returns:
+            float: range of value in the MBar
+        """
+        return self.getMaxValue() - self.getMinValue()
+    
+    def getOrientation(self) -> int:
+        """Return orientation of the MBar
+
+        Returns:
+            int: orientation of the MBar
+        """
+        return self.ORIENTATION
+    
+    def getOrientationAxisLength(self) -> float:
+        """Return width or height depending on orientation
+
+        Returns:
+            float: width or height depending on orientation
+        """
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            return self.getHeight()
+        else:
+            return self.getWidth()
+
+    def getValue(self) -> float:
+        """Return the value stored into the the MBar
+
+        Returns:
+            float: the value stored into the the MBar
+        """
+        return self.value
+    
+    def setAnimation(self, animation: bool) -> None:
+        """Change the value that if the animation is played
+
+        Args:
+            animation (bool): new value of if animation is played
+        """
+        if self.getAnimation() != animation:
+            self.animation = True
+
+    def setAnimationColor(self, animationColor: str) -> None:
+        """Change the animation color
+
+        Args:
+            animationColor (str): new animation color
+        
+        """
+        if self.getAnimationColor() != animationColor:
+            self.animationColor = animationColor
+            if self.getAnimation():
+                self.setShouldModify(True)
+
+    def setAnimationSpeed(self, animationSpeed: float) -> None:
+        """Change the value of the animation speed
+
+        Args:
+            animationSpeed (float): new animation speed
+        """
+        if self.getAnimationSpeed()  != animationSpeed:
+            self.animationSpeed = animationSpeed
+    
+    def setBarColor(self, barColor: tuple) -> None:
+        """Change the value of the color of the bar
+
+        Args:
+            barColor (tuple): new color of the bar
+        """
+        if self.getBarColor() != barColor:
+            self.barColor = barColor
+
+    def setHeight(self, height: float) -> None:
+        """Change the height of the widget
+
+        Args:
+            height (float): new height of the widget
+        """
+        super().setHeight(height)
+        if self.getOrientation() == MBar.ORIENTATION_BOTTOM_TO_TOP or self.getOrientation() == MBar.ORIENTATION_TOP_TO_BOTTOM:
+            self._animationSize = round(self.getHeight()/10)
+    
+    def setMaxValue(self, maxValue: float) -> None:
+        """Change the maximum value storable into the MBar and change value if necessary
+
+        Args:
+            maxValue (float): new  maximum value storable into the MBar
+        """
+        if self.getMaxValue() != maxValue and self.getMinValue() < maxValue:
+            self.maxValue = maxValue
+            if self.getValue() > maxValue:
+                self.setValue(maxValue)
+            self.setShouldModify(True)
+
+    def setMinValue(self, minValue: float) -> None:
+        """Change the minimum value storable into the MBar and change value if necessary
+
+        Args:
+            minValue (float): new  minimum value storable into the MBar
+        """
+        if self.getMinValue() != minValue and self.getMaxValue() > minValue:
+            self.minValue = minValue
+            if self.getValue() < minValue:
+                self.setValue(minValue)
+            self.setShouldModify(True)
+    
+    def setValue(self, value: float) -> None:
+        """Change the value stored into the MBar if value is between minValue and maxValue
+
+        Args:
+            value (float): new value to store into the MBar
+        """
+        if self.getValue() != value and value >= self.minValue and value <= self.maxValue:
+            self.value = value
+            self.setShouldModify(True)
+
+    def setWidth(self, width: float) -> None:
+        """Change the width of the widget
+
+        Args:
+            width (float): new width of the widget
+        """
+        super().setWidth(width)
+        if self.getOrientation() == MBar.ORIENTATION_LEFT_TO_RIGHT or self.getOrientation() == MBar.ORIENTATION_RIGHT_TO_LEFT:
+            self._animationSize = round(self.getWidth()/10)
+
+    def _renderBeforeHierarchy(self, surface: pygame.Surface) -> pygame.Surface:
+        """Draw the graphics element of this MBar
+
+        Args:
+            surface (pygame.Surface): surface to draw element
+
+        Returns:
+            pygame.Surface: surface after drawing element
+        """
+        surface = super()._renderBeforeHierarchy(surface)
+
+        bar = self.barSurface()
+        surface.blit(bar, (self.getFrameWidth(1), self.getFrameWidth(0), bar.get_width(), bar.get_height()))
+
+        return surface
+    
+    def _update(self, deltaTime):
+        if self.getAnimation():
+            self._animationState += self.animationSpeed * deltaTime
+            maxLength = self.getBarLengthInOrientationAxis()
+            if self._animationState > maxLength:
+                self._animationState -= maxLength
+            if self._animationState < (self.getBarLengthInOrientationAxis()) or self._animationState - (self.getBarLengthInOrientationAxis()) < self._animationSize / 2:
+                self.setShouldModify(True)
+
+class MCheckBox(MObject):
+    """Class which make check box creation easier, inherits from MObject
+    """
+
+    def __init__(self, app: MApp, objectType: str = "MCheckBox") -> None:
+        """Construct an MCheckBox object
+
+        Args:
+            app (MApp): main app into the program
+            objectType (str, optional): type of the object. Defaults to "MCheckBox".
+        """
+        super().__init__(app, objectType)
+        self.actualChoice = ""
+        self.baseDataByButton = {}
+        self.buttonsByName = {}
+        self.changeFrameColorOnChoice = False
+        self.changeFrameWidthOnChoice = False
+        self.frameColorOnChoice = (120, 120, 120)
+        self.frameWidthOnChoice = 5
+        self.nameByButton = {}
+
+    def addButton(self, name: str, button: MButton) -> None:
+        """Add a new button into the MCheckBox
+
+        Args:
+            name (str): name of the button
+            button (MButton): button to add
+        """
+        buttons = list(self.buttonsByName.values())
+        names = list(self.nameByButton.values())
+        if buttons.count(button) == 0 and names.count(name) == 0:
+            datas = {"frameColor": button.getFrameColor(), "frameWidth": button.getFrameWidth()}
+
+            self.baseDataByButton[button] = datas
+            self.buttonsByName[name] = button
+            self.nameByButton[button] = name
+
+    def applyActionOnChoice(self) -> None:
+        """Do all action to the chose button
+        """
+        if self.getActualChoice() != "":
+            buttons = list(self.buttonsByName.values())
+            for b in buttons:
+                datas = self.baseDataByButton[b]
+                b.setFrameColor(datas["frameColor"])
+                b.setFrameWidth(datas["frameWidth"])
+
+            if self.getChangeFrameColorOnChoice():
+                self.buttonsByName[self.getActualChoice()].setFrameColor(self.getFrameColorOnChoice())
+
+            if self.getChangeFrameWidthOnChoice():
+                self.buttonsByName[self.getActualChoice()].setFrameWidth(self.getFrameWidthOnChoice())
+
+    def getActualChoice(self) -> str:
+        """Return the actual choice
+
+        Returns:
+            str: actual choice
+        """
+        return self.actualChoice
+    
+    def getChangeFrameColorOnChoice(self) -> bool:
+        """Return if the chose button change his frame color
+
+        Returns:
+            bool: if the chose button change his frame color
+        """
+        return self.changeFrameColorOnChoice
+    
+    def getChangeFrameWidthOnChoice(self) -> bool:
+        """Return if the chose button change his frame width
+
+        Returns:
+            bool: if the chose button change his frame width
+        """
+        return self.changeFrameWidthOnChoice
+    
+    def getFrameColorOnChoice(self) -> tuple:
+        """Return the color of the frame to apply to the chosen button
+
+        Returns:
+            tuple: color of the frame to apply to the chosen button
+        """
+        return self.frameColorOnChoice
+    
+    def getFrameWidthOnChoice(self) -> int:
+        """Return the width of the frame to apply to the chosen button
+
+        Returns:
+            int: width of the frame to apply to the chosen button
+        """
+        return self.frameWidthOnChoice
+    
+    def setActualChoice(self, actualChoice: str) -> None:
+        """Change the value of the actuel choice
+
+        Args:
+            actualChoice (str): new actual choice
+        """
+        names = list(self.nameByButton.values())
+        if self.getActualChoice() != actualChoice and names.count(actualChoice) > 0:
+            self.actualChoice = actualChoice
+            self.applyActionOnChoice()
+    
+    def setChangeFrameColorOnChoice(self, changeFrameColorOnChoice: bool) -> None:
+        """Change if the chose button change his frame color
+
+        Args:
+            changeFrameColorOnChoice (bool): new if the chose button change his frame color
+        """
+        if self.getChangeFrameColorOnChoice() != changeFrameColorOnChoice:
+            self.changeFrameColorOnChoice = changeFrameColorOnChoice
+            self.applyActionOnChoice()
+
+    def setChangeFrameWidthOnChoice(self, changeFrameWidthOnChoice: bool) -> None:
+        """Change if the chose button change his frame width
+
+        Args:
+            changeFrameWidthOnChoice (bool): new if the chose button change his frame width
+        """
+        if self.getChangeFrameWidthOnChoice() != changeFrameWidthOnChoice:
+            self.changeFrameWidthOnChoice = changeFrameWidthOnChoice
+            self.applyActionOnChoice()
+
+    def setFrameColorOnChoice(self, frameColorOnChoice: tuple) -> None:
+        """Change the color to apply to the chosen button
+
+        Args:
+            frameColorOnChoice (tuple): new color to apply to the chosen button
+        """
+        if self.getFrameColorOnChoice() != frameColorOnChoice:
+            self.frameColorOnChoice = frameColorOnChoice
+            self.applyActionOnChoice()
+
+    def setFrameWidthOnChoice(self, frameWidthOnChoice: int) -> None:
+        """Change the width of the frame to apply to the chosen button
+
+        Returns:
+            int: new width of the frame to apply to the chosen button
+        """
+        if self.getFrameWidthOnChoice() != frameWidthOnChoice:
+            self.frameWidthOnChoice = frameWidthOnChoice
+            self.applyActionOnChoice()
+    
+    def _lateUpdate(self, deltaTime: float):
+        """Function usefull for heritage, call by MApp every frame after event handle
+
+        Args:
+            deltaTime (float): time between the last frame and this frame
+        """
+        for b in self.nameByButton:
+            if b.isGettingLeftClicked():
+                self.setActualChoice(self.nameByButton[b])
+
+class MChrono(MText):
+    """Class which allow to do simple chronometer, inherits from MText
+    """
+    FORMAT_HH_MM_SS = 0
+    FORMAT_HH_MM_CS = 1
+
+    def __init__(self, format: int, x: int, y: int, width: int, height: int, parent: MWidget, widgetType: str ="MChrono") -> None:
+        """Construct an MChrono object
+
+        Args:
+            format (int): format of the chronometer
+            x (int): x pos of the widget
+            y (int): y pos of the widget
+            width (int): width of the widget
+            height (int): height of the widget
+            parent (MWidget): parent of the widget
+            widgetType (str, optional): type of the widget. Defaults to "MChrono".
+        """
+        super().__init__("0", x, y, width, height, parent, widgetType)
+
+        self.format = format
+        self.importantTime = []
+        self.speed = 1
+        self.started = False
+        self.unitSeparation = ":"
+        self._nsToAdd = 0
+
+        self.updateChronometer()
+
+    def addNanoSecond(self, ns: float) -> None:
+        """Add ns nanoseconds to the MChrono
+
+        Args:
+            ns (float): number of nanoseconds to add to the MChrono
+        """
+        self._nsToAdd += ns
+        self.updateChronometer()
+
+    def addSecond(self, second: float) -> None:
+        """Add second seconds to the MChrono
+
+        Args:
+            second (float): number of seconds to add to the MChrono
+        """
+        self._nsToAdd += second*(10**9)
+        self.updateChronometer()
+
+    def getChronometerWithFormat(self) -> str:
+        """Return the time since the chronometer is running with the correct format
+
+        Returns:
+            str: time since the chronometer is running with the correct format
+        """
+        if self.getFormat() == MChrono.FORMAT_HH_MM_SS:
+            timeSinceStart = math.floor((math.floor(self.getTimeSinceStart(True)) * self.getSpeed() + self._nsToAdd)/(10**9))
+
+            hour = 0
+            while timeSinceStart >= 3600:
+                timeSinceStart -= 3600
+                hour += 1
+            hourInStr = str(hour)
+            if len(hourInStr) < 2: hourInStr = "0" + hourInStr
+
+            minute = 0
+            while timeSinceStart >= 60:
+                timeSinceStart -= 60
+                minute += 1
+            minuteInStr = str(minute)
+            if len(minuteInStr) < 2: minuteInStr = "0" + minuteInStr
+
+            secondInStr = str(timeSinceStart)
+            if len(secondInStr) < 2: secondInStr = "0" + secondInStr
+            return hourInStr + self.getUnitSeparation() + minuteInStr + self.getUnitSeparation() + secondInStr
+        elif self.getFormat() == MChrono.FORMAT_HH_MM_CS:
+            timeSinceStart = math.floor((math.floor(self.getTimeSinceStart(True)) * self.getSpeed() + self._nsToAdd)/(10**7))
+
+            minute = 0
+            while timeSinceStart >= 6000:
+                timeSinceStart -= 6000
+                minute += 1
+            minuteInStr = str(minute)
+            if len(minuteInStr) < 2: minuteInStr = "0" + minuteInStr
+
+            second = 0
+            while timeSinceStart >= 100:
+                timeSinceStart -= 100
+                second += 1
+            secondInStr = str(second)
+            if len(secondInStr) < 2: secondInStr = "0" + secondInStr
+
+            msInStr = str(timeSinceStart)
+            if len(msInStr) < 2: msInStr = "0" + msInStr
+
+            return minuteInStr + self.getUnitSeparation() + secondInStr + self.getUnitSeparation() + msInStr
+
+    def getFormat(self) -> int:
+        """Return the format of the chronometer
+
+        Returns:
+            int: format of the chronometer
+        """
+        return self.format
+    
+    def getSpeed(self) -> float:
+        """Return the speed of the chronometer
+
+        Returns:
+            float: speed of the chronometer
+        """
+        return self.speed
+    
+    def getTimeSinceStart(self, ns: bool = True) -> float:
+        """Return the amount of time passed since the first start
+
+        Args:
+            ns (bool, optional): if the return is in nano second or not. Defaults to True.
+
+        Returns:
+            float: amount of time passed since the first start
+        """
+        timePassed = 0
+
+        if len(self.importantTime) % 2 == 0:
+            for i in range(math.floor(len(self.importantTime)/2)):
+                j = i * 2
+                timePassed += self.importantTime[j + 1] - self.importantTime[j]
+        else:
+            for i in range(math.floor((len(self.importantTime) )/2)):
+                j = i * 2
+                timePassed += self.importantTime[j + 1] - self.importantTime[j]
+            timePassed += time.time_ns() - self.importantTime[-1]
+
+        if ns:
+            return timePassed
+        return timePassed/(10**9)
+
+    def getUnitSeparation(self) -> str:
+        """Return the separation of units
+
+        Returns:
+            str: separation of units
+        """
+        return self.unitSeparation
+    
+    def isStarted(self) -> bool:
+        """Return if the chronometer is started or not
+
+        Returns:
+            bool: if the chronometer is started or not
+        """
+        return self.started
+    
+    def reset(self) -> None:
+        """Reset the chronometer
+        """
+        started = self.isStarted()
+        if started: self.stop()
+        self.importantTime.clear()
+        if started: self.start()
+        self.updateChronometer()
+    
+    def setFormat(self, format: int) -> None:
+        """Change the value of the format
+
+        Args:
+            format (int): new value of the format
+        """
+        if self.getFormat() != format:
+            self.format = format
+            self.updateChronometer()
+
+    def setSpeed(self, speed: float) -> None:
+        """Change the value of the speed of the chronometer
+
+        Args:
+            speed (float): value of the speed of the chronometer
+        """
+        if self.getSpeed() != speed and speed != 0:
+            self.speed = speed
+
+    def setUnitSeparation(self, unitSeparation: str) -> None:
+        """Change the value of the separation of units
+
+        Args:
+            unitSeparation (str): value of the separation of units
+        """
+        if self.getUnitSeparation() != unitSeparation:
+            self.unitSeparation = unitSeparation
+            self.updateChronometer()
+
+    def start(self, offset: int = 0) -> None:
+        """Start the chronometer
+
+        Args:
+            offset (int): time in nanosecond where the chronometer should start
+        """
+        if not self.isStarted():
+            self.importantTime.append(time.time_ns() - offset)
+            self.started = True
+
+    def stop(self) -> None:
+        """Stop the chronometer
+        """
+        if self.isStarted():
+            self.importantTime.append(time.time_ns())
+            self.started = False
+
+    def updateChronometer(self) -> None:
+        """Update the chronometer text
+        """
+        newText = self.getChronometerWithFormat()
+        self.setText(newText)
+
+    def _update(self, deltaTime):
+        if self.isStarted():
+            self.updateChronometer()
