@@ -19,20 +19,27 @@
             Construit un objet MObject.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
-        <h3 id="getID">getID()</h3>
+        <h3 id = "getID">getID()</h3>
         <div>
             Paramètres : aucun</br>
             Retourne l'<a href="#_id">id</a> de l'objet.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
-        <h3 id="_lastUpdate">_lastUpdate()</h3>
+        <h3 id = "softResetObject">softResetObject()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Reset l'objet sans modifications graphiques.</br>
+            Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameEvent">MApp</a>.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.1.
+        </div>
+        <h3 id = "_lastUpdate">_lastUpdate()</h3>
         <div>
             Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
             Fonction appelée à chaque frame après le contrôle des évènements et des actions utilisateurs, juste avant <a href="./mapp.html#frameGraphics">frameGraphics</a>.</br>
             Fonction dédiée à l'héritage et à la réimplentation qui est appelé par <a href="./mapp.html#frameGraphics">MApp</a>.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
-        <h3 id="_lateUpdate">_lateUpdate()</h3>
+        <h3 id = "_lateUpdate">_lateUpdate()</h3>
         <div>
             Paramètres : deltaTime (temps passé entre cette frame et la dernière frame)</br>
             Fonction appelée à chaque frame après le contrôle des évènements.</br>

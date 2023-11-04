@@ -28,6 +28,11 @@ class MObject:
         if app != 0:
             app._declaringObject(self)
 
+    def softResetObject(self):
+        """Reset without graphics modification
+        """
+        pass
+
     def _lastUpdate(self, deltaTime: float):
         """Function usefull for heritage, call by MApp every frame after event handle and user program
 
@@ -273,7 +278,9 @@ class MWidget(MObject):
         self._isMovingAtThisFrame = True
         self.getParent().setShouldModify(True)
 
-    def softResetWidget(self): #Reset without graphics modification
+    def softResetWidget(self):
+        """Reset without graphics modification
+        """
         self.mouseDown = []
         self.mouseUp = []
         self.overflighted = False
@@ -355,8 +362,9 @@ class MWidget(MObject):
                 surface.blit(child._render(), child.getRect())
         return surface
 
-###################### Main application class
 class MApp(MWidget):
+    """Main application class, inherits from MWidget
+    """
     def __init__(self, pygameWindow, windowTitle, windowWidth, windowHeight, console = False, printFps = False, windowIcon = ""): #MApp's constructor
         MWidget.__init__(self, 0, 0, windowWidth, windowHeight, 0, "MApp") #Parent class constructor call
         self.console = console
@@ -434,10 +442,13 @@ class MApp(MWidget):
         self.pressedKey.clear()
 
         for i in self._widgets: #Update and soft reset all widget
-            if self.frameCount > 0:i.softResetWidget()
+            if self.frameCount > 0:
+                i.softResetWidget()
             i._update(self.getDeltaTime())
 
-        for i in self._objects: #Update all objects
+        for i in self._objects: #Update and soft reset all objects
+            if self.frameCount > 0:
+                i.softResetObject()
             i._update(self.getDeltaTime())
 
         for i in self._modifiedWidget: #Reset all modified widget in the last call of frameEvent
@@ -3079,7 +3090,9 @@ class MCheckBox(MObject):
         self.changeFrameWidthOnChoice = False
         self.frameColorOnChoice = (120, 120, 120)
         self.frameWidthOnChoice = 5
+        self._lastChoice = ""
         self.nameByButton = {}
+        self._isGettindChanged = False
 
     def addButton(self, name: str, button: MButton) -> None:
         """Add a new button into the MCheckBox
@@ -3153,6 +3166,17 @@ class MCheckBox(MObject):
         """
         return self.frameWidthOnChoice
     
+    def isChoiceGettingChanged(self) -> tuple:
+        """Return if the choice is changed and some information in a tuple
+
+        Returns:
+            tuple: tuple (if the choice is changed (only element if False), new choice, last choice)
+        """
+        if self._isGettindChanged:
+            return (True, self.getActualChoice(), self._lastChoice)
+        else:
+            return (False,)
+    
     def setActualChoice(self, actualChoice: str) -> None:
         """Change the value of the actuel choice
 
@@ -3161,7 +3185,9 @@ class MCheckBox(MObject):
         """
         names = list(self.nameByButton.values())
         if self.getActualChoice() != actualChoice and names.count(actualChoice) > 0:
+            self._lastChoice = self.getActualChoice()
             self.actualChoice = actualChoice
+            self._isGettindChanged = True
             self.applyActionOnChoice()
     
     def setChangeFrameColorOnChoice(self, changeFrameColorOnChoice: bool) -> None:
@@ -3203,6 +3229,9 @@ class MCheckBox(MObject):
         if self.getFrameWidthOnChoice() != frameWidthOnChoice:
             self.frameWidthOnChoice = frameWidthOnChoice
             self.applyActionOnChoice()
+
+    def softResetObject(self):
+        self._isGettindChanged = False
     
     def _lateUpdate(self, deltaTime: float):
         """Function usefull for heritage, call by MApp every frame after event handle
