@@ -61,6 +61,13 @@
             Retourne la <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
+        <h3 id = "isChoiceGettingChanged">isChoiceGettingChanged()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Retourne un tuple qui contient dans tous les cas à l'index 0 un booléen qui indique si le choix a changé à cette frame ou non.</br>
+            Si le choix a changé, le tuple contient (booléen, nouveau choix, ancien choix).</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.1.
+        </div>
         <h3 id = "setActualChoice">setActualChoice()</h3>
         <div>
             Paramètres : actualChoice (nouveau <a href="#actualChoice">choix</a> actuel)</br>
@@ -90,6 +97,13 @@
             Paramètres : frameWidthOnChoice (nouvelle <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True)</br>
             Change la <a href="#frameWidthOnChoice">largeur</a> de la bordure du bouton choisie si <a href="#frameWidthOnChoice">frameWidthOnChoice</a> est True par "frameWidthOnChoice".</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "softResetObject">softResetObject()</h3>
+        <div>
+            Paramètres : aucun</br>
+            Reset l'objet sans modifications graphiques.</br>
+            Dans MCheckBox, elle permet de reset "<a href="#_isGettingChanged">_isGettingChanged</a>".</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.1.
         </div>
         <h3 id = "_lateUpdate">_lateUpdate()</h3>
         <div>
@@ -135,9 +149,19 @@
             Largeur de la bordure du bouton choisie si <a href="#changeFrameWidthOnChoice">changeFrameWidthOnChoice</a> est True.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
+        <h3 id = "isGettindChanged">isGettindChanged</h3>
+        <div>
+            Booléen qui indique si le choix est changé pendant cette frame.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.1.
+        </div>
         <h3 id = "nameByButton">nameByButton</h3>
         <div>
             Dictionnaire ayant comme le bouton et comme valeur le nom du bouton.</br>
+            Ajouté à la <a href="../versions.html">version</a> 2.3.0.
+        </div>
+        <h3 id = "_lastChoice">_lastChoice</h3>
+        <div>
+            Choix qui précède le choix actuel.</br>
             Ajouté à la <a href="../versions.html">version</a> 2.3.0.
         </div>
     </body>
