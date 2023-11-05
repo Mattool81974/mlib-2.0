@@ -7,7 +7,7 @@ import time
 pygame.init()
 
 #MLib version
-VERSION = "2.2.0"
+VERSION = "2.3.1"
 
 #Number of existing widget
 _nbWidget = 0
