@@ -690,11 +690,20 @@ class MFrame(MWidget):
     def getFrameColor(self): #Return frameColor
         return self.frameColor
     
-    def getFrameRendered(self, surface: pygame.Surface): #Return a surface with the frame rendered on it
-        toReturn = pygame.Surface((self.getWidth(), self.getHeight()), pygame.SRCALPHA)
-        toReturn.fill(self.getFrameColor())
-        toReturn.blit(surface.subsurface((self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2)))), (self.getFrameWidth(1), self.getFrameWidth(0), self.getWidth() - (self.getFrameWidth(1) + self.getFrameWidth(3)), self.getHeight() - (self.getFrameWidth(0) + self.getFrameWidth(2))))
-        return toReturn
+    def getFrameRendered(self, surface: pygame.Surface) -> pygame.Surface:
+        """Return a surface with the frame rendered on it
+
+        Args:
+            surface (pygame.Surface): surface where to draw the frame
+
+        Returns:
+            pygame.Surface: surface with the frame rendered on it
+        """
+        pygame.draw.rect(surface, self.getFrameColor(), (0, 0, self.getFrameWidth(1), self.getHeight()))
+        pygame.draw.rect(surface, self.getFrameColor(), (0, 0, self.getWidth(), self.getFrameWidth(0)))
+        pygame.draw.rect(surface, self.getFrameColor(), (self.getWidth() - self.getFrameWidth(3), 0, self.getFrameWidth(3), self.getHeight()))
+        pygame.draw.rect(surface, self.getFrameColor(), (0, self.getHeight() - self.getFrameWidth(2), self.getWidth(), self.getFrameWidth(2)))
+        return surface
 
     def getFrameWidth(self, index = 0): #Return the value of frameBottomWidth if 1, frameLeftWidth if 2, frameRightWidth if 3, frameTopWidth if 4
         if index == 0:
